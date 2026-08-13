@@ -1,6 +1,6 @@
 # Runly
 
-![Runly Settings](docs/screenshots/settings-main.png)
+![Runly Settings v0.1.0](docs/screenshots/runly-settings-v0.1.0.png)
 
 Runly turns Windows script files into a double-clickable experience.
 
@@ -97,3 +97,13 @@ Please report security issues privately to the repository owner instead of openi
 
 Current version: **v0.1.0**  
 Download: [Runly v0.1.0 for Windows x64](https://github.com/Teknesyum/Runly/releases/tag/v0.1.0)
+
+---
+
+## Support
+
+This application is built in spare time and is free.
+
+<a href="https://github.com/sponsors/Teknesyum"><img src="https://img.shields.io/badge/Buy_me_a_coffee-b026ff?style=for-the-badge&logo=githubsponsors&logoColor=b026ff&labelColor=0d0d0f" alt="Sponsor" /></a>
+
+**[github.com/Teknesyum](https://github.com/Teknesyum)** · MIT
