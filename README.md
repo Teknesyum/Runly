@@ -1,216 +1,99 @@
 # Runly
 
-Windows üzerinde `.js`, `.ps1`, `.py` ve `.sh` scriptlerini çift tıkla veya sağ tık menüsünden doğrudan çalıştıran başlatıcı.
+![Runly Settings](docs/screenshots/settings-main.png)
 
-## Neden gerekli?
+Runly turns Windows script files into a double-clickable experience.
 
-Windows varsayılan olarak bu dosya türlerini açar, çalıştırmaz:
+Instead of opening `.js`, `.ps1`, `.py`, `.sh`, `.ts`, and related files in an editor, Runly detects the correct interpreter, applies safety checks, and launches the script like a regular Windows application. It also adds a **Run with Runly** context-menu action with optional command-line arguments.
 
-- **`.js`**: Node.js yorumlayıcısı yerine metin editörü açılır
-- **`.ps1`**: PowerShell scriptleri kısıtlı güvenlik modunda çalıştırılır (yerel diskten çalıştırma izni yoktur)
-- **`.py`**: Python varsa bile varsayılan işlem çoğu zaman hatalıdır
-- **`.sh`**: Git Bash veya WSL'e yönlendirilse de beklenmeyen davranışlar olabilir
+## Install with one PowerShell command
 
-Runly bu sorunları çözer: scriptleri algılar, doğru yorumlayıcıyı seçer ve güvenli bir şekilde çalıştırır.
-
-## Kurulum
-
-### Otomatik Kurulum
-
-1. `install.ps1` dosyasını indirin.
-2. PowerShell'i açın (Başlat → PowerShell).
-3. Şu komutu çalıştırın:
-   ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser
-   ```
-4. Sonra:
-   ```powershell
-   & "C:\İndirilenler\install.ps1"
-   ```
-
-Runly ayarlar penceresi açılacaktır. Orada gerekli ayarları yapın.
-
-### Sessiz kurulum yoktur
-
-`install.ps1` yalnızca dosyaları yerine kopyalar ve ayarlar penceresini açar. Uzantı bağlama
-işini penceredeki **Kur / Güncelle** düğmesi yapar, çünkü Windows 11 her uzantı için sizin
-onayınızı istiyor (bkz. [Bilinen sınırlar](docs/KNOWN-ISSUES.md)). Bu yüzden komut satırından
-tek seferde biten bir kurulum mümkün değil.
-
-## Kullanım
-
-### Çift Tık ile Çalıştırma
-
-1. Bir `.js`, `.ps1`, `.py` veya `.sh` dosyasına çift tıklayın.
-2. Runly güvenlik durumunu kontrol eder:
-   - **Güven**: Dosya güvenilir bulunursa doğrudan çalıştırılır
-   - **İlk Çalıştırma**: Dosya ilk kez çalıştırılıyorsa onay istenir
-   - **Reddedildi**: Güven dışı dosya çalıştırılmaz
-
-3. PowerShell scriptleri (`.ps1`) için Windows UAC onay penceresi açılabilir (bkz: "_PowerShell Scripti Güvenlik Onayı_" bölümü).
-
-### Sağ Tık Menüsü ile Çalıştırma
-
-1. Bir script dosyasına sağ tıklayın.
-2. **"Runly ile çalıştır"** seçeneğini tıklayın.
-3. Bir dialog açılır:
-   - Dosya yolunun doğru olduğunu kontrol edin
-   - İsteğe bağlı olarak argümanlar girin (örn: `dosya.txt --verbose`)
-   - **Çalıştır** butonuna tıklayın
-
-### Komut Satırından Çalıştırma
-
-```bash
-# Direct Runly usage
-Runly.exe hello.js
-Runly.exe hello.ps1
-Runly.exe myscript.py arg1 arg2
-```
-
-## Güvenlik Modeli
-
-Runly üç güvenlik seviyesi kullanır:
-
-### 1. Güvenilir Dosyalar (Yeşil)
-
-Aşağıdakilere sahip dosyalar otomatik çalıştırılır:
-- Runly'nin güven deposunda kayıtlı bir sertifika
-- Son kaydedilişinden bu yana değiştirilmemiş
-- NTFS akışında Windows MOTW işareti yok
-
-### 2. İlk Çalıştırma (Sarı)
-
-Dosya ilk kez çalıştırılıyorsa:
-1. Runly "Bu dosyayı çalıştırmak istiyor musunuz?" sorar
-2. "Evet", "Hayır" veya "Daima Güven Et" seçenekleri sunar
-3. "Daima Güven Et" seçilirse dosya güven deposuna eklenir
-
-### 3. Reddedilmiş Dosyalar (Kırmızı)
-
-Runly'nin güven dışı listesindeki dosyalar çalıştırılmaz. Bunlar genellikle:
-- Ağdan indirilen dosyalar (MOTW işareti var)
-- Güvenlik uyarısı gösteren dosyalar
-- Kullanıcının "Asla Çalıştırma" seçtiği dosyalar
-
-## PowerShell Scripti Güvenlik Onayı
-
-Windows, PowerShell scriptlerini çalıştırmadan önce ek onay gerektirir:
-
-### İlk Çalıştırmada (Otomatik)
-
-Runly bir PowerShell scripti çalıştırırken:
-
-1. **Runly başlıyor** → Dosya güvenlik denetimi yapılır
-2. **PowerShell başlıyor** → Windows, yönetici izni talep edebilir
-3. **UAC İzni** (opsiyonel) → "Evet" seçiniz
-4. **Script çalışıyor** → Dosya çalıştırılır
-
-### Kullanıcı ExecutionPolicy'si Ayarlamak
-
-PowerShell'in kısıtlı olması işten düştüyse, durumu iyileştirmek için:
+Open PowerShell and run:
 
 ```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm https://raw.githubusercontent.com/Teknesyum/Runly/main/scripts/install.ps1 | iex
 ```
 
-Bu, yerel dosyaları çalıştırır ama ağdan indirilen dosyaları ister. (Runly bunu zaten yapıyor, bu sadece manuel çalıştırma içindir.)
+The installer downloads the latest Windows x64 release, installs Runly to `%LOCALAPPDATA%\Programs\Runly`, creates a **Runly** shortcut on the desktop, and opens Runly Settings. Select the extensions you want and click **Install / Update** to finish the Windows file-association setup.
 
-## Ayarlar
+> Runly does not silently replace Windows file associations. Windows 11 may require your confirmation for individual extensions.
 
-Runly ayarları buraya kaydedilir:
+## What Runly does
 
-```
-%APPDATA%\Runly\config.json
-```
+- Runs scripts by double-clicking them in File Explorer.
+- Detects Node.js, PowerShell, Python, Git Bash, and other configured interpreters.
+- Supports `.js`, `.cjs`, `.mjs`, `.ts`, `.ps1`, `.py`, `.sh`, and custom extensions.
+- Adds a **Run with Runly** context-menu command.
+- Accepts optional arguments before launching a script.
+- Checks Mark-of-the-Web and trusted-file state before execution.
+- Keeps reversible registry backups when changing file associations.
+- Provides a graphical settings and uninstall experience.
 
-Ayarları değiştirmek için:
+## Requirements
 
-1. **Runly Settings GUI**: Kurulum sırasında veya daha sonra `RunlySettings.exe` dosyasını çalıştırın
-2. **Elle düzenleme**: `config.json` dosyasını metin editörü ile açın
+- Windows 10 or Windows 11, x64.
+- The interpreter required by your scripts, such as Node.js or Python.
+- PowerShell 5.1 or newer for installation.
 
-Başlıca ayarlar:
-- **SecurityMode**: `Strict` (en güvenli), `Standard` (varsayılan), `Permissive` (en esnek)
-- **TrustExpiry**: Bir dosyanın güven süresi (günler cinsinden)
-- **PreferredInterpreters**: Her uzantı için kullanılacak yorumlayıcı
+Runly is self-contained, but it does not bundle language runtimes. For example, running a Python script still requires Python to be installed.
 
-## Kaldırma
+## Usage
 
-### GUI Kaldırması
+After setup, double-click a supported script or right-click it and choose **Run with Runly**.
 
-1. `Denetim Masası` → `Programlar` → `Programları Kaldır` gidin
-2. `Runly` seçip `Kaldır` tıklayın
-3. Veya: `RunlySettings.exe` çalıştırın → `Kaldır` butonuna tıklayın
-
-### Komut Satırından Kaldırma
+Runly can also be used directly:
 
 ```powershell
-& "C:\Program Files\Runly\uninstall.ps1"
+Runly.exe .\hello.js
+Runly.exe .\script.ps1
+Runly.exe .\tool.py --verbose input.txt
 ```
 
-Runly kaldırıldığında:
-- Program dosyaları silinir
-- Registry kaydı temizlenir
-- Türleri için sağ tık menüsü kaldırılır
-- Ayarlar ve güven deposu saklanır (silmek istiyorsanız siz silebilirsiniz: `%APPDATA%\Runly`)
+The first launch of an untrusted script may show a confirmation dialog. Files downloaded from the internet can carry Mark-of-the-Web and receive stricter treatment.
 
-## Sorun Giderme
+## Settings and data
 
-### "Yorumlayıcı Bulunamadı" Hatası
+Runly is installed here:
 
-Örneğin: `node.exe bulunamadı` veya `python.exe bulunamadı`
+```text
+%LOCALAPPDATA%\Programs\Runly
+```
 
-**Çözüm:**
-1. Gerekli yazılımın kurulu olduğundan emin olun (Node.js, Python, vb.)
-2. Kurulum sırasında "PATH'e ekle" seçeneğini işaretlediğinizden emin olun
-3. Bilgisayarı yeniden başlatın (PATH değişikliklerinin etkinleşmesi için)
-4. Runly Settings'te yorumlayıcı yolunu elle ayarlayın
+User configuration, trust data, logs, and registry backups are stored under:
 
-### Çift Tık Hâlâ Eski Uygulamayı Açıyor
+```text
+%APPDATA%\Runly
+```
 
-Windows dosya türü ilişkilendirmesini önbelleğe alabilir.
+## Uninstall
 
-**Çözüm:**
-1. Kurulum sırasında "Dosya Türlerini Kaydet" seçeneğinin seçili olduğundan emin olun
-2. Runly Settings'te `Dosya Türlerini Yenile` butonunu tıklayın
-3. Komut satırından:
-   ```powershell
-   & "C:\Users\<UserName>\AppData\Local\Programs\Runly\Runly.exe" --register-types
-   ```
-4. Windows Explorer'ı kapatıp açın (F5 ile yenileyin)
+Open the **Runly** desktop shortcut and use the uninstall action in Runly Settings, or run:
 
-### ExecutionPolicy Hatası (PowerShell)
-
-Örneğin: `Bu sisteme Script dosyaları yüklenemez...`
-
-**Çözüm:**
 ```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+& "$env:LOCALAPPDATA\Programs\Runly\uninstall.ps1"
 ```
 
-Sonra PowerShell'i kapatıp açın.
+Runly restores or removes the file-association entries it manages. User configuration is retained unless you choose to remove it.
 
-### Script Çıktısı Görmek
+## Build from source
 
-Normalde script çalışır ve kapanır. Çıktısını görmek için:
+Requirements: Windows x64 and the .NET 8 SDK with NativeAOT prerequisites.
 
-1. PowerShell veya CMD ile scriptini açın
-2. Veya `output.log` dosyasını kontrol edin:
-   ```
-   %APPDATA%\Runly\logs\
-   ```
+```powershell
+git clone https://github.com/Teknesyum/Runly.git
+cd Runly
+.\build.ps1
+```
 
-## Yasal Uyarı
+The build runs the test suite, publishes the NativeAOT launcher and self-contained settings application, and creates `Runly-v0.1.0-win-x64.zip`.
 
-Runly programı çalıştırılabilir yapıyor. Bu, sisteminizi daha işlevsel hale getirmesine rağmen, güvenlik sorumlulukları artırır:
+## Security
 
-- **Kötü amaçlı script**: Eğer güvenilmeyen bir script'i "Daima Güven Et" ile çalıştırırsanız, bu script sisteminiz üzerinde tam kontrol elde edebilir.
-- **Ağ kaynakları**: İnternetten indirilen scriptleri doğrudan çalıştırmayın (Runly bu tür dosyaları MOTW işareti yüzünden varsayılan olarak engeller).
-- **Güncellemeler**: Runly'yi düzenli olarak güncelleyin (güvenlik yamaları için).
+Running scripts can modify files, start programs, and access user data. Only run scripts you trust. Runly adds safety checks and explicit prompts, but it cannot make malicious code safe.
 
-Runly güvenlik modeli makul önlemleri alır, ancak hiçbir sistem %100 güvenli değildir. Sorumlu kalmak size bağlıdır.
+Please report security issues privately to the repository owner instead of opening a public exploit report.
 
----
+## Release
 
-**Runly sürümü:** 0.1.0  
-**Son güncelleme:** 2026-08-09  
-**Destek:** [github.com/...](https://github.com/)
+Current version: **v0.1.0**  
+Download: [Runly v0.1.0 for Windows x64](https://github.com/Teknesyum/Runly/releases/tag/v0.1.0)

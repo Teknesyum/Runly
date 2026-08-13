@@ -1,60 +1,92 @@
+param(
+    [switch]$SkipLaunch
+)
+
 $ErrorActionPreference = "Stop"
+$ProgressPreference = "SilentlyContinue"
 
-$installPath = "$env:LOCALAPPDATA\Programs\Runly"
-$distPath = "dist"
+$repository = "Teknesyum/Runly"
+$installPath = Join-Path $env:LOCALAPPDATA "Programs\Runly"
+$temporaryPath = $null
 
-Write-Host "=== Runly Kurulumu ===" -ForegroundColor Green
-
-# Kontrol: dist/ var mı?
-if (-not (Test-Path $distPath)) {
-    Write-Host "HATA: $distPath klasörü bulunamadı. Önce build.ps1 çalıştırın." -ForegroundColor Red
-    exit 1
-}
-
-# Kontrol: Runly.exe var mı?
-$runlyExe = "$distPath/Runly.exe"
-if (-not (Test-Path $runlyExe)) {
-    Write-Host "HATA: $runlyExe bulunamadı." -ForegroundColor Red
-    exit 1
-}
-
-Write-Host "Kurulum yolu: $installPath" -ForegroundColor Cyan
-Write-Host ""
-
-# Eski kurulumu kaldır
-if (Test-Path $installPath) {
-    Write-Host "▸ Eski kurulum siliniyor..." -ForegroundColor Yellow
-    Remove-Item $installPath -Recurse -Force
-}
-
-# Yeni klasör oluştur ve dosyaları kopyala
-Write-Host "▸ Dosyalar kopyalanıyor..." -ForegroundColor Cyan
-New-Item -ItemType Directory $installPath | Out-Null
-Copy-Item "$distPath/*" -Destination $installPath -Recurse -Force
-
-Write-Host "  ✓ Dosyalar $installPath altına kopyalandı" -ForegroundColor Green
-Write-Host ""
-
-# Kurulum RunlySettings.exe üzerinden yapılır
-Write-Host "▸ RunlySettings.exe başlatılıyor (GUI kurulum)..." -ForegroundColor Cyan
-
-$settingsExe = "$installPath\RunlySettings.exe"
-if (-not (Test-Path $settingsExe)) {
-    Write-Host "HATA: $settingsExe bulunamadı." -ForegroundColor Red
-    exit 1
-}
+Write-Host "=== Runly Installer ===" -ForegroundColor Cyan
 
 try {
-    & $settingsExe
-} catch {
-    Write-Host "HATA: RunlySettings.exe başlatılamadı: $_" -ForegroundColor Red
-    exit 1
-}
+    # Use a local build when the script runs from a repository checkout. When invoked through
+    # `irm ... | iex`, download the latest published Windows package from GitHub instead.
+    $localDist = if ($PSScriptRoot) {
+        Join-Path (Split-Path $PSScriptRoot -Parent) "dist"
+    } else {
+        $null
+    }
 
-Write-Host ""
-Write-Host "✓ Runly kuruldu ve kullanıma hazır." -ForegroundColor Green
-Write-Host ""
-Write-Host "Sonraki adımlar:" -ForegroundColor Cyan
-Write-Host "  • Bir .js, .ps1 veya .py dosyasına sağ tık yapın"
-Write-Host "  • 'Runly ile çalıştır' seçeneğini tıklayın"
-Write-Host "  • Ayarlar için: $installPath\RunlySettings.exe" -ForegroundColor Gray
+    if ($localDist -and (Test-Path (Join-Path $localDist "Runly.exe"))) {
+        $packagePath = $localDist
+        Write-Host "Using local Release build." -ForegroundColor DarkGray
+    } else {
+        Write-Host "Downloading the latest Runly release..." -ForegroundColor Cyan
+        $headers = @{ "User-Agent" = "Runly-Installer" }
+        $release = Invoke-RestMethod "https://api.github.com/repos/$repository/releases/latest" -Headers $headers
+        $asset = $release.assets |
+            Where-Object { $_.name -match '^Runly-v.+-win-x64\.zip$' } |
+            Select-Object -First 1
+
+        if (-not $asset) {
+            throw "The latest release does not contain a Windows x64 package."
+        }
+
+        $temporaryPath = Join-Path ([IO.Path]::GetTempPath()) ("Runly-" + [Guid]::NewGuid().ToString("N"))
+        $archivePath = Join-Path $temporaryPath $asset.name
+        $packagePath = Join-Path $temporaryPath "package"
+        New-Item -ItemType Directory -Path $packagePath -Force | Out-Null
+
+        Invoke-WebRequest $asset.browser_download_url -Headers $headers -OutFile $archivePath
+        Expand-Archive -LiteralPath $archivePath -DestinationPath $packagePath -Force
+    }
+
+    if (-not (Test-Path (Join-Path $packagePath "Runly.exe"))) {
+        throw "Runly.exe was not found in the installation package."
+    }
+    if (-not (Test-Path (Join-Path $packagePath "RunlySettings.exe"))) {
+        throw "RunlySettings.exe was not found in the installation package."
+    }
+
+    Write-Host "Installing to $installPath..." -ForegroundColor Cyan
+    if (Test-Path $installPath) {
+        Remove-Item -LiteralPath $installPath -Recurse -Force
+    }
+    New-Item -ItemType Directory -Path $installPath -Force | Out-Null
+    Copy-Item (Join-Path $packagePath "*") -Destination $installPath -Recurse -Force
+
+    $uninstallerPath = Join-Path $installPath "uninstall.ps1"
+    $localUninstaller = if ($PSScriptRoot) { Join-Path $PSScriptRoot "uninstall.ps1" } else { $null }
+    if ($localUninstaller -and (Test-Path $localUninstaller)) {
+        Copy-Item -LiteralPath $localUninstaller -Destination $uninstallerPath -Force
+    } else {
+        Invoke-WebRequest "https://raw.githubusercontent.com/$repository/main/scripts/uninstall.ps1" `
+            -Headers $headers -OutFile $uninstallerPath
+    }
+
+    $settingsExe = Join-Path $installPath "RunlySettings.exe"
+    $desktopPath = [Environment]::GetFolderPath([Environment+SpecialFolder]::DesktopDirectory)
+    $shortcutPath = Join-Path $desktopPath "Runly.lnk"
+    $shell = New-Object -ComObject WScript.Shell
+    $shortcut = $shell.CreateShortcut($shortcutPath)
+    $shortcut.TargetPath = $settingsExe
+    $shortcut.WorkingDirectory = $installPath
+    $shortcut.IconLocation = "$settingsExe,0"
+    $shortcut.Description = "Runly Settings"
+    $shortcut.Save()
+
+    Write-Host "Runly installed successfully." -ForegroundColor Green
+    Write-Host "Desktop shortcut: $shortcutPath" -ForegroundColor Green
+
+    if (-not $SkipLaunch) {
+        Start-Process -FilePath $settingsExe
+        Write-Host "Runly Settings opened. Choose the script extensions you want to enable." -ForegroundColor Cyan
+    }
+} finally {
+    if ($temporaryPath -and (Test-Path $temporaryPath)) {
+        Remove-Item -LiteralPath $temporaryPath -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}

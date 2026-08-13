@@ -1,66 +1,44 @@
 $ErrorActionPreference = "Stop"
 
-$programPath = "$env:LOCALAPPDATA\Programs\Runly"
-$dataPath = "$env:APPDATA\Runly"
+$programPath = Join-Path $env:LOCALAPPDATA "Programs\Runly"
+$dataPath = Join-Path $env:APPDATA "Runly"
+$desktopShortcut = Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::DesktopDirectory)) "Runly.lnk"
 
-Write-Host "=== Runly Kaldırılması ===" -ForegroundColor Yellow
-Write-Host ""
+Write-Host "=== Runly Uninstaller ===" -ForegroundColor Yellow
 
-# Kontrol: kurulum var mı?
-if (-not (Test-Path $programPath)) {
-    Write-Host "Runly kurulu değil." -ForegroundColor Gray
+if (-not (Test-Path -LiteralPath $programPath)) {
+    if (Test-Path -LiteralPath $desktopShortcut) {
+        Remove-Item -LiteralPath $desktopShortcut -Force -ErrorAction SilentlyContinue
+    }
+    Write-Host "Runly is not installed." -ForegroundColor DarkGray
     exit 0
 }
 
-Write-Host "▸ RunlySettings.exe kaldırma modunda çalıştırılıyor..." -ForegroundColor Cyan
-
-$settingsExe = "$programPath\RunlySettings.exe"
-if (Test-Path $settingsExe) {
+$settingsExe = Join-Path $programPath "RunlySettings.exe"
+if (Test-Path -LiteralPath $settingsExe) {
+    Write-Host "Removing Runly file associations..." -ForegroundColor Cyan
     try {
         & $settingsExe --uninstall 2>&1
     } catch {
-        Write-Host "Uyarı: RunlySettings.exe çalıştırılamadı (devam ediliyor): $_" -ForegroundColor Yellow
+        Write-Warning "Runly Settings could not complete its uninstall step: $_"
     }
-} else {
-    Write-Host "Uyarı: RunlySettings.exe bulunamadı (devam ediliyor)" -ForegroundColor Yellow
 }
 
-Write-Host ""
-Write-Host "▸ Program klasörü kaldırılıyor: $programPath" -ForegroundColor Cyan
-
-try {
-    Remove-Item $programPath -Recurse -Force
-    Write-Host "  ✓ Program klasörü silindi" -ForegroundColor Green
-} catch {
-    Write-Host "HATA: Program klasörü silinemedi: $_" -ForegroundColor Red
-    exit 1
+if (Test-Path -LiteralPath $desktopShortcut) {
+    Remove-Item -LiteralPath $desktopShortcut -Force -ErrorAction SilentlyContinue
 }
 
-Write-Host ""
+Write-Host "Removing $programPath..." -ForegroundColor Cyan
+Remove-Item -LiteralPath $programPath -Recurse -Force
 
-# Veri klasörü sorusu
-if (Test-Path $dataPath) {
-    Write-Host "Runly verileri bulundu: $dataPath" -ForegroundColor Cyan
-    Write-Host "  (Ayarlar, oturum geçmişi, güven deposu)" -ForegroundColor Gray
-    Write-Host ""
-
-    $response = Read-Host "Bu verileri de silmek istiyor musunuz? (E/H, varsayılan: H)"
-
-    if ($response -eq "E" -or $response -eq "e") {
-        Write-Host "▸ Veri klasörü kaldırılıyor..." -ForegroundColor Yellow
-        try {
-            Remove-Item $dataPath -Recurse -Force
-            Write-Host "  ✓ Veri klasörü silindi" -ForegroundColor Green
-        } catch {
-            Write-Host "HATA: Veri klasörü silinemedi: $_" -ForegroundColor Red
-            exit 1
-        }
+if (Test-Path -LiteralPath $dataPath) {
+    $response = Read-Host "Remove Runly settings, logs, trust data, and backups too? (y/N)"
+    if ($response -match '^(y|yes)$') {
+        Remove-Item -LiteralPath $dataPath -Recurse -Force
+        Write-Host "Runly user data removed." -ForegroundColor Green
     } else {
-        Write-Host "  ℹ Veriler tutuldu (gerekirse manuel silme: $dataPath)" -ForegroundColor Gray
+        Write-Host "Runly user data was kept at $dataPath." -ForegroundColor DarkGray
     }
-} else {
-    Write-Host "Runly veri klasörü bulunamadı (daha önce temizlenmiş olabilir)" -ForegroundColor Gray
 }
 
-Write-Host ""
-Write-Host "✓ Runly kaldırıldı." -ForegroundColor Green
+Write-Host "Runly was uninstalled." -ForegroundColor Green
