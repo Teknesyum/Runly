@@ -9,6 +9,7 @@ internal static class Strings
         ["refresh"] = ("Yenile", "Refresh"),
         ["addExtension"] = ("Uzantı ekle", "Add extension"),
         ["removeExtension"] = ("Seçili uzantıyı sil", "Remove selected extension"),
+        ["selectAll"] = ("Tümünü seç", "Select all"),
         ["close"] = ("Kapat", "Close"),
         ["save"] = ("Kaydet", "Save"),
         ["restore"] = ("Yedekten geri yükle", "Restore backup"),

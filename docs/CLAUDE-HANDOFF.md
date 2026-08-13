@@ -12,7 +12,7 @@ Repository: `https://github.com/Teknesyum/Runly`
 
 - Source version is `0.1.1` in `Directory.Build.props`.
 - `v0.1.0` is already public on GitHub.
-- `v0.1.1` is the pending patch release and must include the icon/default-app fixes described below.
+- `v0.1.1` is public. Changes made after that tag stay on `main` until the next release is requested.
 - Release build command: `./scripts/build.ps1 -Configuration Release -Version 0.1.1`
 - Expected package: `Runly-v0.1.1-win-x64.zip`
 
@@ -37,7 +37,7 @@ Relevant code:
 
 - `src/Runly.Settings/MainForm.cs`
   - `AskWindows()` opens the Runly-specific Default Apps page.
-  - `OfferUserChoiceTour(...)` offers one direct Settings action after install.
+  - A successful install never shows a result dialog. If protected choices remain, Settings opens the Runly-specific Default Apps page directly.
   - `OfferOrphanRepair(...)` opens the general Default Apps page after uninstall.
   - `Activated` triggers the throttled automatic refresh.
 - `src/Runly.Core/Shell/OpenWithDialog.cs` remains historical/core code but is not a Settings binding path.
@@ -79,5 +79,8 @@ The new cyan/pink icon was visually verified in the live Release Settings title 
 - Do not silently claim Windows defaults.
 - Do not use `SHOpenWithDialog` as the permanent-binding CTA.
 - Do not mutate `UserChoice`.
+- Keep successful installation silent; only an actual installation failure gets a result dialog.
+- Keep the localized `Tümünü seç` / `Select all` extension action.
+- Display only the human-readable semantic version; strip build metadata after `+`.
 - Do not remove the explicit embedded Settings icon.
 - Do not omit `LICENSE` from the release ZIP.

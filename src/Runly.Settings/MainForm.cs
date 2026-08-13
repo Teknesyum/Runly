@@ -174,10 +174,13 @@ internal sealed class MainForm : NeonForm
         gridArea.Controls.Add(detailPanel, 1, 0);
 
         var extButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
+        var selectAllButton = new NeonButton { Text = "Tümünü seç", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
         var addExtButton = new NeonButton { Text = "Uzantı ekle", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
         var removeExtButton = new NeonButton { Text = "Seçili uzantıyı sil", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
+        selectAllButton.Click += (_, _) => SetAllExtensionsEnabled();
         addExtButton.Click += OnAddExtensionClicked;
         removeExtButton.Click += OnRemoveExtensionClicked;
+        extButtons.Controls.Add(selectAllButton);
         extButtons.Controls.Add(addExtButton);
         extButtons.Controls.Add(removeExtButton);
         gridArea.Controls.Add(extButtons, 0, 1);
@@ -689,6 +692,17 @@ internal sealed class MainForm : NeonForm
         UpdateSingleRowStatus(e.RowIndex, status.Extension);
     }
 
+    private void SetAllExtensionsEnabled()
+    {
+        foreach (var extension in _config.Extensions.Keys.ToList())
+        {
+            _config.Extensions[extension] = _config.Extensions[extension] with { Enabled = true };
+        }
+
+        RefreshExtensionGrid();
+        MarkDirty();
+    }
+
     private void OnGridCellContentClick(object? sender, DataGridViewCellEventArgs e)
     {
         if (e.RowIndex < 0 || e.ColumnIndex != ColStatus)
@@ -1064,46 +1078,23 @@ internal sealed class MainForm : NeonForm
 
     private async void OnInstallClicked(object? sender, EventArgs e)
     {
-        List<string>? pendingTour = null;
-
         SetBusy(true, "Kuruluyor…");
         try
         {
             var exePath = ExePath;
             var result = await Task.Run(() => _shellRegistrar.Install(_config, exePath));
 
-            var bound = result.Extensions.Where(x => x.Bound == BindingState.Bound).ToList();
             var pending = result.Extensions.Where(x => x.Bound == BindingState.NeedsUserChoice).ToList();
 
-            var lines = new List<string>();
-            if (result.Success)
+            if (!result.Success)
             {
-                lines.Add(BuildInstallSummary(bound.Count, pending.Count));
-                lines.Add(string.Empty);
+                ResultDialog.Show(this, "Kurulum hatası", false, result.Actions, result.ErrorMessage);
             }
-
-            lines.AddRange(result.Actions);
-
-            if (result.Skipped.Count > 0)
+            else if (pending.Count > 0)
             {
-                lines.Add(string.Empty);
-                lines.Add("Atlanan uzantılar:");
-                foreach (var skipped in result.Skipped)
-                {
-                    lines.Add($"  {skipped.Extension} — {skipped.Reason}");
-                }
-            }
-
-            // Decision K19: pending approval is the normal case, not a failure — but it is also not "done".
-            var headline = result.Success && pending.Count > 0
-                ? BuildInstallSummary(bound.Count, pending.Count)
-                : null;
-
-            ResultDialog.Show(this, "Kurulum sonucu", result.Success, lines, result.ErrorMessage, headline);
-
-            if (result.Success && pending.Count > 0)
-            {
-                pendingTour = pending.Select(p => p.Extension).ToList();
+                // Registration succeeded. Windows protects the final UserChoice value, so continue
+                // directly in the Runly-specific settings page without another result/prompt dialog.
+                OpenDefaultAppsSettings(forRunly: true);
             }
         }
         catch (Exception ex)
@@ -1119,51 +1110,6 @@ internal sealed class MainForm : NeonForm
             RefreshStatusStrip();
         }
 
-        if (pendingTour is not null)
-        {
-            OfferUserChoiceTour(pendingTour);
-        }
-    }
-
-    private static string BuildInstallSummary(int boundCount, int pendingCount)
-    {
-        if (pendingCount == 0)
-        {
-            return boundCount == 0
-                ? "Hiçbir uzantı bağlanmadı."
-                : $"{boundCount} uzantı Runly'ye bağlı.";
-        }
-
-        var head = boundCount == 0
-            ? $"{pendingCount} uzantı için Windows onayı gerekiyor"
-            : $"{boundCount} uzantı bağlandı, {pendingCount} uzantı için Windows onayı gerekiyor";
-
-        return head + " — aşağıdaki adımlarla tamamlayın.";
-    }
-
-    /// <summary>
-    /// Sends the user to Runly's application-specific Windows Default apps page after registration.
-    /// Windows owns the protected per-user choice, so Runly can prepare candidates but cannot confirm them.
-    /// </summary>
-    private void OfferUserChoiceTour(IReadOnlyList<string> extensions)
-    {
-        var english = Strings.Language == "en";
-        var message = english
-            ? $"Windows needs your confirmation for {extensions.Count} extensions:\n\n" +
-              $"{string.Join(", ", extensions)}\n\n" +
-              "Open Runly's Default apps page and select Runly for each extension you want to double-click. " +
-              "When you return, this window refreshes automatically.\n\nOpen Windows Settings now?"
-            : $"Windows'un {extensions.Count} uzantı için onayınıza ihtiyacı var:\n\n" +
-              $"{string.Join(", ", extensions)}\n\n" +
-              "Runly'nin Varsayılan uygulamalar sayfasını açıp çift tıklamak istediğiniz her uzantıda " +
-              "Runly'yi seçin. Geri döndüğünüzde bu pencere otomatik yenilenir.\n\nWindows Ayarları şimdi açılsın mı?";
-
-        if (NeonMessageBox.Show(this, message,
-                english ? "Set Runly as default" : "Runly'yi varsayılan yap",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
-        {
-            OpenDefaultAppsSettings(forRunly: true);
-        }
     }
 
     private async void OnUninstallClicked(object? sender, EventArgs e)
@@ -1506,7 +1452,7 @@ internal sealed class MainForm : NeonForm
                 var info = FileVersionInfo.GetVersionInfo(exePath);
                 if (!string.IsNullOrWhiteSpace(info.ProductVersion))
                 {
-                    return info.ProductVersion;
+                    return info.ProductVersion.Split('+', 2)[0];
                 }
             }
         }
