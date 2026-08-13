@@ -706,7 +706,7 @@ internal sealed class MainForm : NeonForm
             return;
         }
 
-        AskWindows(status.Extension, e.RowIndex);
+        AskWindows();
     }
 
     private void OnDetailAskButtonClicked(object? sender, EventArgs e)
@@ -716,21 +716,15 @@ internal sealed class MainForm : NeonForm
             return;
         }
 
-        AskWindows(status.Extension, _grid.SelectedRows[0].Index);
+        AskWindows();
     }
 
-    private void AskWindows(string extension, int rowIndex)
+    private void AskWindows()
     {
-        var samplePath = Path.Combine(Path.GetTempPath(), "runly-ornek" + extension);
-        var completed = OpenWithDialog.ShowForExtension(Handle, samplePath);
-        if (!completed)
-        {
-            // User gave up without choosing; leave the row exactly as it was (T4-COMPLETE.md guidance).
-            return;
-        }
-
-        UpdateSingleRowStatus(rowIndex, extension);
-        RefreshStatusStrip();
+        // SHOpenWithDialog is intentionally not used here: Windows 11 exposes only "Just once"
+        // through that API. The registered-app deep link opens Runly's Default apps page, where
+        // the user can make a persistent per-extension choice.
+        OpenDefaultAppsSettings(forRunly: true);
     }
 
     private void UpdateDetailPanel()
@@ -749,7 +743,7 @@ internal sealed class MainForm : NeonForm
         if (status.Bound == BindingState.NeedsUserChoice)
         {
             RenderMarkdownLite(_detailText, BuildNeedsChoiceExplanation(status.Extension, status.UserChoiceOwnerName));
-            _detailAskButton.Text = Strings.Language == "en" ? "Open Windows ‘Open with’ dialog" : "Windows'un \"Birlikte aç\" penceresini aç";
+            _detailAskButton.Text = Strings.Language == "en" ? "Open Runly default-app settings" : "Runly varsayılan uygulama ayarlarını aç";
             _detailAskButton.Visible = true;
         }
         else if (status.Bound == BindingState.Bound)
@@ -782,8 +776,8 @@ internal sealed class MainForm : NeonForm
                 : $"Windows currently opens this extension with **{ownerName}**.";
             return englishSituation + $"\n\nTo bind **{extension}** permanently, right-click a `{extension}` file in Explorer → " +
                    "**Open with** → **Choose another app** → **Runly** → **Always**. " +
-                   "The button below opens Windows’ ‘Open with’ dialog, but on this Windows 11 machine that dialog " +
-                   "offers only ‘Just once’; use the Explorer path above or Default apps for a permanent choice.";
+                   "The button below opens Runly’s Windows Default apps page, where you can make the same " +
+                   "persistent choice for each extension.";
         }
 
         var situation = string.IsNullOrWhiteSpace(ownerName)
@@ -801,9 +795,8 @@ internal sealed class MainForm : NeonForm
         $"1. Bir `{extension}` dosyasına **sağ tıklayın** → **Birlikte aç** → **Başka bir uygulama seç**.\n" +
         "2. Açılan listeden **Runly**'yi seçin.\n" +
         "3. **\"Her zaman\"** düğmesine basın.\n\n" +
-        "(Aşağıdaki düğme aynı pencereyi açar, ama Windows 11 bu yoldan gelindiğinde çoğu zaman yalnızca " +
-        "**\"Yalnızca bir kez\"** sunuyor — kalıcı bağlama için yukarıdaki üç adımı ya da " +
-        "**Ayarlar → Uygulamalar → Varsayılan uygulamalar** sayfasını kullanın.)\n\n" +
+        "Aşağıdaki düğme Runly'nin Windows **Varsayılan uygulamalar** sayfasını açar; " +
+        "buradan her uzantı için kalıcı seçimi yapabilirsiniz.\n\n" +
         $"Bu adımı atlarsanız Runly çalışmaya devam eder; yalnızca `{extension}` dosyalarına çift tıklamak " +
         "Runly'yi açmaz. Dosyaya sağ tıklayıp **\"Birlikte aç → Runly\"** diyerek yine de çalıştırabilirsiniz.";
     }
@@ -1149,127 +1142,29 @@ internal sealed class MainForm : NeonForm
     }
 
     /// <summary>
-    /// Walks the user through the "Birlikte aç → Her zaman" step for every extension Windows has not confirmed
-    /// yet (decision K19). This is a normal part of installing, so it is offered right after the result dialog
-    /// instead of being buried in the table.
+    /// Sends the user to Runly's application-specific Windows Default apps page after registration.
+    /// Windows owns the protected per-user choice, so Runly can prepare candidates but cannot confirm them.
     /// </summary>
     private void OfferUserChoiceTour(IReadOnlyList<string> extensions)
     {
-        var intro = NeonMessageBox.Show(
-            this,
-            $"{extensions.Count} uzantı için son bir adım kaldı: hangi uygulamanın kullanılacağını sizin " +
-            "onaylamanız gerekiyor. Windows bu seçimi korumalı bir anahtarda tutar; hiçbir program kendi " +
-            "başına değiştiremez.\n\n" +
-            $"Onay bekleyenler: {string.Join(", ", extensions)}\n\n" +
-            "En güvenilir yol (Windows 11'de ölçüldü): dosyaya sağ tıklayın → \"Birlikte aç\" → " +
-            "\"Başka bir uygulama seç\" → Runly → \"Her zaman\".\n\n" +
-            "Evet = \"Varsayılan uygulamalar\" ayarlarını aç\n" +
-            "Hayır = Windows'un \"Birlikte aç\" penceresini uzantı uzantı dene\n" +
-            "İptal = şimdilik bırak",
-            "Windows onayı gerekiyor",
-            MessageBoxButtons.YesNoCancel,
-            MessageBoxIcon.Information);
+        var english = Strings.Language == "en";
+        var message = english
+            ? $"Windows needs your confirmation for {extensions.Count} extensions:\n\n" +
+              $"{string.Join(", ", extensions)}\n\n" +
+              "Open Runly's Default apps page and select Runly for each extension you want to double-click. " +
+              "When you return, this window refreshes automatically.\n\nOpen Windows Settings now?"
+            : $"Windows'un {extensions.Count} uzantı için onayınıza ihtiyacı var:\n\n" +
+              $"{string.Join(", ", extensions)}\n\n" +
+              "Runly'nin Varsayılan uygulamalar sayfasını açıp çift tıklamak istediğiniz her uzantıda " +
+              "Runly'yi seçin. Geri döndüğünüzde bu pencere otomatik yenilenir.\n\nWindows Ayarları şimdi açılsın mı?";
 
-        if (intro == DialogResult.Cancel)
+        if (NeonMessageBox.Show(this, message,
+                english ? "Set Runly as default" : "Runly'yi varsayılan yap",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
         {
-            return;
+            OpenDefaultAppsSettings(forRunly: true);
         }
-
-        if (intro == DialogResult.Yes)
-        {
-            OpenDefaultAppsSettings();
-            return;
-        }
-
-        var completed = new List<string>();
-        var remaining = new List<string>();
-
-        for (var index = 0; index < extensions.Count; index++)
-        {
-            var extension = extensions[index];
-
-            var answer = NeonMessageBox.Show(
-                this,
-                $"({index + 1}/{extensions.Count})  {extension}\n\n" +
-                "\"Şimdi yap\" derseniz Windows'un \"Birlikte aç\" penceresi açılır.\n\n" +
-                "Evet = şimdi yap · Hayır = bu uzantıyı atla · İptal = tura son ver",
-                $"{extension} için Windows onayı",
-                MessageBoxButtons.YesNoCancel,
-                MessageBoxIcon.Information);
-
-            if (answer == DialogResult.Cancel)
-            {
-                remaining.AddRange(extensions.Skip(index));
-                break;
-            }
-
-            if (answer == DialogResult.No)
-            {
-                remaining.Add(extension);
-                continue;
-            }
-
-            try
-            {
-                OpenWithDialog.ShowForExtension(Handle, Path.Combine(Path.GetTempPath(), "runly-ornek" + extension));
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"\"Birlikte aç\" penceresi açılamadı: {extension}", ex);
-                NeonMessageBox.Show(this, $"\"Birlikte aç\" penceresi açılamadı: {ex.Message}", "Runly Ayarları",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                remaining.Add(extension);
-                continue;
-            }
-
-            // Ask the registry again rather than assuming the dialog did what we hoped.
-            RefreshExtensionGrid();
-            RefreshStatusStrip();
-
-            if (IsBound(extension))
-            {
-                completed.Add(extension);
-            }
-            else
-            {
-                remaining.Add(extension);
-            }
-        }
-
-        var summary = new System.Text.StringBuilder();
-        summary.AppendLine(completed.Count == 0
-            ? "Hiçbir uzantı onaylanmadı."
-            : $"Onaylanan: {string.Join(", ", completed)}");
-
-        if (remaining.Count > 0)
-        {
-            summary.AppendLine();
-            summary.AppendLine($"Hâlâ onay bekleyen: {string.Join(", ", remaining)}");
-            summary.AppendLine();
-            summary.AppendLine("Bu uzantılar için Runly çift tıkla açılmaz. Windows 11'de \"Birlikte aç\" " +
-                               "penceresi varsayılanı tek başına değiştiremiyor; kalıcı bağlamak için dosyaya " +
-                               "sağ tıklayıp \"Birlikte aç → Başka bir uygulama seç → Runly → Her zaman\" " +
-                               "yapın ya da \"Varsayılan uygulamalar\" ayarlarını kullanın.");
-            summary.AppendLine();
-            summary.Append("\"Varsayılan uygulamalar\" ayarlarını şimdi açayım mı?");
-
-            if (NeonMessageBox.Show(this, summary.ToString(), "Onay turu tamamlandı",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
-            {
-                OpenDefaultAppsSettings();
-            }
-
-            return;
-        }
-
-        NeonMessageBox.Show(this, summary.ToString(), "Onay turu tamamlandı",
-            MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
-
-    private bool IsBound(string extension) =>
-        _shellRegistrar.GetStatus(_config)
-            .Any(s => string.Equals(s.Extension, extension, StringComparison.OrdinalIgnoreCase) &&
-                      s.Bound == BindingState.Bound);
 
     private async void OnUninstallClicked(object? sender, EventArgs e)
     {
@@ -1340,9 +1235,8 @@ internal sealed class MainForm : NeonForm
     }
 
     /// <summary>
-    /// Offers the two ways out of an orphaned <c>UserChoice</c> (decision K20): Windows' own "Birlikte aç"
-    /// dialog per extension, or the "Varsayılan uygulamalar" settings page. Runly cannot fix it itself —
-    /// the key is ACL protected and forging its hash is forbidden.
+    /// Opens Windows Default apps for orphaned protected choices after uninstall. Runly cannot fix these
+    /// itself because the UserChoice key is protected and its hash must never be forged.
     /// </summary>
     private void OfferOrphanRepair(IReadOnlyList<OrphanedUserChoice> orphans)
     {
@@ -1353,48 +1247,27 @@ internal sealed class MainForm : NeonForm
             $"Şu uzantılar hâlâ silinmiş bir Runly kaydına bağlı: {list}\n\n" +
             "Windows bu seçimi korumalı bir anahtarda tutuyor ve silinmesine izin vermiyor; " +
             "yalnızca siz değiştirebilirsiniz.\n\n" +
-            "Her uzantı için \"Birlikte aç\" penceresini şimdi açalım mı?\n\n" +
-            "Evet = pencereleri sırayla aç · Hayır = \"Varsayılan uygulamalar\" ayarlarını aç · " +
-            "İptal = şimdilik bırak",
+            "Bu uzantılara yeni bir varsayılan seçmek için Windows Varsayılan uygulamalar sayfası açılsın mı?",
             "Geçersiz kalan dosya ilişkileri",
-            MessageBoxButtons.YesNoCancel,
+            MessageBoxButtons.YesNo,
             MessageBoxIcon.Warning);
 
-        if (answer == DialogResult.Cancel)
+        if (answer != DialogResult.Yes)
         {
             return;
         }
 
-        if (answer == DialogResult.No)
-        {
-            OpenDefaultAppsSettings();
-            return;
-        }
-
-        foreach (var orphan in orphans)
-        {
-            try
-            {
-                OpenWithDialog.ShowForExtension(
-                    Handle, Path.Combine(Path.GetTempPath(), "runly-ornek" + orphan.Extension));
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"\"Birlikte aç\" penceresi açılamadı: {orphan.Extension}", ex);
-                NeonMessageBox.Show(this, $"\"Birlikte aç\" penceresi açılamadı: {ex.Message}", "Runly Ayarları",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-
-        RefreshExtensionGrid();
-        RefreshStatusStrip();
+        OpenDefaultAppsSettings();
     }
 
-    private void OpenDefaultAppsSettings()
+    private void OpenDefaultAppsSettings(bool forRunly = false)
     {
         try
         {
-            Process.Start(new ProcessStartInfo { FileName = "ms-settings:defaultapps", UseShellExecute = true })?.Dispose();
+            var settingsUri = forRunly
+                ? "ms-settings:defaultapps?registeredAppUser=Runly"
+                : "ms-settings:defaultapps";
+            Process.Start(new ProcessStartInfo { FileName = settingsUri, UseShellExecute = true })?.Dispose();
         }
         catch (Exception ex)
         {

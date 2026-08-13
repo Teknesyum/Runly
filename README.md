@@ -95,8 +95,8 @@ Please report security issues privately to the repository owner instead of openi
 
 ## Release
 
-Current version: **v0.1.0**  
-Download: [Runly v0.1.0 for Windows x64](https://github.com/Teknesyum/Runly/releases/tag/v0.1.0)
+Current version: **v0.1.1**  
+Download: [Runly v0.1.1 for Windows x64](https://github.com/Teknesyum/Runly/releases/tag/v0.1.1)
 
 ---
 
@@ -106,4 +106,4 @@ This application is built in spare time and is free.
 
 <a href="https://github.com/sponsors/Teknesyum"><img src="https://img.shields.io/badge/Buy_me_a_coffee-b026ff?style=for-the-badge&logo=githubsponsors&logoColor=b026ff&labelColor=0d0d0f" alt="Sponsor" /></a>
 
-**[github.com/Teknesyum](https://github.com/Teknesyum)** · MIT
+**[github.com/Teknesyum](https://github.com/Teknesyum)** · [MIT](LICENSE)

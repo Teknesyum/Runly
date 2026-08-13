@@ -116,6 +116,12 @@ if (Test-Path "README.md") {
     Write-Host "  * README.md kopyalandı"
 }
 
+# License
+if (Test-Path "LICENSE") {
+    Copy-Item "LICENSE" -Destination "$Output/LICENSE" -Force
+    Write-Host "  * LICENSE kopyalandı"
+}
+
 Write-Host ""
 
 # 5. Son durumu yazdır

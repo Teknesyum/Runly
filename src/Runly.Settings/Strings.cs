@@ -27,7 +27,7 @@ internal static class Strings
         ["bound"] = ("Bağlı", "Bound"),
         ["notBound"] = ("Bağlı değil", "Not bound"),
         ["needsApproval"] = ("Windows onayı gerekiyor", "Windows approval required"),
-        ["askWindows"] = ("⚠ Windows'a sor", "⚠ Ask Windows"),
+        ["askWindows"] = ("⚠ Varsayılan yap", "⚠ Set default"),
         ["installed"] = ("Runly kurulu", "Runly installed"),
         ["notInstalled"] = ("Runly kurulu değil", "Runly not installed"),
         ["cancel"] = ("Vazgeç", "Cancel"),

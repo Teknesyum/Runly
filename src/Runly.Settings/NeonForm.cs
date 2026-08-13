@@ -29,6 +29,13 @@ internal class NeonForm : Form
 
     protected NeonForm()
     {
+        using var iconStream = typeof(NeonForm).Assembly.GetManifestResourceStream("Runly.Settings.runly.ico");
+        if (iconStream is not null)
+        {
+            using var embeddedIcon = new Icon(iconStream);
+            Icon = (Icon)embeddedIcon.Clone();
+        }
+
         FormBorderStyle = FormBorderStyle.None;
         SetStyle(ControlStyles.ResizeRedraw | ControlStyles.OptimizedDoubleBuffer, true);
         Activated += (_, _) => { _active = true; InvalidateCaption(); };

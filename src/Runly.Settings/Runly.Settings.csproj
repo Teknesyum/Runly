@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Runly.Core\Runly.Core.csproj" />
+    <EmbeddedResource Include="..\..\assets\runly.ico" LogicalName="Runly.Settings.runly.ico" />
   </ItemGroup>
 
 </Project>
