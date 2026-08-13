@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+
+console.log("Shebang testi: Bu dosyanın uzantısı yok ama Node.js ile çalıştırılıyor.");
+console.log("Runly shebang satırını tanıdı ve doğru yorumlayıcı ile başlattı.");
+process.exit(0);

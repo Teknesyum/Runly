@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Runly.Core</RootNamespace>
+    <AssemblyName>Runly.Core</AssemblyName>
+    <!-- Consumed by the AOT launcher: keep trim/AOT analyzers on so violations surface at build time. -->
+    <IsAotCompatible>true</IsAotCompatible>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- Enforces the "one XML doc line per public type" rule from SPEC 11 via CS1591. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>
