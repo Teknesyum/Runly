@@ -525,6 +525,7 @@ internal sealed class MainForm : NeonForm
             {
                 Kind = entry.DefaultKind,
                 Category = entry.Category,
+                TypeName = entry.DisplayName.Tr,
                 Interpreter = string.Empty,
                 OpenWith = null,
                 Args = "\"{script}\" {args}",
@@ -797,6 +798,8 @@ internal sealed class MainForm : NeonForm
             ? HandlerKind.Open : HandlerKind.Run;
         var handler = row.Cells[ColInterpreter].Value as string ?? (kind == HandlerKind.Run ? mapping.Interpreter : mapping.OpenWith ?? string.Empty);
         var args = row.Cells[ColArgs].Value as string ?? mapping.Args;
+        var catalogTypeName = ExtensionCatalog.Entries.FirstOrDefault(entry =>
+            string.Equals(entry.Extension, status.Extension, StringComparison.OrdinalIgnoreCase))?.DisplayName.Tr;
 
         _config.Extensions[status.Extension] = mapping with
         {
@@ -804,6 +807,7 @@ internal sealed class MainForm : NeonForm
             Kind = kind,
             Interpreter = kind == HandlerKind.Run ? handler : mapping.Interpreter,
             OpenWith = kind == HandlerKind.Open ? handler : null,
+            TypeName = catalogTypeName ?? mapping.TypeName,
             Args = args,
         };
         MarkDirty();
@@ -833,6 +837,8 @@ internal sealed class MainForm : NeonForm
             {
                 Kind = HandlerKind.Open,
                 OpenWith = app.Path,
+                TypeName = ExtensionCatalog.Entries.FirstOrDefault(entry =>
+                    string.Equals(entry.Extension, extension, StringComparison.OrdinalIgnoreCase))?.DisplayName.Tr,
                 Args = "\"{script}\" {args}",
                 Enabled = true,
             };

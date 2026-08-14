@@ -75,7 +75,7 @@ public sealed class ShellRegistrarTests : IDisposable
 
         const string progId = @"Software\Classes\Runly.Script.js";
 
-        Assert.Equal("JS File (Runly)",
+        Assert.Equal("JS dosyası (Runly)",
             _registry.GetValue(RegistryRoot.CurrentUser, progId, "")!.AsString());
         Assert.Equal(@"C:\Program Files\Runly\assets\js.ico,0",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\DefaultIcon", "")!.AsString());
@@ -528,7 +528,7 @@ public sealed class ShellRegistrarTests : IDisposable
         {
             Extensions = new Dictionary<string, ExtensionMapping>(StringComparer.OrdinalIgnoreCase)
             {
-                [".md"] = new() { Kind = HandlerKind.Open, Category = "text", OpenWith = handler, Args = "\"{script}\" {args}", Enabled = true },
+                [".md"] = new() { Kind = HandlerKind.Open, Category = "text", TypeName = "Markdown belgesi", OpenWith = handler, Args = "\"{script}\" {args}", Enabled = true },
             },
         };
 
@@ -540,6 +540,8 @@ public sealed class ShellRegistrarTests : IDisposable
         Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, shell + @"\runas"));
         Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, shell + @"\edit"));
         Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, shell + @"\runlyargs"));
+        Assert.Equal("Markdown belgesi (Runly)",
+            _registry.GetValue(RegistryRoot.CurrentUser, RunlyRegistryLayout.ProgIdKey(".md"), "")!.AsString());
     }
 
     /// <summary>Stands in for Windows' own association resolution (<c>AssocQueryString</c>).</summary>

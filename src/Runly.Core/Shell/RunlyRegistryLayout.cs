@@ -94,10 +94,11 @@ public static class RunlyRegistryLayout
     public static string FileAssociationsKey => CapabilitiesKey + @"\FileAssociations";
 
     /// <summary>Turkish type name shown in Explorer's "Type" column, for example "JavaScript Betiği (Runly)".</summary>
-    public static string TypeNameFor(string extension)
+    public static string TypeNameFor(string extension, string? typeName = null)
     {
         var ext = NormalizeExtension(extension);
-        return ext[1..].ToUpperInvariant() + " File (Runly)";
+        var label = string.IsNullOrWhiteSpace(typeName) ? ext[1..].ToUpperInvariant() + " dosyası" : typeName.Trim();
+        return label + " (Runly)";
     }
 
     /// <summary>The <c>DefaultIcon</c> value for an extension, falling back to the launcher's own icon.</summary>

@@ -116,6 +116,7 @@ public sealed class ConfigStore : IConfigStore
                 {
                     Kind = Enum.IsDefined(pair.Value.Kind) ? pair.Value.Kind : HandlerKind.Run,
                     Category = NormalizeCategory(pair.Value.Category),
+                    TypeName = string.IsNullOrWhiteSpace(pair.Value.TypeName) ? null : pair.Value.TypeName,
                     Interpreter = pair.Value.Interpreter ?? string.Empty,
                     OpenWith = string.IsNullOrWhiteSpace(pair.Value.OpenWith) ? null : pair.Value.OpenWith,
                     Args = pair.Value.Args ?? string.Empty,

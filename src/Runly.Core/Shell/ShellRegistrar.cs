@@ -460,7 +460,7 @@ public sealed class ShellRegistrar : IShellRegistrar
         var key = RunlyRegistryLayout.ProgIdKey(extension);
 
         _registry.SetValue(RegistryRoot.CurrentUser, key,
-            RegistryValueEntry.FromString(RegistryValueEntry.DefaultValueName, RunlyRegistryLayout.TypeNameFor(extension)));
+            RegistryValueEntry.FromString(RegistryValueEntry.DefaultValueName, RunlyRegistryLayout.TypeNameFor(extension, mapping.TypeName)));
 
         _registry.SetValue(RegistryRoot.CurrentUser, key + @"\DefaultIcon",
             RegistryValueEntry.FromString(RegistryValueEntry.DefaultValueName, RunlyRegistryLayout.IconValue(installDir, mapping.Icon, mapping.Category)));
