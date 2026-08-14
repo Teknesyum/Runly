@@ -2,6 +2,17 @@ using System.Text.Json.Serialization;
 
 namespace Runly.Core.Models;
 
+/// <summary>How Runly handles a file mapping.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<HandlerKind>))]
+public enum HandlerKind
+{
+    /// <summary>Execute the file through an interpreter and the security gate.</summary>
+    Run,
+
+    /// <summary>Open the file in an explicitly selected desktop application.</summary>
+    Open,
+}
+
 /// <summary>How often the security gate asks the user before a script is allowed to run (SPEC 6).</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<SecurityMode>))]
 public enum SecurityMode

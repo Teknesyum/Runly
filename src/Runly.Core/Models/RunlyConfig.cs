@@ -7,7 +7,7 @@ namespace Runly.Core.Models;
 public sealed record RunlyConfig
 {
     /// <summary>Schema version this build writes and understands.</summary>
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 
     /// <summary>Schema version of the loaded file; used by the migration hook in the config store.</summary>
     [JsonPropertyName("version")]

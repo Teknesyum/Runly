@@ -87,9 +87,12 @@ public sealed class ConfigStore : IConfigStore
         return fresh;
     }
 
-    // Schema migrations land here as CurrentVersion advances; nothing to transform yet at version 1 (T2.md).
-    private static RunlyConfig MigrateFromOlderVersion(RunlyConfig config) =>
-        config with { Version = RunlyConfig.CurrentVersion };
+    private static RunlyConfig MigrateFromOlderVersion(RunlyConfig config)
+    {
+        // HandlerKind.Run is deliberately enum value zero: a v1 mapping with no "kind" field
+        // deserializes as Run and retains every existing user-edited value.
+        return config with { Version = RunlyConfig.CurrentVersion };
+    }
 
     private static RunlyConfig Normalize(RunlyConfig config)
     {
@@ -111,7 +114,10 @@ public sealed class ConfigStore : IConfigStore
 
                 extensions[key] = pair.Value with
                 {
+                    Kind = Enum.IsDefined(pair.Value.Kind) ? pair.Value.Kind : HandlerKind.Run,
+                    Category = string.IsNullOrWhiteSpace(pair.Value.Category) ? "Betikler" : pair.Value.Category,
                     Interpreter = pair.Value.Interpreter ?? string.Empty,
+                    OpenWith = string.IsNullOrWhiteSpace(pair.Value.OpenWith) ? null : pair.Value.OpenWith,
                     Args = pair.Value.Args ?? string.Empty,
                 };
             }

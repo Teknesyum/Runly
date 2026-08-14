@@ -52,7 +52,8 @@ public sealed class DefaultConfigTests
         Assert.Equal(KeepWindowMode.OnError, config.KeepWindowOpen);
         Assert.Equal("code", config.EditorCommand);
         Assert.True(config.LogEnabled);
-        Assert.Equal(1, config.Version);
+        Assert.Equal(2, config.Version);
+        Assert.All(config.Extensions.Values, mapping => Assert.Equal(HandlerKind.Run, mapping.Kind));
         Assert.Equal("js.ico", config.Extensions[".js"].Icon);
     }
 

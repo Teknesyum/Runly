@@ -44,6 +44,45 @@ public sealed class ConfigStoreTests : IDisposable
     }
 
     [Fact]
+    public void Load_Version1Config_MigratesLosslesslyAndDefaultsKindToRun()
+    {
+        Directory.CreateDirectory(_tempDir);
+        File.WriteAllText(_configPath, """
+            {
+              "version": 1,
+              "language": "en",
+              "securityMode": "AlwaysAsk",
+              "keepWindowOpen": "Always",
+              "editorCommand": "custom-editor",
+              "logEnabled": false,
+              "extensions": {
+                ".XYZ": { "interpreter": "custom.exe", "args": "--flag \"{script}\"", "enabled": true, "icon": "mine.ico" }
+              }
+            }
+            """);
+
+        var config = new ConfigStore(_configPath).Load();
+
+        Assert.Equal(2, config.Version);
+        Assert.Equal("en", config.Language);
+        Assert.Equal(SecurityMode.AlwaysAsk, config.SecurityMode);
+        Assert.Equal(KeepWindowMode.Always, config.KeepWindowOpen);
+        Assert.Equal("custom-editor", config.EditorCommand);
+        Assert.False(config.LogEnabled);
+        var mapping = Assert.Single(config.Extensions).Value;
+        Assert.Equal(HandlerKind.Run, mapping.Kind);
+        Assert.Equal("Betikler", mapping.Category);
+        Assert.Equal("custom.exe", mapping.Interpreter);
+        Assert.Equal("--flag \"{script}\"", mapping.Args);
+        Assert.True(mapping.Enabled);
+        Assert.Equal("mine.ico", mapping.Icon);
+
+        var rewritten = File.ReadAllText(_configPath);
+        Assert.Contains("\"version\": 2", rewritten, StringComparison.Ordinal);
+        Assert.Contains("\"kind\": \"Run\"", rewritten, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Load_WhenFileIsCorruptJson_RenamesToBakAndReturnsDefaults()
     {
         Directory.CreateDirectory(_tempDir);
