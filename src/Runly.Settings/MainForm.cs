@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Reflection;
 using Runly.Core.Abstractions;
 using Runly.Core.Defaults;
 using Runly.Core.Models;
@@ -73,6 +74,7 @@ internal sealed class MainForm : NeonForm
     private readonly TextBox _searchBox;
     private readonly ComboBox _bulkAppBox;
     private readonly IReadOnlyList<InstalledApplication> _installedApplications;
+    private readonly Dictionary<string, Icon> _categoryIcons = new(StringComparer.Ordinal);
     private readonly Label _statusLabel;
     private readonly Label _exePathLabel;
     private readonly Label _versionLabel;
@@ -169,12 +171,19 @@ internal sealed class MainForm : NeonForm
         gridArea.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
 
         _grid = BuildExtensionGrid();
-        _categoryList = new ListBox { Dock = DockStyle.Fill, BackColor = Palette.Surface, ForeColor = Palette.TextBody, BorderStyle = BorderStyle.None, Font = Palette.Body, Margin = new Padding(0, 0, 8, 0) };
+        _categoryList = new ListBox
+        {
+            Dock = DockStyle.Fill, BackColor = Palette.AppBg, ForeColor = Palette.TextBody,
+            BorderStyle = BorderStyle.None, Font = Palette.Body, Margin = new Padding(0, 0, 8, 0),
+            DrawMode = DrawMode.OwnerDrawFixed, ItemHeight = 34,
+        };
+        LoadCategoryIcons();
         foreach (var category in ExtensionCatalog.Entries.Select(entry => entry.Category).Distinct(StringComparer.Ordinal))
         {
             _categoryList.Items.Add(category);
         }
         _categoryList.SelectedIndexChanged += (_, _) => RefreshExtensionGrid();
+        _categoryList.DrawItem += DrawCategoryItem;
         gridArea.Controls.Add(_categoryList, 0, 0);
         gridArea.Controls.Add(_grid, 1, 0);
 
@@ -523,6 +532,48 @@ internal sealed class MainForm : NeonForm
         Enabled = false,
     };
 
+    private void LoadCategoryIcons()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        foreach (var category in ExtensionCatalog.Entries.Select(entry => entry.Category).Distinct(StringComparer.Ordinal))
+        {
+            var fileName = RunlyRegistryLayout.CategoryIconFileName(category);
+            using var stream = assembly.GetManifestResourceStream("Runly.Settings.assets." + fileName);
+            if (stream is not null) _categoryIcons[category] = new Icon(stream, new Size(20, 20));
+        }
+    }
+
+    private void DrawCategoryItem(object? sender, DrawItemEventArgs e)
+    {
+        if (e.Index < 0 || e.Index >= _categoryList.Items.Count) return;
+        var category = (string)_categoryList.Items[e.Index];
+        var selected = (e.State & DrawItemState.Selected) != 0;
+        using var background = new SolidBrush(selected ? Palette.Surface : Palette.AppBg);
+        e.Graphics.FillRectangle(background, e.Bounds);
+        if (selected)
+        {
+            using var strip = new SolidBrush(Palette.NeonBlue);
+            e.Graphics.FillRectangle(strip, e.Bounds.Left, e.Bounds.Top, 3, e.Bounds.Height);
+        }
+        if (_categoryIcons.TryGetValue(category, out var icon))
+            e.Graphics.DrawIcon(icon, new Rectangle(e.Bounds.Left + 8, e.Bounds.Top + 7, 20, 20));
+
+        var entries = ExtensionCatalog.Entries.Where(entry => entry.Category == category).ToArray();
+        var catalogExtensions = ExtensionCatalog.Entries.Select(entry => entry.Extension).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var custom = _config.Extensions.Where(pair => !catalogExtensions.Contains(pair.Key) && pair.Value.Category == category).ToArray();
+        var enabled = entries.Count(entry => EffectiveMapping(entry.Extension).Enabled) + custom.Count(pair => pair.Value.Enabled);
+        var total = entries.Length + custom.Length;
+        var label = Strings.Get("category." + category);
+        var fore = selected ? Palette.NeonBlue : Palette.TextBody;
+        TextRenderer.DrawText(e.Graphics, label, Font, new Rectangle(e.Bounds.Left + 36, e.Bounds.Top, e.Bounds.Width - 88, e.Bounds.Height), fore,
+            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+        TextRenderer.DrawText(e.Graphics, $"{enabled}/{total}", Palette.LabelFont,
+            new Rectangle(e.Bounds.Right - 54, e.Bounds.Top, 46, e.Bounds.Height), selected ? Palette.NeonBlue : Palette.TextHint,
+            TextFormatFlags.Right | TextFormatFlags.VerticalCenter);
+    }
+
+    private void RefreshCategoryRail() => _categoryList.Invalidate();
+
     private ExtensionMapping EffectiveMapping(string extension)
     {
         if (_config.Extensions.TryGetValue(extension, out var configured)) return configured;
@@ -712,6 +763,7 @@ internal sealed class MainForm : NeonForm
         }
 
         UpdateDetailPanel();
+        RefreshCategoryRail();
         _bindingProgress.SetProgress(statuses.Count(status => status.Bound == BindingState.Bound), statuses.Count);
     }
 
@@ -850,6 +902,7 @@ internal sealed class MainForm : NeonForm
             };
         }
         MarkDirty();
+        RefreshCategoryRail();
         RefreshExtensionGrid();
     }
 
@@ -882,6 +935,7 @@ internal sealed class MainForm : NeonForm
         _logEnabledCheck.Checked = imported.LogEnabled;
         MarkDirty();
         RefreshExtensionGrid();
+        RefreshCategoryRail();
         _progressLabel.Text = Strings.Get("profile.imported");
     }
 
