@@ -20,12 +20,19 @@ internal sealed class MainForm : NeonForm
     private const int ColArgs = 4;
     private const int ColStatus = 5;
 
-    private static readonly Color BoundBack = Color.FromArgb(40, Palette.Success);
+    // DataGridView hücre dolgusu alfa kanalını yok sayar: yarı saydam bir BackColor beyaza dönüp
+    // satırı bozar. Tint'ler bu yüzden yüzey rengiyle önceden karıştırılıp opak veriliyor.
+    private static readonly Color BoundBack = Tint(Palette.Success, 40);
     private static readonly Color BoundFore = Palette.Success;
-    private static readonly Color NeedsChoiceBack = Color.FromArgb(40, Palette.NeonPink);
+    private static readonly Color NeedsChoiceBack = Tint(Palette.NeonPink, 40);
     private static readonly Color NeedsChoiceFore = Palette.NeonPink;
     private static readonly Color NotBoundBack = Palette.FieldBg;
     private static readonly Color NotBoundFore = Palette.TextHint;
+
+    private static Color Tint(Color accent, int alpha) => Color.FromArgb(
+        Palette.Surface.R + ((accent.R - Palette.Surface.R) * alpha / 255),
+        Palette.Surface.G + ((accent.G - Palette.Surface.G) * alpha / 255),
+        Palette.Surface.B + ((accent.B - Palette.Surface.B) * alpha / 255));
 
     /// <summary>
     /// Section label in the Teknesyum "Etiket" role: small, bold, uppercase, letter-spaced, dim.
@@ -52,6 +59,10 @@ internal sealed class MainForm : NeonForm
     private bool _suppressGridEvents;
     private bool _autoRefreshInFlight;
     private DateTime _lastAutoRefresh = DateTime.MinValue;
+
+    /// <summary>B6: the config file's timestamp when this window last read or wrote it. A newer stamp
+    /// on disk means someone edited the file behind our back, and saving would silently revert them.</summary>
+    private DateTime _configStamp = DateTime.MinValue;
 
     private readonly DataGridView _grid;
     private readonly Label _statusLabel;
@@ -102,6 +113,7 @@ internal sealed class MainForm : NeonForm
         _registryBackup = registryBackup;
         _logger = logger;
         _config = config;
+        _configStamp = ReadConfigStamp();
         Strings.Language = string.Equals(config.Language, "en", StringComparison.OrdinalIgnoreCase) ? "en" : "tr";
         _lastGoodSecurityMode = config.SecurityMode;
 
@@ -1291,6 +1303,11 @@ internal sealed class MainForm : NeonForm
             Language = Strings.Language,
         };
 
+        if (ReadConfigStamp() > _configStamp && !ConfirmOverwriteExternalEdit())
+        {
+            return;
+        }
+
         try
         {
             _configStore.Save(toSave);
@@ -1304,9 +1321,35 @@ internal sealed class MainForm : NeonForm
             return;
         }
 
+        _configStamp = ReadConfigStamp();
         _dirty = false;
         UpdateTitle();
         _progressLabel.Text = "Kaydedildi ✓";
+    }
+
+    private DateTime ReadConfigStamp()
+    {
+        try
+        {
+            return File.Exists(_configStore.ConfigPath) ? File.GetLastWriteTimeUtc(_configStore.ConfigPath) : DateTime.MinValue;
+        }
+        catch (IOException)
+        {
+            return _configStamp;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return _configStamp;
+        }
+    }
+
+    private bool ConfirmOverwriteExternalEdit()
+    {
+        var answer = NeonMessageBox.Show(this,
+            "Ayar dosyası bu pencere açıkken dışarıdan değiştirildi. Kaydederseniz o değişiklikler " +
+            "bu pencerenin bildiği hâlle değiştirilir.\n\nYine de kaydedilsin mi?",
+            "Runly Ayarları", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+        return answer == DialogResult.Yes;
     }
 
     private void ChangeLanguage(string language)

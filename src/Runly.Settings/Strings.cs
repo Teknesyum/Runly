@@ -1,86 +1,29 @@
+using System.Reflection;
+using System.Text.Json;
+
 namespace Runly.Settings;
 
-/// <summary>Embedded Turkish/English UI dictionary; avoids satellite assemblies for the AOT launcher.</summary>
+/// <summary>UI dictionary loaded from the embedded <c>locale/*.json</c> files. Translators edit the
+/// JSON; nothing here changes. Embedded rather than satellite assemblies so the shipped layout stays
+/// a single folder, and parsed at runtime because this project is never trimmed or AOT-compiled.</summary>
 internal static class Strings
 {
-    private static readonly Dictionary<string, (string Tr, string En)> Values = new(StringComparer.Ordinal)
-    {
-        ["app.title"] = ("Runly Ayarları", "Runly Settings"),
-        ["refresh"] = ("Yenile", "Refresh"),
-        ["addExtension"] = ("Uzantı ekle", "Add extension"),
-        ["removeExtension"] = ("Seçili uzantıyı sil", "Remove selected extension"),
-        ["selectAll"] = ("Tümünü seç", "Select all"),
-        ["close"] = ("Kapat", "Close"),
-        ["save"] = ("Kaydet", "Save"),
-        ["restore"] = ("Yedekten geri yükle", "Restore backup"),
-        ["uninstall"] = ("Kaldır", "Uninstall"),
-        ["install"] = ("Kur / Güncelle", "Install / Update"),
-        ["security"] = ("GÜVENLİK", "SECURITY"),
-        ["securityInvariant"] = ("GÜVENLIK", "SECURITY"),
-        ["behavior"] = ("DAVRANIŞ", "BEHAVIOR"),
-        ["details"] = ("AYRINTILAR", "DETAILS"),
-        ["enabled"] = ("ETKİN", "ENABLED"),
-        ["extension"] = ("UZANTI", "EXTENSION"),
-        ["interpreter"] = ("YORUMLAYICI", "INTERPRETER"),
-        ["found"] = ("BULUNDU", "FOUND"),
-        ["arguments"] = ("ARGÜMANLAR", "ARGUMENTS"),
-        ["status"] = ("DURUM", "STATUS"),
-        ["bound"] = ("Bağlı", "Bound"),
-        ["notBound"] = ("Bağlı değil", "Not bound"),
-        ["needsApproval"] = ("Windows onayı gerekiyor", "Windows approval required"),
-        ["askWindows"] = ("⚠ Varsayılan yap", "⚠ Set default"),
-        ["installed"] = ("Runly kurulu", "Runly installed"),
-        ["notInstalled"] = ("Runly kurulu değil", "Runly not installed"),
-        ["cancel"] = ("Vazgeç", "Cancel"),
-        ["add"] = ("Ekle", "Add"),
-        ["yes"] = ("Evet", "Yes"),
-        ["no"] = ("Hayır", "No"),
-        ["ok"] = ("Tamam", "OK"),
-        ["retry"] = ("Yeniden dene", "Retry"),
-        ["error"] = ("HATA", "ERROR"),
-        ["warning"] = ("DİKKAT", "WARNING"),
-        ["confirmation"] = ("ONAY", "CONFIRMATION"),
-        ["information"] = ("BİLGİ", "INFORMATION"),
-        ["runlyInstalledShort"] = ("Runly kurulu", "Runly installed"),
-        ["runlyNotInstalledShort"] = ("Runly kurulu değil", "Runly not installed"),
-        ["version"] = ("sürüm", "version"),
-        ["saved"] = ("Kaydedildi ✓", "Saved ✓"),
-        ["securityWarningTitle"] = ("Runly Ayarları — Güvenlik uyarısı", "Runly Settings — Security warning"),
-        ["neverAskWarning"] = ("Bu ayarla, çift tıkladığınız her script hiçbir soru sorulmadan çalışır. İnternetten\nindirilmiş dosyalar yine de uyarı gösterir. Devam edilsin mi?", "With this setting, every script you double-click runs without any prompt. Files downloaded\nfrom the internet still show a warning. Continue?"),
-        ["selectRow"] = ("Bir satır seçtiğinizde ayrıntılar burada görünür.", "Select a row to see its details here."),
-        ["alwaysAsk"] = ("Her seferinde sor", "Ask every time"),
-        ["trustFirst"] = ("İlk seferde sor, sonra güven", "Ask once, then trust"),
-        ["neverAsk"] = ("Hiç sorma (önerilmez)", "Never ask (not recommended)"),
-        ["neverAskShort"] = ("Hiç sorma", "Never ask"),
-        ["keepAlwaysShort"] = ("Her zaman", "Always"),
-        ["keepErrorShort"] = ("Sadece hata olursa", "Only on error"),
-        ["keepNeverShort"] = ("Hiçbir zaman", "Never"),
-        ["windowOpen"] = ("P E N C E R E Y İ   A Ç I K   T U T", "K E E P   W I N D O W   O P E N"),
-        ["editorCommand"] = ("D Ü Z E N L E Y İ C İ   K O M U T U", "E D I T O R   C O M M A N D"),
-        ["trustedFolders"] = ("G Ü V E N İ L E N   K L A S Ö R L E R", "T R U S T E D   F O L D E R S"),
-        ["remove"] = ("Çıkar", "Remove"),
-        ["clearAll"] = ("Tümünü temizle", "Clear all"),
-        ["test"] = ("Test et", "Test"),
-        ["logShort"] = ("Günlük tut", "Enable logging"),
-        ["openLog"] = ("Günlük klasörünü aç", "Open log folder"),
-        ["keepAlways"] = ("Her zaman açık tut", "Always keep open"),
-        ["keepError"] = ("Yalnızca hatada açık tut", "Keep open only on error"),
-        ["keepNever"] = ("Hiç açık tutma", "Never keep open"),
-        ["log"] = ("Günlük kaydı açık", "Enable logging"),
-    };
+    private const string SourceLanguage = "tr";
 
-    public static string Language { get; set; } = "tr";
-    public static string Get(string key) => Values.TryGetValue(key, out var value) ? (Language == "en" ? value.En : value.Tr) : key;
+    private static readonly Dictionary<string, Dictionary<string, string>> Catalogs = LoadCatalogs();
 
-    public static string Translate(string text)
-    {
-        foreach (var value in Values.Values)
-        {
-            if (string.Equals(text, value.Tr, StringComparison.Ordinal)) return Language == "en" ? value.En : value.Tr;
-            if (string.Equals(text, value.En, StringComparison.Ordinal)) return Language == "tr" ? value.Tr : value.En;
-        }
-        return text;
-    }
+    /// <summary>Source text to key. Built once so a language switch is a lookup, not a scan.</summary>
+    private static readonly Dictionary<string, string> KeyByText = BuildReverseIndex();
+
+    public static string Language { get; set; } = SourceLanguage;
+
+    public static string Get(string key) =>
+        Catalogs.TryGetValue(Language, out var catalog) && catalog.TryGetValue(key, out var value)
+            ? value
+            : Catalogs[SourceLanguage].TryGetValue(key, out var source) ? source : key;
+
+    public static string Translate(string text) =>
+        string.IsNullOrEmpty(text) ? text : KeyByText.TryGetValue(text, out var key) ? Get(key) : text;
 
     public static void Apply(Control root)
     {
@@ -99,5 +42,45 @@ internal static class Strings
         }
         foreach (Control child in root.Controls) Apply(child);
         root.Invalidate();
+    }
+
+    private static Dictionary<string, Dictionary<string, string>> LoadCatalogs()
+    {
+        var catalogs = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+        var assembly = Assembly.GetExecutingAssembly();
+        foreach (var name in assembly.GetManifestResourceNames())
+        {
+            if (!name.StartsWith("Runly.Settings.locale.", StringComparison.Ordinal) ||
+                !name.EndsWith(".json", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            var code = name["Runly.Settings.locale.".Length..^".json".Length];
+            using var stream = assembly.GetManifestResourceStream(name);
+            if (stream is null) continue;
+            var parsed = JsonSerializer.Deserialize<Dictionary<string, string>>(stream);
+            if (parsed is not null) catalogs[code] = new Dictionary<string, string>(parsed, StringComparer.Ordinal);
+        }
+
+        if (!catalogs.ContainsKey(SourceLanguage))
+        {
+            throw new InvalidOperationException($"locale/{SourceLanguage}.json gömülü kaynaklarda bulunamadı.");
+        }
+
+        return catalogs;
+    }
+
+    private static Dictionary<string, string> BuildReverseIndex()
+    {
+        // Every language maps back to its key so switching works in both directions. A repeated value
+        // resolves to the first key that declared it; the ones that repeat today are identical across
+        // languages, so the winner does not matter.
+        var index = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var catalog in Catalogs.Values)
+        {
+            foreach (var pair in catalog) index.TryAdd(pair.Value, pair.Key);
+        }
+        return index;
     }
 }

@@ -1,13 +1,26 @@
 ﻿param(
     [string]$Configuration = "Release",
     [string]$Output = "dist",
-    [string]$Version = "0.1.0"
+    [string]$Version
 )
 
 $ErrorActionPreference = "Stop"
 
+# Sürüm tek yerden gelir: Directory.Build.props. Buraya sabit yazılırsa paket adı ile içindeki
+# ikilinin sürümü ayrışır ve yanlış isimli yayın çıkar.
+if (-not $Version) {
+    $propsPath = Join-Path (Split-Path $PSScriptRoot -Parent) "Directory.Build.props"
+    $match = Select-String -Path $propsPath -Pattern '<Version>([^<]+)</Version>' | Select-Object -First 1
+    if (-not $match) {
+        Write-Host "HATA: Directory.Build.props icinde <Version> bulunamadi." -ForegroundColor Red
+        exit 1
+    }
+    $Version = $match.Matches[0].Groups[1].Value.Trim()
+}
+
 Write-Host "=== Runly Build Başladı ===" -ForegroundColor Green
 Write-Host "Yapılandırma: $Configuration"
+Write-Host "Sürüm: $Version"
 Write-Host "Çıktı: $Output`n"
 
 # 1. Testler

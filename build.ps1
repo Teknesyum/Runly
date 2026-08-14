@@ -1,7 +1,7 @@
 param(
     [string]$Configuration = "Release",
     [string]$Output = "dist",
-    [string]$Version = "0.1.0"
+    [string]$Version
 )
 
 $ErrorActionPreference = "Stop"

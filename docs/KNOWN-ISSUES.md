@@ -1,6 +1,6 @@
 # Runly — Bilinen Sınırlar ve Açık Sorunlar
 
-Sürüm 0.1.0 · Son güncelleme: 2026-08-11 (R3)
+Sürüm 0.1.1 · Son güncelleme: 2026-08-14 (T0)
 
 ## 1. Windows kısıtları (çözümü yok)
 
@@ -25,9 +25,7 @@ Sürüm 0.1.0 · Son güncelleme: 2026-08-11 (R3)
 
 | # | Sorun | Etki | Sahibi |
 |---|---|---|---|
-| B6 | **Ayarlar penceresi diskteki config değişikliğini fark etmiyor.** Pencere açıkken config dışarıdan değişirse "Kaydet" eski bellek durumunu geri yazıyor. | Küçük; sadece eşzamanlı düzenlemede. | T5 |
-| B7 | **Tablo, uygulama dışında yapılan bağlama değişikliğini canlı yakalamıyor.** Pencere yeniden açılınca doğru gösteriyor. | Küçük. | T5 |
-| B8 | **Kök `README.md` satır 38-41 hâlâ `install.ps1 -Silent` örneği veriyor**, oysa bu parametre R2'de kaldırıldı. | Yanlış belge. | T0/T6 kararı |
+| — | Açık kayıt yok. | | |
 
 ### Kapatılanlar
 
@@ -39,6 +37,16 @@ Sürüm 0.1.0 · Son güncelleme: 2026-08-11 (R3)
   `GetFinalPathNameByHandleW` ile reparse point çözüyor, 4 junction testi yeşil.
 - **B4** (`install.ps1 -Silent` ölü kod) — R2'de kaldırıldı.
 - **B5** (`samples/hello.ps1` BOM'suz) — R2'de BOM eklendi.
+- **B6** (dışarıdan değişen config'in sessizce geri yazılması) — 0.1.1'de kapatıldı; pencere
+  config dosyasının zaman damgasını tutuyor, kaydederken damga ilerlemişse üzerine yazmadan
+  önce onay soruyor.
+- **B7** (bağlama değişikliğinin canlı yakalanmaması) — R5'te kapatıldı; `RefreshStatusOnly`
+  pencere öne geldiğinde yalnız "Bulundu"/"Durum" sütunlarını tazeliyor, düzenlenmekte olan
+  hücreye dokunmuyor.
+- **B8** (README'deki `install.ps1 -Silent` örneği) — README İngilizceye taşınırken kaldırıldı.
+- **B9** (bağlı satırın hücre zemini beyaza dönüyordu) — 0.1.1'de kapatıldı; `DataGridView`
+  hücre dolgusu alfa kanalını yok sayıyor, yarı saydam tint'ler yüzey rengiyle önceden
+  karıştırılıp opak veriliyor.
 
 ## 3. Doğrulanamayanlar — kullanıcı tarafından doğrulanmalı
 
@@ -49,5 +57,8 @@ Sürüm 0.1.0 · Son güncelleme: 2026-08-11 (R3)
 - **`--verb runas` (UAC yükseltme).** UAC istemi otomasyonla onaylanamadığı için (Windows UIPI)
   uçtan uca denenemedi; sağ tık menüsünde fiilin **var olduğu** T7'de doğrulandı.
 - **Farklı bir kullanıcı hesabında kurulum.** Tek hesapta test edildi.
+- **Başlık çubuğu fiziksel etkileşimleri** — kenara sürükleyip yaslama (Aero Snap), çift tıkla
+  ekranı kapla, kenardan yeniden boyutlandırma, `Alt`+`F4`. Kod yazıldı; otomasyonla
+  doğrulanamaz, kullanıcı elle denemeli.
 - **R3'ün 6 maddesi (S1, S7, S12, B3 regresyonu, B5, dürüstlük denetimi)** — bu oturumda gerçek
   makinede çalıştırılamadı, bkz. `docs/reports/R3-COMPLETE.md`.

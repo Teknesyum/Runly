@@ -1,6 +1,6 @@
 # Runly
 
-![Runly Settings v0.1.0](docs/screenshots/runly-settings-v0.1.0.png)
+![Runly Settings v0.1.2](docs/screenshots/runly-settings-v0.1.2.png)
 
 Runly turns Windows script files into a double-clickable experience.
 
@@ -85,7 +85,7 @@ cd Runly
 .\build.ps1
 ```
 
-The build runs the test suite, publishes the NativeAOT launcher and self-contained settings application, and creates `Runly-v0.1.0-win-x64.zip`.
+The build runs the test suite, publishes the NativeAOT launcher and self-contained settings application, and creates `Runly-v<version>-win-x64.zip`. The version comes from `Directory.Build.props`, so the archive name always matches the binaries inside it.
 
 ## Security
 
@@ -93,10 +93,20 @@ Running scripts can modify files, start programs, and access user data. Only run
 
 Please report security issues privately to the repository owner instead of opening a public exploit report.
 
+### SmartScreen on first launch
+
+Runly is not code-signed, so Windows may show **"Windows protected your PC — Unknown publisher"** the first time you run it. This is expected for an unsigned application and does not mean the file was altered. To continue, click **More info**, then **Run anyway**.
+
+If you would rather confirm the download first, compare its hash against the SHA-256 published on the release page:
+
+```powershell
+Get-FileHash .\Runly-v0.1.2-win-x64.zip -Algorithm SHA256
+```
+
 ## Release
 
-Current version: **v0.1.1**  
-Download: [Runly v0.1.1 for Windows x64](https://github.com/Teknesyum/Runly/releases/tag/v0.1.1)
+Current version: **v0.1.2**  
+Download: [Runly v0.1.2 for Windows x64](https://github.com/Teknesyum/Runly/releases/tag/v0.1.2)
 
 ---
 
@@ -107,3 +117,4 @@ This application is built in spare time and is free.
 <a href="https://github.com/sponsors/Teknesyum"><img src="https://img.shields.io/badge/Buy_me_a_coffee-b026ff?style=for-the-badge&logo=githubsponsors&logoColor=b026ff&labelColor=0d0d0f" alt="Sponsor" /></a>
 
 **[github.com/Teknesyum](https://github.com/Teknesyum)** · [MIT](LICENSE)
+

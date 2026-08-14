@@ -21,6 +21,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Runly.Core\Runly.Core.csproj" />
     <EmbeddedResource Include="..\..\assets\runly.ico" LogicalName="Runly.Settings.runly.ico" />
+    <EmbeddedResource Include="locale\tr.json" LogicalName="Runly.Settings.locale.tr.json" />
+    <EmbeddedResource Include="locale\en.json" LogicalName="Runly.Settings.locale.en.json" />
   </ItemGroup>
 
 </Project>

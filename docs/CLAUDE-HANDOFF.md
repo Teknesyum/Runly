@@ -1,6 +1,6 @@
-# Runly — Claude Handoff
+﻿# Runly — Claude Handoff
 
-Last updated: 2026-08-13
+Last updated: 2026-08-14
 
 ## Product
 
@@ -10,11 +10,12 @@ Repository: `https://github.com/Teknesyum/Runly`
 
 ## Current release work
 
-- Source version is `0.1.1` in `Directory.Build.props`.
-- `v0.1.0` is already public on GitHub.
-- `v0.1.1` is public. Changes made after that tag stay on `main` until the next release is requested.
-- Release build command: `./scripts/build.ps1 -Configuration Release -Version 0.1.1`
-- Expected package: `Runly-v0.1.1-win-x64.zip`
+- Source version is `0.1.2` in `Directory.Build.props`.
+- `v0.1.0` and `v0.1.1` are public on GitHub.
+- `v0.1.2` is tagged locally and awaits `git push` plus a GitHub release upload.
+- Release build command: `./scripts/build.ps1` — the version is read from `Directory.Build.props`;
+  pass `-Version` only to override it deliberately.
+- Expected package: `Runly-v0.1.2-win-x64.zip`
 
 ## Default-app decision — important
 
@@ -64,7 +65,7 @@ The new cyan/pink icon was visually verified in the live Release Settings title 
 ## README
 
 - README is English.
-- Current screenshot: `docs/screenshots/runly-settings-v0.1.0.png` (filename is historical; image includes the new title-bar icon).
+- Current screenshot: `docs/screenshots/runly-settings-v0.1.2.png` — captured from the 0.1.2 build (transparent icon, footer-only status strip, rounded window, neon panel titles).
 - Support block intentionally matches the Adamantium Base repository design and links to `https://github.com/sponsors/Teknesyum`.
 
 ## Verification baseline
@@ -84,3 +85,4 @@ The new cyan/pink icon was visually verified in the live Release Settings title 
 - Display only the human-readable semantic version; strip build metadata after `+`.
 - Do not remove the explicit embedded Settings icon.
 - Do not omit `LICENSE` from the release ZIP.
+

@@ -19,21 +19,59 @@ $icons = @(
     @{ Name = "generic"; Label = "?";  Bg = "#666666"; Fg = "#FFFFFF" }
 )
 
-function New-RoundedSquarePath {
-    param([int]$Size, [int]$Inset = 0)
+function Remove-OuterSurface {
+    param([System.Drawing.Bitmap]$Bitmap)
 
-    # Teknesyum UI §10 ile ayni dil: yaricap, dis kenarin tam %22'si.
-    $radius = [single]($Size * 0.22)
-    $diameter = $radius * 2
-    $edge = [single]($Size - 1 - $Inset)
-    $start = [single]$Inset
-    $path = New-Object System.Drawing.Drawing2D.GraphicsPath
-    $path.AddArc($start, $start, $diameter, $diameter, 180, 90)
-    $path.AddArc($edge - $diameter, $start, $diameter, $diameter, 270, 90)
-    $path.AddArc($edge - $diameter, $edge - $diameter, $diameter, $diameter, 0, 90)
-    $path.AddArc($start, $edge - $diameter, $diameter, $diameter, 90, 90)
-    $path.CloseFigure()
-    return $path
+    # Ana cizimde zemin duz siyah bir yuvarlak kare. Disaridan iceriye tasma yapmadan
+    # yalnizca "en distaki" siyahi kaldirmak icin kenardan tasma-doldurma yapiliyor.
+    # Ok basinin siyahi bu alana bagli oldugu icin o da saydamlasir; sonuc kasitli.
+    $w = $Bitmap.Width
+    $h = $Bitmap.Height
+    $rect = New-Object System.Drawing.Rectangle(0, 0, $w, $h)
+    $data = $Bitmap.LockBits($rect, [System.Drawing.Imaging.ImageLockMode]::ReadWrite, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+    $len = $data.Stride * $h
+    $buf = New-Object byte[] $len
+    [System.Runtime.InteropServices.Marshal]::Copy($data.Scan0, $buf, 0, $len)
+
+    $isBg = New-Object bool[] ($w * $h)
+    for ($y = 0; $y -lt $h; $y++) {
+        $row = $y * $data.Stride
+        for ($x = 0; $x -lt $w; $x++) {
+            $o = $row + $x * 4
+            $mx = [Math]::Max([Math]::Max($buf[$o], $buf[$o + 1]), $buf[$o + 2])
+            if ($buf[$o + 3] -lt 16 -or $mx -lt 60) { $isBg[$y * $w + $x] = $true }
+        }
+    }
+
+    $seen = New-Object bool[] ($w * $h)
+    $stack = New-Object System.Collections.Generic.Stack[int]
+    for ($x = 0; $x -lt $w; $x++) {
+        foreach ($y in @(0, ($h - 1))) { $i = $y * $w + $x; if ($isBg[$i] -and -not $seen[$i]) { $seen[$i] = $true; $stack.Push($i) } }
+    }
+    for ($y = 0; $y -lt $h; $y++) {
+        foreach ($x in @(0, ($w - 1))) { $i = $y * $w + $x; if ($isBg[$i] -and -not $seen[$i]) { $seen[$i] = $true; $stack.Push($i) } }
+    }
+    while ($stack.Count -gt 0) {
+        $i = $stack.Pop()
+        $x = $i % $w
+        $y = [int](($i - $x) / $w)
+        if ($x -gt 0)     { $j = $i - 1;  if ($isBg[$j] -and -not $seen[$j]) { $seen[$j] = $true; $stack.Push($j) } }
+        if ($x -lt $w - 1) { $j = $i + 1;  if ($isBg[$j] -and -not $seen[$j]) { $seen[$j] = $true; $stack.Push($j) } }
+        if ($y -gt 0)     { $j = $i - $w; if ($isBg[$j] -and -not $seen[$j]) { $seen[$j] = $true; $stack.Push($j) } }
+        if ($y -lt $h - 1) { $j = $i + $w; if ($isBg[$j] -and -not $seen[$j]) { $seen[$j] = $true; $stack.Push($j) } }
+    }
+
+    for ($y = 0; $y -lt $h; $y++) {
+        $row = $y * $data.Stride
+        for ($x = 0; $x -lt $w; $x++) {
+            if ($seen[$y * $w + $x]) {
+                $o = $row + $x * 4
+                $buf[$o] = 0; $buf[$o + 1] = 0; $buf[$o + 2] = 0; $buf[$o + 3] = 0
+            }
+        }
+    }
+    [System.Runtime.InteropServices.Marshal]::Copy($buf, 0, $data.Scan0, $len)
+    $Bitmap.UnlockBits($data)
 }
 
 function New-RunlySmallFrame {
@@ -50,11 +88,8 @@ function New-RunlySmallFrame {
 
     $blue = New-Object System.Drawing.SolidBrush([System.Drawing.ColorTranslator]::FromHtml("#00F3FF"))
     $pink = New-Object System.Drawing.SolidBrush([System.Drawing.ColorTranslator]::FromHtml("#FF00EA"))
-    $surface = New-Object System.Drawing.SolidBrush([System.Drawing.ColorTranslator]::FromHtml("#08090A"))
 
-    $outer = New-RoundedSquarePath -Size $Size
-    $graphics.FillPath($surface, $outer)
-
+    # Dis yuvarlak kare artik cizilmiyor: ikon saydam zemin uzerinde duruyor.
     # Belge govdesi: ust sag kose katlanmis.
     $doc = New-Object System.Drawing.Drawing2D.GraphicsPath
     $doc.StartFigure()
@@ -81,8 +116,8 @@ function New-RunlySmallFrame {
     $arrow.CloseFigure()
     $graphics.FillPath($pink, $arrow)
 
-    $arrow.Dispose(); $fold.Dispose(); $doc.Dispose(); $outer.Dispose()
-    $surface.Dispose(); $pink.Dispose(); $blue.Dispose(); $graphics.Dispose()
+    $arrow.Dispose(); $fold.Dispose(); $doc.Dispose()
+    $pink.Dispose(); $blue.Dispose(); $graphics.Dispose()
     $stream = New-Object System.IO.MemoryStream
     $bitmap.Save($stream, [System.Drawing.Imaging.ImageFormat]::Png)
     $bitmap.Dispose()
@@ -101,7 +136,11 @@ function New-RunlyFrame {
     if (-not (Test-Path -LiteralPath $masterPath)) {
         throw "Runly ana ikon cizimi bulunamadi: $masterPath"
     }
-    $master = [System.Drawing.Image]::FromFile($masterPath)
+    if ($null -eq $script:masterBitmap) {
+        $script:masterBitmap = New-Object System.Drawing.Bitmap([System.Drawing.Image]::FromFile($masterPath))
+        Remove-OuterSurface -Bitmap $script:masterBitmap
+    }
+    $master = $script:masterBitmap
     $scaled = New-Object System.Drawing.Bitmap($Size, $Size)
     $scaledGraphics = [System.Drawing.Graphics]::FromImage($scaled)
     $scaledGraphics.CompositingMode = [System.Drawing.Drawing2D.CompositingMode]::SourceCopy
@@ -109,7 +148,7 @@ function New-RunlyFrame {
     $scaledGraphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
     $scaledGraphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::Half
     $scaledGraphics.DrawImage($master, 0, 0, $Size, $Size)
-    $scaledGraphics.Dispose(); $master.Dispose()
+    $scaledGraphics.Dispose()
     $scaledStream = New-Object System.IO.MemoryStream
     $scaled.Save($scaledStream, [System.Drawing.Imaging.ImageFormat]::Png)
     $scaled.Dispose()
