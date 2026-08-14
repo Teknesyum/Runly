@@ -1,6 +1,6 @@
 # Runly
 
-![Runly Settings v0.1.2](docs/screenshots/runly-settings-v0.1.2.png)
+![Runly Settings v0.1.3](docs/screenshots/runly-settings-v0.1.3.png)
 
 Runly turns Windows script files into a double-clickable experience.
 
@@ -100,13 +100,13 @@ Runly is not code-signed, so Windows may show **"Windows protected your PC — U
 If you would rather confirm the download first, compare its hash against the SHA-256 published on the release page:
 
 ```powershell
-Get-FileHash .\Runly-v0.1.2-win-x64.zip -Algorithm SHA256
+Get-FileHash .\Runly-v0.1.3-win-x64.zip -Algorithm SHA256
 ```
 
 ## Release
 
-Current version: **v0.1.2**  
-Download: [Runly v0.1.2 for Windows x64](https://github.com/Teknesyum/Runly/releases/tag/v0.1.2)
+Current version: **v0.1.3**  
+Download: [Runly v0.1.3 for Windows x64](https://github.com/Teknesyum/Runly/releases/tag/v0.1.3)
 
 ---
 
@@ -117,4 +117,5 @@ This application is built in spare time and is free.
 <a href="https://github.com/sponsors/Teknesyum"><img src="https://img.shields.io/badge/Buy_me_a_coffee-b026ff?style=for-the-badge&logo=githubsponsors&logoColor=b026ff&labelColor=0d0d0f" alt="Sponsor" /></a>
 
 **[github.com/Teknesyum](https://github.com/Teknesyum)** · [MIT](LICENSE)
+
 

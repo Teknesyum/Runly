@@ -1,6 +1,6 @@
 # Runly — Bilinen Sınırlar ve Açık Sorunlar
 
-Sürüm 0.1.1 · Son güncelleme: 2026-08-14 (T0)
+Sürüm 0.1.3 · Son güncelleme: 2026-08-14 (T0)
 
 ## 1. Windows kısıtları (çözümü yok)
 
@@ -44,6 +44,13 @@ Sürüm 0.1.1 · Son güncelleme: 2026-08-14 (T0)
   pencere öne geldiğinde yalnız "Bulundu"/"Durum" sütunlarını tazeliyor, düzenlenmekte olan
   hücreye dokunmuyor.
 - **B8** (README'deki `install.ps1 -Silent` örneği) — README İngilizceye taşınırken kaldırıldı.
+- **B10** (kenardan boyutlandırma, Aero Snap ve çift tıkla ekranı kaplama çalışmıyordu) —
+  0.1.3'te kapatıldı. Üç sebep vardı: `FormBorderStyle.None` pencereden `WS_THICKFRAME` ve
+  `WS_MAXIMIZEBOX` stillerini alıyor, Windows bunlar olmadan doğru bildirilen HTLEFT/HTCAPTION
+  kodlarına tepki vermiyor; stiller eklenince bu kez 7px'lik görünür bir çerçeve doğuyor, bu da
+  `WM_NCCALCSIZE`'a sıfır dönerek yok ediliyor; son olarak sol/sağ/alt kenarları `Dock=Fill`
+  çocuk denetimler kaplıyordu, pencerenin hit-test'i oralara hiç ulaşmıyordu — `DisplayRectangle`
+  artık üç kenarda 7px'lik bir tutamak payı bırakıyor. Dördü de otomasyonla ölçüldü.
 - **B9** (bağlı satırın hücre zemini beyaza dönüyordu) — 0.1.1'de kapatıldı; `DataGridView`
   hücre dolgusu alfa kanalını yok sayıyor, yarı saydam tint'ler yüzey rengiyle önceden
   karıştırılıp opak veriliyor.
@@ -57,8 +64,6 @@ Sürüm 0.1.1 · Son güncelleme: 2026-08-14 (T0)
 - **`--verb runas` (UAC yükseltme).** UAC istemi otomasyonla onaylanamadığı için (Windows UIPI)
   uçtan uca denenemedi; sağ tık menüsünde fiilin **var olduğu** T7'de doğrulandı.
 - **Farklı bir kullanıcı hesabında kurulum.** Tek hesapta test edildi.
-- **Başlık çubuğu fiziksel etkileşimleri** — kenara sürükleyip yaslama (Aero Snap), çift tıkla
-  ekranı kapla, kenardan yeniden boyutlandırma, `Alt`+`F4`. Kod yazıldı; otomasyonla
-  doğrulanamaz, kullanıcı elle denemeli.
+- ~~Başlık çubuğu fiziksel etkileşimleri~~ — 0.1.3'te ölçüldü ve kapatıldı, bkz. B10.
 - **R3'ün 6 maddesi (S1, S7, S12, B3 regresyonu, B5, dürüstlük denetimi)** — bu oturumda gerçek
   makinede çalıştırılamadı, bkz. `docs/reports/R3-COMPLETE.md`.

@@ -10,6 +10,10 @@ internal class NeonForm : Form
     private const int CaptionButtonWidth = 52;
     private const int ResizeBorder = 7;
     private const int WmNcHitTest = 0x0084;
+    private const int WmNcCalcSize = 0x0083;
+    private const int WsThickFrame = 0x00040000;
+    private const int WsMaximizeBox = 0x00010000;
+    private const int WsMinimizeBox = 0x00020000;
     private const int WmGetMinMaxInfo = 0x0024;
     private const int HtClient = 1;
     private const int HtCaption = 2;
@@ -46,6 +50,21 @@ internal class NeonForm : Form
         Resize += (_, _) => ApplyCornerRegion();
     }
 
+    /// <summary>Restores the window styles that <see cref="FormBorderStyle.None"/> strips. The hit test
+    /// below already reports HTLEFT/HTCAPTION, but Windows only acts on those codes when the window
+    /// actually carries a sizing frame and a maximize box — without them there is no edge resizing, no
+    /// double-click-to-maximize and no Aero Snap. The frame is non-visual here; the caption and border
+    /// are still drawn by us.</summary>
+    protected override CreateParams CreateParams
+    {
+        get
+        {
+            var parameters = base.CreateParams;
+            parameters.Style |= WsThickFrame | WsMaximizeBox | WsMinimizeBox;
+            return parameters;
+        }
+    }
+
     /// Rounds the window corners. FormBorderStyle.None windows get no DWM rounding, so the shape is
     /// clipped by Region instead. Maximized windows stay square: rounded corners there leave the
     /// desktop showing through at the screen edge.
@@ -70,7 +89,17 @@ internal class NeonForm : Form
         get
         {
             var display = base.DisplayRectangle;
-            return new Rectangle(display.X, display.Y + CaptionHeight, display.Width, Math.Max(0, display.Height - CaptionHeight));
+
+            // The caption is reserved at the top, and a resize gutter on the other three sides. Child
+            // controls are hit-tested before the form is, so an edge covered by a docked child can
+            // never start a resize however correct HitTest is — the gutter is what keeps it reachable.
+            // A maximized window is not resizable, so it gets the full area.
+            var gutter = WindowState == FormWindowState.Maximized ? 0 : ResizeBorder;
+            return new Rectangle(
+                display.X + gutter,
+                display.Y + CaptionHeight,
+                Math.Max(0, display.Width - (gutter * 2)),
+                Math.Max(0, display.Height - CaptionHeight - gutter));
         }
     }
 
@@ -107,6 +136,15 @@ internal class NeonForm : Form
 
     protected override void WndProc(ref Message m)
     {
+        // The sizing frame added in CreateParams would otherwise eat a 7px non-client border on every
+        // side, insetting the drawn surface and putting the corner region on the wrong rectangle.
+        // Reporting no non-client area gives the frame's behaviour without its pixels.
+        if (m.Msg == WmNcCalcSize && m.WParam != IntPtr.Zero)
+        {
+            m.Result = IntPtr.Zero;
+            return;
+        }
+
         if (m.Msg == WmNcHitTest)
         {
             base.WndProc(ref m);
