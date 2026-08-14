@@ -65,5 +65,6 @@
   "kind.open": "Open",
   "catalog.searchPlaceholder": "Search .md, markdown, or notepad",
   "catalog.bulkOpen": "Open category with this app",
-  "catalog.blocked": "Disabled for Windows security"
+  "catalog.blocked": "Disabled for Windows security",
+  "binding.progress": "extensions bound"
 }

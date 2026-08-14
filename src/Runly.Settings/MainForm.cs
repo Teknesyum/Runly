@@ -80,6 +80,7 @@ internal sealed class MainForm : NeonForm
     private readonly RichTextBox _detailText;
     private readonly Button _detailAskButton;
     private readonly Label _detailPlaceholder;
+    private readonly BindingProgressRing _bindingProgress;
 
     private readonly RadioButton _radioAlwaysAsk;
     private readonly RadioButton _radioTrustOnFirstUse;
@@ -196,10 +197,12 @@ internal sealed class MainForm : NeonForm
             Visible = false,
         };
         _detailAskButton = new NeonButton { Dock = DockStyle.Bottom, AutoSize = true, Visible = false };
+        _bindingProgress = new BindingProgressRing();
         _detailAskButton.Click += OnDetailAskButtonClicked;
         detailPanel.Controls.Add(_detailText);
         detailPanel.Controls.Add(_detailAskButton);
         detailPanel.Controls.Add(_detailPlaceholder);
+        detailPanel.Controls.Add(_bindingProgress);
         gridArea.Controls.Add(detailPanel, 2, 0);
 
         var extButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
@@ -562,7 +565,9 @@ internal sealed class MainForm : NeonForm
 
             _grid.Rows.Clear();
 
-            foreach (var status in _shellRegistrar.GetStatus(VisibleStatusConfig()))
+            var statuses = _shellRegistrar.GetStatus(VisibleStatusConfig());
+            _bindingProgress.SetProgress(statuses.Count(status => status.Bound == BindingState.Bound), statuses.Count);
+            foreach (var status in statuses)
             {
                 if (!_config.Extensions.TryGetValue(status.Extension, out var mapping))
                 {
@@ -697,6 +702,7 @@ internal sealed class MainForm : NeonForm
         }
 
         UpdateDetailPanel();
+        _bindingProgress.SetProgress(statuses.Count(status => status.Bound == BindingState.Bound), statuses.Count);
     }
 
     private void UpdateSingleRowStatus(int rowIndex, string extension)

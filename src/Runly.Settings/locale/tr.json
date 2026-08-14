@@ -65,5 +65,6 @@
   "kind.open": "Aç",
   "catalog.searchPlaceholder": ".md, markdown veya notepad ara",
   "catalog.bulkOpen": "Kategoriyi bu uygulamayla aç",
-  "catalog.blocked": "Windows güvenliği nedeniyle devre dışı"
+  "catalog.blocked": "Windows güvenliği nedeniyle devre dışı",
+  "binding.progress": "uzantı bağlı"
 }
