@@ -71,5 +71,10 @@
   "profile.import": "Profili içe aktar",
   "profile.filter": "Runly yapılandırması (*.json)|*.json|Tüm dosyalar (*.*)|*.*",
   "profile.exported": "Profil dışa aktarıldı ✓",
-  "profile.imported": "Profil içe aktarıldı — kaydetmeyi unutmayın"
+  "profile.imported": "Profil içe aktarıldı — kaydetmeyi unutmayın",
+  "category.scripts": "Betikler", "category.code": "Kod/Geliştirme", "category.text": "Metin ve Belge",
+  "category.data": "Yapılandırma/Veri", "category.web": "Web", "category.images": "Görseller",
+  "category.audio": "Ses", "category.video": "Video", "category.archive": "Arşiv",
+  "category.office": "Ofis/Doküman", "category.design": "3B ve Tasarım", "category.fonts": "Yazı Tipleri",
+  "category.locked": "Kilitli", "category.special": "Özel"
 }

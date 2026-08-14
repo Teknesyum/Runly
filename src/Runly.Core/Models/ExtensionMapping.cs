@@ -11,7 +11,7 @@ public sealed record ExtensionMapping
 
     /// <summary>Catalog category used by the settings application.</summary>
     [JsonPropertyName("category")]
-    public string Category { get; init; } = "Betikler";
+    public string Category { get; init; } = "scripts";
 
     /// <summary>Interpreter name to look up on PATH, or a full path to an executable.</summary>
     [JsonPropertyName("interpreter")]

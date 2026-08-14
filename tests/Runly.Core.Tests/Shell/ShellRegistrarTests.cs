@@ -528,7 +528,7 @@ public sealed class ShellRegistrarTests : IDisposable
         {
             Extensions = new Dictionary<string, ExtensionMapping>(StringComparer.OrdinalIgnoreCase)
             {
-                [".md"] = new() { Kind = HandlerKind.Open, Category = "Metin ve Belge", OpenWith = handler, Args = "\"{script}\" {args}", Enabled = true },
+                [".md"] = new() { Kind = HandlerKind.Open, Category = "text", OpenWith = handler, Args = "\"{script}\" {args}", Enabled = true },
             },
         };
 

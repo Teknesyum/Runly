@@ -71,5 +71,10 @@
   "profile.import": "Import profile",
   "profile.filter": "Runly configuration (*.json)|*.json|All files (*.*)|*.*",
   "profile.exported": "Profile exported ✓",
-  "profile.imported": "Profile imported — remember to save"
+  "profile.imported": "Profile imported — remember to save",
+  "category.scripts": "Scripts", "category.code": "Code/Development", "category.text": "Text and Documents",
+  "category.data": "Configuration/Data", "category.web": "Web", "category.images": "Images",
+  "category.audio": "Audio", "category.video": "Video", "category.archive": "Archives",
+  "category.office": "Office/Documents", "category.design": "3D and Design", "category.fonts": "Fonts",
+  "category.locked": "Locked", "category.special": "Special"
 }

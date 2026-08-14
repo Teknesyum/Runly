@@ -115,7 +115,7 @@ public sealed class ConfigStore : IConfigStore
                 extensions[key] = pair.Value with
                 {
                     Kind = Enum.IsDefined(pair.Value.Kind) ? pair.Value.Kind : HandlerKind.Run,
-                    Category = string.IsNullOrWhiteSpace(pair.Value.Category) ? "Betikler" : pair.Value.Category,
+                    Category = NormalizeCategory(pair.Value.Category),
                     Interpreter = pair.Value.Interpreter ?? string.Empty,
                     OpenWith = string.IsNullOrWhiteSpace(pair.Value.OpenWith) ? null : pair.Value.OpenWith,
                     Args = pair.Value.Args ?? string.Empty,
@@ -131,6 +131,25 @@ public sealed class ConfigStore : IConfigStore
             Extensions = extensions,
         };
     }
+
+    private static string NormalizeCategory(string? category) => category switch
+    {
+        null or "" or "scripts" or "Betikler" => "scripts",
+        "code" or "Kod/Geliştirme" => "code",
+        "text" or "Metin ve Belge" => "text",
+        "data" or "Yapılandırma/Veri" => "data",
+        "web" or "Web" => "web",
+        "images" or "Görseller" => "images",
+        "audio" or "Ses" => "audio",
+        "video" or "Video" => "video",
+        "archive" or "Arşiv" => "archive",
+        "office" or "Ofis/Doküman" => "office",
+        "design" or "3B ve Tasarım" => "design",
+        "fonts" or "Yazı Tipleri" => "fonts",
+        "locked" or "Kilitli" => "locked",
+        "special" or "Özel" => "special",
+        _ => "special",
+    };
 
     private void TrySave(RunlyConfig config)
     {

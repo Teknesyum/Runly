@@ -116,19 +116,19 @@ public static class RunlyRegistryLayout
     /// <summary>Maps a catalog category to its single shared neon icon file.</summary>
     public static string CategoryIconFileName(string category) => category switch
     {
-        "Betikler" => "category-scripts.ico",
-        "Kod/Geliştirme" => "category-code.ico",
-        "Metin ve Belge" => "category-text.ico",
-        "Yapılandırma/Veri" => "category-data.ico",
-        "Web" => "category-web.ico",
-        "Görseller" => "category-images.ico",
-        "Ses" => "category-audio.ico",
-        "Video" => "category-video.ico",
-        "Arşiv" => "category-archive.ico",
-        "Ofis/Doküman" => "category-office.ico",
-        "3B ve Tasarım" => "category-design.ico",
-        "Yazı Tipleri" => "category-fonts.ico",
-        "Kilitli" => "category-locked.ico",
+        "scripts" => "category-scripts.ico",
+        "code" => "category-code.ico",
+        "text" => "category-text.ico",
+        "data" => "category-data.ico",
+        "web" => "category-web.ico",
+        "images" => "category-images.ico",
+        "audio" => "category-audio.ico",
+        "video" => "category-video.ico",
+        "archive" => "category-archive.ico",
+        "office" => "category-office.ico",
+        "design" => "category-design.ico",
+        "fonts" => "category-fonts.ico",
+        "locked" => "category-locked.ico",
         _ => "category-special.ico",
     };
 }

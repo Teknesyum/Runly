@@ -71,7 +71,7 @@ public sealed class ConfigStoreTests : IDisposable
         Assert.False(config.LogEnabled);
         var mapping = Assert.Single(config.Extensions).Value;
         Assert.Equal(HandlerKind.Run, mapping.Kind);
-        Assert.Equal("Betikler", mapping.Category);
+        Assert.Equal("scripts", mapping.Category);
         Assert.Equal("custom.exe", mapping.Interpreter);
         Assert.Equal("--flag \"{script}\"", mapping.Args);
         Assert.True(mapping.Enabled);

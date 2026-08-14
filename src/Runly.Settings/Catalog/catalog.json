@@ -1,7 +1,7 @@
 [
   {
     "extension": ".js",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "JS dosyası",
       "en": "JS file"
@@ -12,7 +12,7 @@
   },
   {
     "extension": ".mjs",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "MJS dosyası",
       "en": "MJS file"
@@ -23,7 +23,7 @@
   },
   {
     "extension": ".cjs",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "CJS dosyası",
       "en": "CJS file"
@@ -34,7 +34,7 @@
   },
   {
     "extension": ".ts",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "TS dosyası",
       "en": "TS file"
@@ -45,7 +45,7 @@
   },
   {
     "extension": ".ps1",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "PS1 dosyası",
       "en": "PS1 file"
@@ -56,7 +56,7 @@
   },
   {
     "extension": ".py",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "PY dosyası",
       "en": "PY file"
@@ -67,7 +67,7 @@
   },
   {
     "extension": ".pyw",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "PYW dosyası",
       "en": "PYW file"
@@ -78,7 +78,7 @@
   },
   {
     "extension": ".rb",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "RB dosyası",
       "en": "RB file"
@@ -89,7 +89,7 @@
   },
   {
     "extension": ".pl",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "PL dosyası",
       "en": "PL file"
@@ -100,7 +100,7 @@
   },
   {
     "extension": ".lua",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "LUA dosyası",
       "en": "LUA file"
@@ -111,7 +111,7 @@
   },
   {
     "extension": ".php",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "PHP dosyası",
       "en": "PHP file"
@@ -122,7 +122,7 @@
   },
   {
     "extension": ".sh",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "SH dosyası",
       "en": "SH file"
@@ -133,7 +133,7 @@
   },
   {
     "extension": ".r",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "R dosyası",
       "en": "R file"
@@ -144,7 +144,7 @@
   },
   {
     "extension": ".jar",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "JAR dosyası",
       "en": "JAR file"
@@ -155,7 +155,7 @@
   },
   {
     "extension": ".bash",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "BASH dosyası",
       "en": "BASH file"
@@ -166,7 +166,7 @@
   },
   {
     "extension": ".zsh",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "ZSH dosyası",
       "en": "ZSH file"
@@ -177,7 +177,7 @@
   },
   {
     "extension": ".fish",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "FISH dosyası",
       "en": "FISH file"
@@ -188,7 +188,7 @@
   },
   {
     "extension": ".tcl",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "TCL dosyası",
       "en": "TCL file"
@@ -199,7 +199,7 @@
   },
   {
     "extension": ".awk",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "AWK dosyası",
       "en": "AWK file"
@@ -210,7 +210,7 @@
   },
   {
     "extension": ".psm1",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "PSM1 dosyası",
       "en": "PSM1 file"
@@ -221,7 +221,7 @@
   },
   {
     "extension": ".psd1",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "PSD1 dosyası",
       "en": "PSD1 file"
@@ -232,7 +232,7 @@
   },
   {
     "extension": ".vbs",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "VBS dosyası",
       "en": "VBS file"
@@ -243,7 +243,7 @@
   },
   {
     "extension": ".wsf",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "WSF dosyası",
       "en": "WSF file"
@@ -254,7 +254,7 @@
   },
   {
     "extension": ".wsh",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "WSH dosyası",
       "en": "WSH file"
@@ -265,7 +265,7 @@
   },
   {
     "extension": ".hta",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "HTA dosyası",
       "en": "HTA file"
@@ -276,7 +276,7 @@
   },
   {
     "extension": ".groovy",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "GROOVY dosyası",
       "en": "GROOVY file"
@@ -287,7 +287,7 @@
   },
   {
     "extension": ".kts",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "KTS dosyası",
       "en": "KTS file"
@@ -298,7 +298,7 @@
   },
   {
     "extension": ".dart",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "DART dosyası",
       "en": "DART file"
@@ -309,7 +309,7 @@
   },
   {
     "extension": ".coffee",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "COFFEE dosyası",
       "en": "COFFEE file"
@@ -320,7 +320,7 @@
   },
   {
     "extension": ".exs",
-    "category": "Betikler",
+    "category": "scripts",
     "displayName": {
       "tr": "EXS dosyası",
       "en": "EXS file"
@@ -331,7 +331,7 @@
   },
   {
     "extension": ".cs",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "CS dosyası",
       "en": "CS file"
@@ -342,7 +342,7 @@
   },
   {
     "extension": ".csx",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "CSX dosyası",
       "en": "CSX file"
@@ -353,7 +353,7 @@
   },
   {
     "extension": ".vb",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "VB dosyası",
       "en": "VB file"
@@ -364,7 +364,7 @@
   },
   {
     "extension": ".fs",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "FS dosyası",
       "en": "FS file"
@@ -375,7 +375,7 @@
   },
   {
     "extension": ".fsx",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "FSX dosyası",
       "en": "FSX file"
@@ -386,7 +386,7 @@
   },
   {
     "extension": ".cpp",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "CPP dosyası",
       "en": "CPP file"
@@ -397,7 +397,7 @@
   },
   {
     "extension": ".cc",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "CC dosyası",
       "en": "CC file"
@@ -408,7 +408,7 @@
   },
   {
     "extension": ".cxx",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "CXX dosyası",
       "en": "CXX file"
@@ -419,7 +419,7 @@
   },
   {
     "extension": ".c",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "C dosyası",
       "en": "C file"
@@ -430,7 +430,7 @@
   },
   {
     "extension": ".h",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "H dosyası",
       "en": "H file"
@@ -441,7 +441,7 @@
   },
   {
     "extension": ".hpp",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "HPP dosyası",
       "en": "HPP file"
@@ -452,7 +452,7 @@
   },
   {
     "extension": ".hxx",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "HXX dosyası",
       "en": "HXX file"
@@ -463,7 +463,7 @@
   },
   {
     "extension": ".java",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "JAVA dosyası",
       "en": "JAVA file"
@@ -474,7 +474,7 @@
   },
   {
     "extension": ".kt",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "KT dosyası",
       "en": "KT file"
@@ -485,7 +485,7 @@
   },
   {
     "extension": ".ktscript",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "KTSCRIPT dosyası",
       "en": "KTSCRIPT file"
@@ -496,7 +496,7 @@
   },
   {
     "extension": ".go",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "GO dosyası",
       "en": "GO file"
@@ -507,7 +507,7 @@
   },
   {
     "extension": ".rs",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "RS dosyası",
       "en": "RS file"
@@ -518,7 +518,7 @@
   },
   {
     "extension": ".swift",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "SWIFT dosyası",
       "en": "SWIFT file"
@@ -529,7 +529,7 @@
   },
   {
     "extension": ".scala",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "SCALA dosyası",
       "en": "SCALA file"
@@ -540,7 +540,7 @@
   },
   {
     "extension": ".clj",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "CLJ dosyası",
       "en": "CLJ file"
@@ -551,7 +551,7 @@
   },
   {
     "extension": ".cljs",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "CLJS dosyası",
       "en": "CLJS file"
@@ -562,7 +562,7 @@
   },
   {
     "extension": ".hs",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "HS dosyası",
       "en": "HS file"
@@ -573,7 +573,7 @@
   },
   {
     "extension": ".lhs",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "LHS dosyası",
       "en": "LHS file"
@@ -584,7 +584,7 @@
   },
   {
     "extension": ".erl",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "ERL dosyası",
       "en": "ERL file"
@@ -595,7 +595,7 @@
   },
   {
     "extension": ".hrl",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "HRL dosyası",
       "en": "HRL file"
@@ -606,7 +606,7 @@
   },
   {
     "extension": ".ex",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "EX dosyası",
       "en": "EX file"
@@ -617,7 +617,7 @@
   },
   {
     "extension": ".elm",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "ELM dosyası",
       "en": "ELM file"
@@ -628,7 +628,7 @@
   },
   {
     "extension": ".sol",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "SOL dosyası",
       "en": "SOL file"
@@ -639,7 +639,7 @@
   },
   {
     "extension": ".asm",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "ASM dosyası",
       "en": "ASM file"
@@ -650,7 +650,7 @@
   },
   {
     "extension": ".s",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "S dosyası",
       "en": "S file"
@@ -661,7 +661,7 @@
   },
   {
     "extension": ".pas",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "PAS dosyası",
       "en": "PAS file"
@@ -672,7 +672,7 @@
   },
   {
     "extension": ".pp",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "PP dosyası",
       "en": "PP file"
@@ -683,7 +683,7 @@
   },
   {
     "extension": ".d",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "D dosyası",
       "en": "D file"
@@ -694,7 +694,7 @@
   },
   {
     "extension": ".nim",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "NIM dosyası",
       "en": "NIM file"
@@ -705,7 +705,7 @@
   },
   {
     "extension": ".zig",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "ZIG dosyası",
       "en": "ZIG file"
@@ -716,7 +716,7 @@
   },
   {
     "extension": ".v",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "V dosyası",
       "en": "V file"
@@ -727,7 +727,7 @@
   },
   {
     "extension": ".vue",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "VUE dosyası",
       "en": "VUE file"
@@ -738,7 +738,7 @@
   },
   {
     "extension": ".svelte",
-    "category": "Kod/Geliştirme",
+    "category": "code",
     "displayName": {
       "tr": "SVELTE dosyası",
       "en": "SVELTE file"
@@ -749,7 +749,7 @@
   },
   {
     "extension": ".txt",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "TXT dosyası",
       "en": "TXT file"
@@ -764,7 +764,7 @@
   },
   {
     "extension": ".md",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "MD dosyası",
       "en": "MD file"
@@ -780,7 +780,7 @@
   },
   {
     "extension": ".markdown",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "MARKDOWN dosyası",
       "en": "MARKDOWN file"
@@ -791,7 +791,7 @@
   },
   {
     "extension": ".rst",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "RST dosyası",
       "en": "RST file"
@@ -802,7 +802,7 @@
   },
   {
     "extension": ".adoc",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "ADOC dosyası",
       "en": "ADOC file"
@@ -813,7 +813,7 @@
   },
   {
     "extension": ".asciidoc",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "ASCIIDOC dosyası",
       "en": "ASCIIDOC file"
@@ -824,7 +824,7 @@
   },
   {
     "extension": ".tex",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "TEX dosyası",
       "en": "TEX file"
@@ -835,7 +835,7 @@
   },
   {
     "extension": ".latex",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "LATEX dosyası",
       "en": "LATEX file"
@@ -846,7 +846,7 @@
   },
   {
     "extension": ".log",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "LOG dosyası",
       "en": "LOG file"
@@ -857,7 +857,7 @@
   },
   {
     "extension": ".nfo",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "NFO dosyası",
       "en": "NFO file"
@@ -868,7 +868,7 @@
   },
   {
     "extension": ".readme",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "README dosyası",
       "en": "README file"
@@ -879,7 +879,7 @@
   },
   {
     "extension": ".rtf",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "RTF dosyası",
       "en": "RTF file"
@@ -890,7 +890,7 @@
   },
   {
     "extension": ".textile",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "TEXTILE dosyası",
       "en": "TEXTILE file"
@@ -901,7 +901,7 @@
   },
   {
     "extension": ".org",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "ORG dosyası",
       "en": "ORG file"
@@ -912,7 +912,7 @@
   },
   {
     "extension": ".wiki",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "WIKI dosyası",
       "en": "WIKI file"
@@ -923,7 +923,7 @@
   },
   {
     "extension": ".man",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "MAN dosyası",
       "en": "MAN file"
@@ -934,7 +934,7 @@
   },
   {
     "extension": ".me",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "ME dosyası",
       "en": "ME file"
@@ -945,7 +945,7 @@
   },
   {
     "extension": ".asc",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "ASC dosyası",
       "en": "ASC file"
@@ -956,7 +956,7 @@
   },
   {
     "extension": ".etx",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "ETX dosyası",
       "en": "ETX file"
@@ -967,7 +967,7 @@
   },
   {
     "extension": ".utf8",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "UTF8 dosyası",
       "en": "UTF8 file"
@@ -978,7 +978,7 @@
   },
   {
     "extension": ".text",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "TEXT dosyası",
       "en": "TEXT file"
@@ -989,7 +989,7 @@
   },
   {
     "extension": ".fodt",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "FODT dosyası",
       "en": "FODT file"
@@ -1000,7 +1000,7 @@
   },
   {
     "extension": ".uot",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "UOT dosyası",
       "en": "UOT file"
@@ -1011,7 +1011,7 @@
   },
   {
     "extension": ".stw",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "STW dosyası",
       "en": "STW file"
@@ -1022,7 +1022,7 @@
   },
   {
     "extension": ".sxw",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "SXW dosyası",
       "en": "SXW file"
@@ -1033,7 +1033,7 @@
   },
   {
     "extension": ".pages",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "PAGES dosyası",
       "en": "PAGES file"
@@ -1044,7 +1044,7 @@
   },
   {
     "extension": ".wpd",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "WPD dosyası",
       "en": "WPD file"
@@ -1055,7 +1055,7 @@
   },
   {
     "extension": ".wps",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "WPS dosyası",
       "en": "WPS file"
@@ -1066,7 +1066,7 @@
   },
   {
     "extension": ".abw",
-    "category": "Metin ve Belge",
+    "category": "text",
     "displayName": {
       "tr": "ABW dosyası",
       "en": "ABW file"
@@ -1077,7 +1077,7 @@
   },
   {
     "extension": ".json",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "JSON dosyası",
       "en": "JSON file"
@@ -1091,7 +1091,7 @@
   },
   {
     "extension": ".jsonc",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "JSONC dosyası",
       "en": "JSONC file"
@@ -1102,7 +1102,7 @@
   },
   {
     "extension": ".json5",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "JSON5 dosyası",
       "en": "JSON5 file"
@@ -1113,7 +1113,7 @@
   },
   {
     "extension": ".xml",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "XML dosyası",
       "en": "XML file"
@@ -1124,7 +1124,7 @@
   },
   {
     "extension": ".yaml",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "YAML dosyası",
       "en": "YAML file"
@@ -1135,7 +1135,7 @@
   },
   {
     "extension": ".yml",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "YML dosyası",
       "en": "YML file"
@@ -1146,7 +1146,7 @@
   },
   {
     "extension": ".toml",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "TOML dosyası",
       "en": "TOML file"
@@ -1157,7 +1157,7 @@
   },
   {
     "extension": ".ini",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "INI dosyası",
       "en": "INI file"
@@ -1168,7 +1168,7 @@
   },
   {
     "extension": ".cfg",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "CFG dosyası",
       "en": "CFG file"
@@ -1179,7 +1179,7 @@
   },
   {
     "extension": ".conf",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "CONF dosyası",
       "en": "CONF file"
@@ -1190,7 +1190,7 @@
   },
   {
     "extension": ".config",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "CONFIG dosyası",
       "en": "CONFIG file"
@@ -1201,7 +1201,7 @@
   },
   {
     "extension": ".properties",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "PROPERTIES dosyası",
       "en": "PROPERTIES file"
@@ -1212,7 +1212,7 @@
   },
   {
     "extension": ".env",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "ENV dosyası",
       "en": "ENV file"
@@ -1223,7 +1223,7 @@
   },
   {
     "extension": ".dotenv",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "DOTENV dosyası",
       "en": "DOTENV file"
@@ -1234,7 +1234,7 @@
   },
   {
     "extension": ".csv",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "CSV dosyası",
       "en": "CSV file"
@@ -1245,7 +1245,7 @@
   },
   {
     "extension": ".tsv",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "TSV dosyası",
       "en": "TSV file"
@@ -1256,7 +1256,7 @@
   },
   {
     "extension": ".sql",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "SQL dosyası",
       "en": "SQL file"
@@ -1267,7 +1267,7 @@
   },
   {
     "extension": ".db",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "DB dosyası",
       "en": "DB file"
@@ -1278,7 +1278,7 @@
   },
   {
     "extension": ".sqlite",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "SQLITE dosyası",
       "en": "SQLITE file"
@@ -1289,7 +1289,7 @@
   },
   {
     "extension": ".sqlite3",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "SQLITE3 dosyası",
       "en": "SQLITE3 file"
@@ -1300,7 +1300,7 @@
   },
   {
     "extension": ".parquet",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "PARQUET dosyası",
       "en": "PARQUET file"
@@ -1311,7 +1311,7 @@
   },
   {
     "extension": ".avro",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "AVRO dosyası",
       "en": "AVRO file"
@@ -1322,7 +1322,7 @@
   },
   {
     "extension": ".proto",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "PROTO dosyası",
       "en": "PROTO file"
@@ -1333,7 +1333,7 @@
   },
   {
     "extension": ".graphql",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "GRAPHQL dosyası",
       "en": "GRAPHQL file"
@@ -1344,7 +1344,7 @@
   },
   {
     "extension": ".gql",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "GQL dosyası",
       "en": "GQL file"
@@ -1355,7 +1355,7 @@
   },
   {
     "extension": ".xsd",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "XSD dosyası",
       "en": "XSD file"
@@ -1366,7 +1366,7 @@
   },
   {
     "extension": ".xsl",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "XSL dosyası",
       "en": "XSL file"
@@ -1377,7 +1377,7 @@
   },
   {
     "extension": ".xslt",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "XSLT dosyası",
       "en": "XSLT file"
@@ -1388,7 +1388,7 @@
   },
   {
     "extension": ".dtd",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "DTD dosyası",
       "en": "DTD file"
@@ -1399,7 +1399,7 @@
   },
   {
     "extension": ".plist",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "PLIST dosyası",
       "en": "PLIST file"
@@ -1410,7 +1410,7 @@
   },
   {
     "extension": ".reg",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "REG dosyası",
       "en": "REG file"
@@ -1421,7 +1421,7 @@
   },
   {
     "extension": ".inf",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "INF dosyası",
       "en": "INF file"
@@ -1432,7 +1432,7 @@
   },
   {
     "extension": ".manifest",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "MANIFEST dosyası",
       "en": "MANIFEST file"
@@ -1443,7 +1443,7 @@
   },
   {
     "extension": ".lock",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "LOCK dosyası",
       "en": "LOCK file"
@@ -1454,7 +1454,7 @@
   },
   {
     "extension": ".editorconfig",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "EDITORCONFIG dosyası",
       "en": "EDITORCONFIG file"
@@ -1465,7 +1465,7 @@
   },
   {
     "extension": ".gitignore",
-    "category": "Yapılandırma/Veri",
+    "category": "data",
     "displayName": {
       "tr": "GITIGNORE dosyası",
       "en": "GITIGNORE file"
@@ -1476,7 +1476,7 @@
   },
   {
     "extension": ".html",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "HTML dosyası",
       "en": "HTML file"
@@ -1487,7 +1487,7 @@
   },
   {
     "extension": ".htm",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "HTM dosyası",
       "en": "HTM file"
@@ -1498,7 +1498,7 @@
   },
   {
     "extension": ".xhtml",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "XHTML dosyası",
       "en": "XHTML file"
@@ -1509,7 +1509,7 @@
   },
   {
     "extension": ".css",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "CSS dosyası",
       "en": "CSS file"
@@ -1520,7 +1520,7 @@
   },
   {
     "extension": ".scss",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "SCSS dosyası",
       "en": "SCSS file"
@@ -1531,7 +1531,7 @@
   },
   {
     "extension": ".sass",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "SASS dosyası",
       "en": "SASS file"
@@ -1542,7 +1542,7 @@
   },
   {
     "extension": ".less",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "LESS dosyası",
       "en": "LESS file"
@@ -1553,7 +1553,7 @@
   },
   {
     "extension": ".styl",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "STYL dosyası",
       "en": "STYL file"
@@ -1564,7 +1564,7 @@
   },
   {
     "extension": ".svg",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "SVG dosyası",
       "en": "SVG file"
@@ -1575,7 +1575,7 @@
   },
   {
     "extension": ".wasm",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "WASM dosyası",
       "en": "WASM file"
@@ -1586,7 +1586,7 @@
   },
   {
     "extension": ".webmanifest",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "WEBMANIFEST dosyası",
       "en": "WEBMANIFEST file"
@@ -1597,7 +1597,7 @@
   },
   {
     "extension": ".map",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "MAP dosyası",
       "en": "MAP file"
@@ -1608,7 +1608,7 @@
   },
   {
     "extension": ".mht",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "MHT dosyası",
       "en": "MHT file"
@@ -1619,7 +1619,7 @@
   },
   {
     "extension": ".mhtml",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "MHTML dosyası",
       "en": "MHTML file"
@@ -1630,7 +1630,7 @@
   },
   {
     "extension": ".xht",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "XHT dosyası",
       "en": "XHT file"
@@ -1641,7 +1641,7 @@
   },
   {
     "extension": ".shtml",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "SHTML dosyası",
       "en": "SHTML file"
@@ -1652,7 +1652,7 @@
   },
   {
     "extension": ".asp",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "ASP dosyası",
       "en": "ASP file"
@@ -1663,7 +1663,7 @@
   },
   {
     "extension": ".aspx",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "ASPX dosyası",
       "en": "ASPX file"
@@ -1674,7 +1674,7 @@
   },
   {
     "extension": ".jsp",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "JSP dosyası",
       "en": "JSP file"
@@ -1685,7 +1685,7 @@
   },
   {
     "extension": ".twig",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "TWIG dosyası",
       "en": "TWIG file"
@@ -1696,7 +1696,7 @@
   },
   {
     "extension": ".hbs",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "HBS dosyası",
       "en": "HBS file"
@@ -1707,7 +1707,7 @@
   },
   {
     "extension": ".handlebars",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "HANDLEBARS dosyası",
       "en": "HANDLEBARS file"
@@ -1718,7 +1718,7 @@
   },
   {
     "extension": ".ejs",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "EJS dosyası",
       "en": "EJS file"
@@ -1729,7 +1729,7 @@
   },
   {
     "extension": ".pug",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "PUG dosyası",
       "en": "PUG file"
@@ -1740,7 +1740,7 @@
   },
   {
     "extension": ".jade",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "JADE dosyası",
       "en": "JADE file"
@@ -1751,7 +1751,7 @@
   },
   {
     "extension": ".razor",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "RAZOR dosyası",
       "en": "RAZOR file"
@@ -1762,7 +1762,7 @@
   },
   {
     "extension": ".cshtml",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "CSHTML dosyası",
       "en": "CSHTML file"
@@ -1773,7 +1773,7 @@
   },
   {
     "extension": ".rss",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "RSS dosyası",
       "en": "RSS file"
@@ -1784,7 +1784,7 @@
   },
   {
     "extension": ".atom",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "ATOM dosyası",
       "en": "ATOM file"
@@ -1795,7 +1795,7 @@
   },
   {
     "extension": ".webloc",
-    "category": "Web",
+    "category": "web",
     "displayName": {
       "tr": "WEBLOC dosyası",
       "en": "WEBLOC file"
@@ -1806,7 +1806,7 @@
   },
   {
     "extension": ".png",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "PNG dosyası",
       "en": "PNG file"
@@ -1819,7 +1819,7 @@
   },
   {
     "extension": ".jpg",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "JPG dosyası",
       "en": "JPG file"
@@ -1832,7 +1832,7 @@
   },
   {
     "extension": ".jpeg",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "JPEG dosyası",
       "en": "JPEG file"
@@ -1843,7 +1843,7 @@
   },
   {
     "extension": ".jpe",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "JPE dosyası",
       "en": "JPE file"
@@ -1854,7 +1854,7 @@
   },
   {
     "extension": ".gif",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "GIF dosyası",
       "en": "GIF file"
@@ -1865,7 +1865,7 @@
   },
   {
     "extension": ".bmp",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "BMP dosyası",
       "en": "BMP file"
@@ -1876,7 +1876,7 @@
   },
   {
     "extension": ".tif",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "TIF dosyası",
       "en": "TIF file"
@@ -1887,7 +1887,7 @@
   },
   {
     "extension": ".tiff",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "TIFF dosyası",
       "en": "TIFF file"
@@ -1898,7 +1898,7 @@
   },
   {
     "extension": ".webp",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "WEBP dosyası",
       "en": "WEBP file"
@@ -1909,7 +1909,7 @@
   },
   {
     "extension": ".avif",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "AVIF dosyası",
       "en": "AVIF file"
@@ -1920,7 +1920,7 @@
   },
   {
     "extension": ".heic",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "HEIC dosyası",
       "en": "HEIC file"
@@ -1931,7 +1931,7 @@
   },
   {
     "extension": ".heif",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "HEIF dosyası",
       "en": "HEIF file"
@@ -1942,7 +1942,7 @@
   },
   {
     "extension": ".ico",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "ICO dosyası",
       "en": "ICO file"
@@ -1953,7 +1953,7 @@
   },
   {
     "extension": ".cur",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "CUR dosyası",
       "en": "CUR file"
@@ -1964,7 +1964,7 @@
   },
   {
     "extension": ".raw",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "RAW dosyası",
       "en": "RAW file"
@@ -1975,7 +1975,7 @@
   },
   {
     "extension": ".dng",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "DNG dosyası",
       "en": "DNG file"
@@ -1986,7 +1986,7 @@
   },
   {
     "extension": ".cr2",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "CR2 dosyası",
       "en": "CR2 file"
@@ -1997,7 +1997,7 @@
   },
   {
     "extension": ".nef",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "NEF dosyası",
       "en": "NEF file"
@@ -2008,7 +2008,7 @@
   },
   {
     "extension": ".arw",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "ARW dosyası",
       "en": "ARW file"
@@ -2019,7 +2019,7 @@
   },
   {
     "extension": ".orf",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "ORF dosyası",
       "en": "ORF file"
@@ -2030,7 +2030,7 @@
   },
   {
     "extension": ".rw2",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "RW2 dosyası",
       "en": "RW2 file"
@@ -2041,7 +2041,7 @@
   },
   {
     "extension": ".psd",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "PSD dosyası",
       "en": "PSD file"
@@ -2052,7 +2052,7 @@
   },
   {
     "extension": ".xcf",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "XCF dosyası",
       "en": "XCF file"
@@ -2063,7 +2063,7 @@
   },
   {
     "extension": ".kra",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "KRA dosyası",
       "en": "KRA file"
@@ -2074,7 +2074,7 @@
   },
   {
     "extension": ".ora",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "ORA dosyası",
       "en": "ORA file"
@@ -2085,7 +2085,7 @@
   },
   {
     "extension": ".pbm",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "PBM dosyası",
       "en": "PBM file"
@@ -2096,7 +2096,7 @@
   },
   {
     "extension": ".pgm",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "PGM dosyası",
       "en": "PGM file"
@@ -2107,7 +2107,7 @@
   },
   {
     "extension": ".ppm",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "PPM dosyası",
       "en": "PPM file"
@@ -2118,7 +2118,7 @@
   },
   {
     "extension": ".pnm",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "PNM dosyası",
       "en": "PNM file"
@@ -2129,7 +2129,7 @@
   },
   {
     "extension": ".tga",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "TGA dosyası",
       "en": "TGA file"
@@ -2140,7 +2140,7 @@
   },
   {
     "extension": ".dds",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "DDS dosyası",
       "en": "DDS file"
@@ -2151,7 +2151,7 @@
   },
   {
     "extension": ".jxl",
-    "category": "Görseller",
+    "category": "images",
     "displayName": {
       "tr": "JXL dosyası",
       "en": "JXL file"
@@ -2162,7 +2162,7 @@
   },
   {
     "extension": ".mp3",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "MP3 dosyası",
       "en": "MP3 file"
@@ -2175,7 +2175,7 @@
   },
   {
     "extension": ".wav",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "WAV dosyası",
       "en": "WAV file"
@@ -2186,7 +2186,7 @@
   },
   {
     "extension": ".flac",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "FLAC dosyası",
       "en": "FLAC file"
@@ -2197,7 +2197,7 @@
   },
   {
     "extension": ".aac",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "AAC dosyası",
       "en": "AAC file"
@@ -2208,7 +2208,7 @@
   },
   {
     "extension": ".m4a",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "M4A dosyası",
       "en": "M4A file"
@@ -2219,7 +2219,7 @@
   },
   {
     "extension": ".ogg",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "OGG dosyası",
       "en": "OGG file"
@@ -2230,7 +2230,7 @@
   },
   {
     "extension": ".oga",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "OGA dosyası",
       "en": "OGA file"
@@ -2241,7 +2241,7 @@
   },
   {
     "extension": ".opus",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "OPUS dosyası",
       "en": "OPUS file"
@@ -2252,7 +2252,7 @@
   },
   {
     "extension": ".wma",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "WMA dosyası",
       "en": "WMA file"
@@ -2263,7 +2263,7 @@
   },
   {
     "extension": ".aiff",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "AIFF dosyası",
       "en": "AIFF file"
@@ -2274,7 +2274,7 @@
   },
   {
     "extension": ".aif",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "AIF dosyası",
       "en": "AIF file"
@@ -2285,7 +2285,7 @@
   },
   {
     "extension": ".mid",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "MID dosyası",
       "en": "MID file"
@@ -2296,7 +2296,7 @@
   },
   {
     "extension": ".midi",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "MIDI dosyası",
       "en": "MIDI file"
@@ -2307,7 +2307,7 @@
   },
   {
     "extension": ".amr",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "AMR dosyası",
       "en": "AMR file"
@@ -2318,7 +2318,7 @@
   },
   {
     "extension": ".ape",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "APE dosyası",
       "en": "APE file"
@@ -2329,7 +2329,7 @@
   },
   {
     "extension": ".alac",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "ALAC dosyası",
       "en": "ALAC file"
@@ -2340,7 +2340,7 @@
   },
   {
     "extension": ".ac3",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "AC3 dosyası",
       "en": "AC3 file"
@@ -2351,7 +2351,7 @@
   },
   {
     "extension": ".dts",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "DTS dosyası",
       "en": "DTS file"
@@ -2362,7 +2362,7 @@
   },
   {
     "extension": ".mka",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "MKA dosyası",
       "en": "MKA file"
@@ -2373,7 +2373,7 @@
   },
   {
     "extension": ".ra",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "RA dosyası",
       "en": "RA file"
@@ -2384,7 +2384,7 @@
   },
   {
     "extension": ".ram",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "RAM dosyası",
       "en": "RAM file"
@@ -2395,7 +2395,7 @@
   },
   {
     "extension": ".caf",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "CAF dosyası",
       "en": "CAF file"
@@ -2406,7 +2406,7 @@
   },
   {
     "extension": ".au",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "AU dosyası",
       "en": "AU file"
@@ -2417,7 +2417,7 @@
   },
   {
     "extension": ".snd",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "SND dosyası",
       "en": "SND file"
@@ -2428,7 +2428,7 @@
   },
   {
     "extension": ".voc",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "VOC dosyası",
       "en": "VOC file"
@@ -2439,7 +2439,7 @@
   },
   {
     "extension": ".weba",
-    "category": "Ses",
+    "category": "audio",
     "displayName": {
       "tr": "WEBA dosyası",
       "en": "WEBA file"
@@ -2450,7 +2450,7 @@
   },
   {
     "extension": ".mp4",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "MP4 dosyası",
       "en": "MP4 file"
@@ -2463,7 +2463,7 @@
   },
   {
     "extension": ".m4v",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "M4V dosyası",
       "en": "M4V file"
@@ -2474,7 +2474,7 @@
   },
   {
     "extension": ".mkv",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "MKV dosyası",
       "en": "MKV file"
@@ -2485,7 +2485,7 @@
   },
   {
     "extension": ".avi",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "AVI dosyası",
       "en": "AVI file"
@@ -2496,7 +2496,7 @@
   },
   {
     "extension": ".mov",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "MOV dosyası",
       "en": "MOV file"
@@ -2507,7 +2507,7 @@
   },
   {
     "extension": ".wmv",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "WMV dosyası",
       "en": "WMV file"
@@ -2518,7 +2518,7 @@
   },
   {
     "extension": ".webm",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "WEBM dosyası",
       "en": "WEBM file"
@@ -2529,7 +2529,7 @@
   },
   {
     "extension": ".mpeg",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "MPEG dosyası",
       "en": "MPEG file"
@@ -2540,7 +2540,7 @@
   },
   {
     "extension": ".mpg",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "MPG dosyası",
       "en": "MPG file"
@@ -2551,7 +2551,7 @@
   },
   {
     "extension": ".mpe",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "MPE dosyası",
       "en": "MPE file"
@@ -2562,7 +2562,7 @@
   },
   {
     "extension": ".tsvdo",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "TSVDO dosyası",
       "en": "TSVDO file"
@@ -2573,7 +2573,7 @@
   },
   {
     "extension": ".mts",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "MTS dosyası",
       "en": "MTS file"
@@ -2584,7 +2584,7 @@
   },
   {
     "extension": ".m2ts",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "M2TS dosyası",
       "en": "M2TS file"
@@ -2595,7 +2595,7 @@
   },
   {
     "extension": ".3gp",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "3GP dosyası",
       "en": "3GP file"
@@ -2606,7 +2606,7 @@
   },
   {
     "extension": ".3g2",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "3G2 dosyası",
       "en": "3G2 file"
@@ -2617,7 +2617,7 @@
   },
   {
     "extension": ".flv",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "FLV dosyası",
       "en": "FLV file"
@@ -2628,7 +2628,7 @@
   },
   {
     "extension": ".f4v",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "F4V dosyası",
       "en": "F4V file"
@@ -2639,7 +2639,7 @@
   },
   {
     "extension": ".ogv",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "OGV dosyası",
       "en": "OGV file"
@@ -2650,7 +2650,7 @@
   },
   {
     "extension": ".vob",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "VOB dosyası",
       "en": "VOB file"
@@ -2661,7 +2661,7 @@
   },
   {
     "extension": ".rm",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "RM dosyası",
       "en": "RM file"
@@ -2672,7 +2672,7 @@
   },
   {
     "extension": ".rmvb",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "RMVB dosyası",
       "en": "RMVB file"
@@ -2683,7 +2683,7 @@
   },
   {
     "extension": ".asf",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "ASF dosyası",
       "en": "ASF file"
@@ -2694,7 +2694,7 @@
   },
   {
     "extension": ".divx",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "DIVX dosyası",
       "en": "DIVX file"
@@ -2705,7 +2705,7 @@
   },
   {
     "extension": ".mxf",
-    "category": "Video",
+    "category": "video",
     "displayName": {
       "tr": "MXF dosyası",
       "en": "MXF file"
@@ -2716,7 +2716,7 @@
   },
   {
     "extension": ".zip",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "ZIP dosyası",
       "en": "ZIP file"
@@ -2727,7 +2727,7 @@
   },
   {
     "extension": ".7z",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "7Z dosyası",
       "en": "7Z file"
@@ -2738,7 +2738,7 @@
   },
   {
     "extension": ".rar",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "RAR dosyası",
       "en": "RAR file"
@@ -2749,7 +2749,7 @@
   },
   {
     "extension": ".tar",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "TAR dosyası",
       "en": "TAR file"
@@ -2760,7 +2760,7 @@
   },
   {
     "extension": ".gz",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "GZ dosyası",
       "en": "GZ file"
@@ -2771,7 +2771,7 @@
   },
   {
     "extension": ".gzip",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "GZIP dosyası",
       "en": "GZIP file"
@@ -2782,7 +2782,7 @@
   },
   {
     "extension": ".bz2",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "BZ2 dosyası",
       "en": "BZ2 file"
@@ -2793,7 +2793,7 @@
   },
   {
     "extension": ".bzip2",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "BZIP2 dosyası",
       "en": "BZIP2 file"
@@ -2804,7 +2804,7 @@
   },
   {
     "extension": ".xz",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "XZ dosyası",
       "en": "XZ file"
@@ -2815,7 +2815,7 @@
   },
   {
     "extension": ".lz",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "LZ dosyası",
       "en": "LZ file"
@@ -2826,7 +2826,7 @@
   },
   {
     "extension": ".lzma",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "LZMA dosyası",
       "en": "LZMA file"
@@ -2837,7 +2837,7 @@
   },
   {
     "extension": ".zst",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "ZST dosyası",
       "en": "ZST file"
@@ -2848,7 +2848,7 @@
   },
   {
     "extension": ".cab",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "CAB dosyası",
       "en": "CAB file"
@@ -2859,7 +2859,7 @@
   },
   {
     "extension": ".iso",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "ISO dosyası",
       "en": "ISO file"
@@ -2870,7 +2870,7 @@
   },
   {
     "extension": ".img",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "IMG dosyası",
       "en": "IMG file"
@@ -2881,7 +2881,7 @@
   },
   {
     "extension": ".dmg",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "DMG dosyası",
       "en": "DMG file"
@@ -2892,7 +2892,7 @@
   },
   {
     "extension": ".tgz",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "TGZ dosyası",
       "en": "TGZ file"
@@ -2903,7 +2903,7 @@
   },
   {
     "extension": ".tbz",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "TBZ dosyası",
       "en": "TBZ file"
@@ -2914,7 +2914,7 @@
   },
   {
     "extension": ".tbz2",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "TBZ2 dosyası",
       "en": "TBZ2 file"
@@ -2925,7 +2925,7 @@
   },
   {
     "extension": ".txz",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "TXZ dosyası",
       "en": "TXZ file"
@@ -2936,7 +2936,7 @@
   },
   {
     "extension": ".cpio",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "CPIO dosyası",
       "en": "CPIO file"
@@ -2947,7 +2947,7 @@
   },
   {
     "extension": ".ar",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "AR dosyası",
       "en": "AR file"
@@ -2958,7 +2958,7 @@
   },
   {
     "extension": ".deb",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "DEB dosyası",
       "en": "DEB file"
@@ -2969,7 +2969,7 @@
   },
   {
     "extension": ".rpm",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "RPM dosyası",
       "en": "RPM file"
@@ -2980,7 +2980,7 @@
   },
   {
     "extension": ".apk",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "APK dosyası",
       "en": "APK file"
@@ -2991,7 +2991,7 @@
   },
   {
     "extension": ".xpi",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "XPI dosyası",
       "en": "XPI file"
@@ -3002,7 +3002,7 @@
   },
   {
     "extension": ".crx",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "CRX dosyası",
       "en": "CRX file"
@@ -3013,7 +3013,7 @@
   },
   {
     "extension": ".pak",
-    "category": "Arşiv",
+    "category": "archive",
     "displayName": {
       "tr": "PAK dosyası",
       "en": "PAK file"
@@ -3024,7 +3024,7 @@
   },
   {
     "extension": ".doc",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "DOC dosyası",
       "en": "DOC file"
@@ -3035,7 +3035,7 @@
   },
   {
     "extension": ".docx",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "DOCX dosyası",
       "en": "DOCX file"
@@ -3048,7 +3048,7 @@
   },
   {
     "extension": ".docm",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "DOCM dosyası",
       "en": "DOCM file"
@@ -3059,7 +3059,7 @@
   },
   {
     "extension": ".dot",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "DOT dosyası",
       "en": "DOT file"
@@ -3070,7 +3070,7 @@
   },
   {
     "extension": ".dotx",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "DOTX dosyası",
       "en": "DOTX file"
@@ -3081,7 +3081,7 @@
   },
   {
     "extension": ".xls",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "XLS dosyası",
       "en": "XLS file"
@@ -3092,7 +3092,7 @@
   },
   {
     "extension": ".xlsx",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "XLSX dosyası",
       "en": "XLSX file"
@@ -3105,7 +3105,7 @@
   },
   {
     "extension": ".xlsm",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "XLSM dosyası",
       "en": "XLSM file"
@@ -3116,7 +3116,7 @@
   },
   {
     "extension": ".xlt",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "XLT dosyası",
       "en": "XLT file"
@@ -3127,7 +3127,7 @@
   },
   {
     "extension": ".xltx",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "XLTX dosyası",
       "en": "XLTX file"
@@ -3138,7 +3138,7 @@
   },
   {
     "extension": ".ppt",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "PPT dosyası",
       "en": "PPT file"
@@ -3149,7 +3149,7 @@
   },
   {
     "extension": ".pptx",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "PPTX dosyası",
       "en": "PPTX file"
@@ -3162,7 +3162,7 @@
   },
   {
     "extension": ".pptm",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "PPTM dosyası",
       "en": "PPTM file"
@@ -3173,7 +3173,7 @@
   },
   {
     "extension": ".pot",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "POT dosyası",
       "en": "POT file"
@@ -3184,7 +3184,7 @@
   },
   {
     "extension": ".potx",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "POTX dosyası",
       "en": "POTX file"
@@ -3195,7 +3195,7 @@
   },
   {
     "extension": ".odt",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "ODT dosyası",
       "en": "ODT file"
@@ -3206,7 +3206,7 @@
   },
   {
     "extension": ".ods",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "ODS dosyası",
       "en": "ODS file"
@@ -3217,7 +3217,7 @@
   },
   {
     "extension": ".odp",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "ODP dosyası",
       "en": "ODP file"
@@ -3228,7 +3228,7 @@
   },
   {
     "extension": ".odg",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "ODG dosyası",
       "en": "ODG file"
@@ -3239,7 +3239,7 @@
   },
   {
     "extension": ".pdf",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "PDF dosyası",
       "en": "PDF file"
@@ -3253,7 +3253,7 @@
   },
   {
     "extension": ".epub",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "EPUB dosyası",
       "en": "EPUB file"
@@ -3264,7 +3264,7 @@
   },
   {
     "extension": ".mobi",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "MOBI dosyası",
       "en": "MOBI file"
@@ -3275,7 +3275,7 @@
   },
   {
     "extension": ".azw",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "AZW dosyası",
       "en": "AZW file"
@@ -3286,7 +3286,7 @@
   },
   {
     "extension": ".azw3",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "AZW3 dosyası",
       "en": "AZW3 file"
@@ -3297,7 +3297,7 @@
   },
   {
     "extension": ".xps",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "XPS dosyası",
       "en": "XPS file"
@@ -3308,7 +3308,7 @@
   },
   {
     "extension": ".oxps",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "OXPS dosyası",
       "en": "OXPS file"
@@ -3319,7 +3319,7 @@
   },
   {
     "extension": ".pub",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "PUB dosyası",
       "en": "PUB file"
@@ -3330,7 +3330,7 @@
   },
   {
     "extension": ".vsd",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "VSD dosyası",
       "en": "VSD file"
@@ -3341,7 +3341,7 @@
   },
   {
     "extension": ".vsdx",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "VSDX dosyası",
       "en": "VSDX file"
@@ -3352,7 +3352,7 @@
   },
   {
     "extension": ".one",
-    "category": "Ofis/Doküman",
+    "category": "office",
     "displayName": {
       "tr": "ONE dosyası",
       "en": "ONE file"
@@ -3363,7 +3363,7 @@
   },
   {
     "extension": ".obj",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "OBJ dosyası",
       "en": "OBJ file"
@@ -3374,7 +3374,7 @@
   },
   {
     "extension": ".fbx",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "FBX dosyası",
       "en": "FBX file"
@@ -3385,7 +3385,7 @@
   },
   {
     "extension": ".stl",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "STL dosyası",
       "en": "STL file"
@@ -3396,7 +3396,7 @@
   },
   {
     "extension": ".3ds",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "3DS dosyası",
       "en": "3DS file"
@@ -3407,7 +3407,7 @@
   },
   {
     "extension": ".blend",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "BLEND dosyası",
       "en": "BLEND file"
@@ -3418,7 +3418,7 @@
   },
   {
     "extension": ".dae",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "DAE dosyası",
       "en": "DAE file"
@@ -3429,7 +3429,7 @@
   },
   {
     "extension": ".gltf",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "GLTF dosyası",
       "en": "GLTF file"
@@ -3440,7 +3440,7 @@
   },
   {
     "extension": ".glb",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "GLB dosyası",
       "en": "GLB file"
@@ -3451,7 +3451,7 @@
   },
   {
     "extension": ".ply",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "PLY dosyası",
       "en": "PLY file"
@@ -3462,7 +3462,7 @@
   },
   {
     "extension": ".step",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "STEP dosyası",
       "en": "STEP file"
@@ -3473,7 +3473,7 @@
   },
   {
     "extension": ".stp",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "STP dosyası",
       "en": "STP file"
@@ -3484,7 +3484,7 @@
   },
   {
     "extension": ".iges",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "IGES dosyası",
       "en": "IGES file"
@@ -3495,7 +3495,7 @@
   },
   {
     "extension": ".igs",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "IGS dosyası",
       "en": "IGS file"
@@ -3506,7 +3506,7 @@
   },
   {
     "extension": ".dwg",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "DWG dosyası",
       "en": "DWG file"
@@ -3517,7 +3517,7 @@
   },
   {
     "extension": ".dxf",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "DXF dosyası",
       "en": "DXF file"
@@ -3528,7 +3528,7 @@
   },
   {
     "extension": ".skp",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "SKP dosyası",
       "en": "SKP file"
@@ -3539,7 +3539,7 @@
   },
   {
     "extension": ".3dm",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "3DM dosyası",
       "en": "3DM file"
@@ -3550,7 +3550,7 @@
   },
   {
     "extension": ".max",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "MAX dosyası",
       "en": "MAX file"
@@ -3561,7 +3561,7 @@
   },
   {
     "extension": ".ma",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "MA dosyası",
       "en": "MA file"
@@ -3572,7 +3572,7 @@
   },
   {
     "extension": ".mb",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "MB dosyası",
       "en": "MB file"
@@ -3583,7 +3583,7 @@
   },
   {
     "extension": ".c4d",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "C4D dosyası",
       "en": "C4D file"
@@ -3594,7 +3594,7 @@
   },
   {
     "extension": ".usd",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "USD dosyası",
       "en": "USD file"
@@ -3605,7 +3605,7 @@
   },
   {
     "extension": ".usda",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "USDA dosyası",
       "en": "USDA file"
@@ -3616,7 +3616,7 @@
   },
   {
     "extension": ".usdc",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "USDC dosyası",
       "en": "USDC file"
@@ -3627,7 +3627,7 @@
   },
   {
     "extension": ".usdz",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "USDZ dosyası",
       "en": "USDZ file"
@@ -3638,7 +3638,7 @@
   },
   {
     "extension": ".sldprt",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "SLDPRT dosyası",
       "en": "SLDPRT file"
@@ -3649,7 +3649,7 @@
   },
   {
     "extension": ".sldasm",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "SLDASM dosyası",
       "en": "SLDASM file"
@@ -3660,7 +3660,7 @@
   },
   {
     "extension": ".ipt",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "IPT dosyası",
       "en": "IPT file"
@@ -3671,7 +3671,7 @@
   },
   {
     "extension": ".iam",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "IAM dosyası",
       "en": "IAM file"
@@ -3682,7 +3682,7 @@
   },
   {
     "extension": ".fcstd",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "FCSTD dosyası",
       "en": "FCSTD file"
@@ -3693,7 +3693,7 @@
   },
   {
     "extension": ".scad",
-    "category": "3B ve Tasarım",
+    "category": "design",
     "displayName": {
       "tr": "SCAD dosyası",
       "en": "SCAD file"
@@ -3704,7 +3704,7 @@
   },
   {
     "extension": ".ttf",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "TTF dosyası",
       "en": "TTF file"
@@ -3715,7 +3715,7 @@
   },
   {
     "extension": ".otf",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "OTF dosyası",
       "en": "OTF file"
@@ -3726,7 +3726,7 @@
   },
   {
     "extension": ".woff",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "WOFF dosyası",
       "en": "WOFF file"
@@ -3737,7 +3737,7 @@
   },
   {
     "extension": ".woff2",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "WOFF2 dosyası",
       "en": "WOFF2 file"
@@ -3748,7 +3748,7 @@
   },
   {
     "extension": ".eot",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "EOT dosyası",
       "en": "EOT file"
@@ -3759,7 +3759,7 @@
   },
   {
     "extension": ".fon",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "FON dosyası",
       "en": "FON file"
@@ -3770,7 +3770,7 @@
   },
   {
     "extension": ".fnt",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "FNT dosyası",
       "en": "FNT file"
@@ -3781,7 +3781,7 @@
   },
   {
     "extension": ".pfb",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "PFB dosyası",
       "en": "PFB file"
@@ -3792,7 +3792,7 @@
   },
   {
     "extension": ".pfm",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "PFM dosyası",
       "en": "PFM file"
@@ -3803,7 +3803,7 @@
   },
   {
     "extension": ".ttc",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "TTC dosyası",
       "en": "TTC file"
@@ -3814,7 +3814,7 @@
   },
   {
     "extension": ".otc",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "OTC dosyası",
       "en": "OTC file"
@@ -3825,7 +3825,7 @@
   },
   {
     "extension": ".bdf",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "BDF dosyası",
       "en": "BDF file"
@@ -3836,7 +3836,7 @@
   },
   {
     "extension": ".pcf",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "PCF dosyası",
       "en": "PCF file"
@@ -3847,7 +3847,7 @@
   },
   {
     "extension": ".sfd",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "SFD dosyası",
       "en": "SFD file"
@@ -3858,7 +3858,7 @@
   },
   {
     "extension": ".ufo",
-    "category": "Yazı Tipleri",
+    "category": "fonts",
     "displayName": {
       "tr": "UFO dosyası",
       "en": "UFO file"
@@ -3869,7 +3869,7 @@
   },
   {
     "extension": ".torrent",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "TORRENT dosyası",
       "en": "TORRENT file"
@@ -3880,7 +3880,7 @@
   },
   {
     "extension": ".ics",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "ICS dosyası",
       "en": "ICS file"
@@ -3891,7 +3891,7 @@
   },
   {
     "extension": ".vcf",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "VCF dosyası",
       "en": "VCF file"
@@ -3902,7 +3902,7 @@
   },
   {
     "extension": ".eml",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "EML dosyası",
       "en": "EML file"
@@ -3913,7 +3913,7 @@
   },
   {
     "extension": ".msg",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "MSG dosyası",
       "en": "MSG file"
@@ -3924,7 +3924,7 @@
   },
   {
     "extension": ".mbox",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "MBOX dosyası",
       "en": "MBOX file"
@@ -3935,7 +3935,7 @@
   },
   {
     "extension": ".bib",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "BIB dosyası",
       "en": "BIB file"
@@ -3946,7 +3946,7 @@
   },
   {
     "extension": ".ris",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "RIS dosyası",
       "en": "RIS file"
@@ -3957,7 +3957,7 @@
   },
   {
     "extension": ".opml",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "OPML dosyası",
       "en": "OPML file"
@@ -3968,7 +3968,7 @@
   },
   {
     "extension": ".gpx",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "GPX dosyası",
       "en": "GPX file"
@@ -3979,7 +3979,7 @@
   },
   {
     "extension": ".kml",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "KML dosyası",
       "en": "KML file"
@@ -3990,7 +3990,7 @@
   },
   {
     "extension": ".kmz",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "KMZ dosyası",
       "en": "KMZ file"
@@ -4001,7 +4001,7 @@
   },
   {
     "extension": ".fit",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "FIT dosyası",
       "en": "FIT file"
@@ -4012,7 +4012,7 @@
   },
   {
     "extension": ".sav",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "SAV dosyası",
       "en": "SAV file"
@@ -4023,7 +4023,7 @@
   },
   {
     "extension": ".rom",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "ROM dosyası",
       "en": "ROM file"
@@ -4034,7 +4034,7 @@
   },
   {
     "extension": ".nes",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "NES dosyası",
       "en": "NES file"
@@ -4045,7 +4045,7 @@
   },
   {
     "extension": ".sfc",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "SFC dosyası",
       "en": "SFC file"
@@ -4056,7 +4056,7 @@
   },
   {
     "extension": ".gba",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "GBA dosyası",
       "en": "GBA file"
@@ -4067,7 +4067,7 @@
   },
   {
     "extension": ".iso2",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "ISO2 dosyası",
       "en": "ISO2 file"
@@ -4078,7 +4078,7 @@
   },
   {
     "extension": ".cue",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "CUE dosyası",
       "en": "CUE file"
@@ -4089,7 +4089,7 @@
   },
   {
     "extension": ".patch",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "PATCH dosyası",
       "en": "PATCH file"
@@ -4100,7 +4100,7 @@
   },
   {
     "extension": ".diff",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "DIFF dosyası",
       "en": "DIFF file"
@@ -4111,7 +4111,7 @@
   },
   {
     "extension": ".desktop",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "DESKTOP dosyası",
       "en": "DESKTOP file"
@@ -4122,7 +4122,7 @@
   },
   {
     "extension": ".url2",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "URL2 dosyası",
       "en": "URL2 file"
@@ -4133,7 +4133,7 @@
   },
   {
     "extension": ".pem",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "PEM dosyası",
       "en": "PEM file"
@@ -4144,7 +4144,7 @@
   },
   {
     "extension": ".crt",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "CRT dosyası",
       "en": "CRT file"
@@ -4155,7 +4155,7 @@
   },
   {
     "extension": ".cer",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "CER dosyası",
       "en": "CER file"
@@ -4166,7 +4166,7 @@
   },
   {
     "extension": ".key",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "KEY dosyası",
       "en": "KEY file"
@@ -4177,7 +4177,7 @@
   },
   {
     "extension": ".csr",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "CSR dosyası",
       "en": "CSR file"
@@ -4188,7 +4188,7 @@
   },
   {
     "extension": ".pfx",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "PFX dosyası",
       "en": "PFX file"
@@ -4199,7 +4199,7 @@
   },
   {
     "extension": ".p12",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "P12 dosyası",
       "en": "P12 file"
@@ -4210,7 +4210,7 @@
   },
   {
     "extension": ".der",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "DER dosyası",
       "en": "DER file"
@@ -4221,7 +4221,7 @@
   },
   {
     "extension": ".torrent2",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "TORRENT2 dosyası",
       "en": "TORRENT2 file"
@@ -4232,7 +4232,7 @@
   },
   {
     "extension": ".bak",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "BAK dosyası",
       "en": "BAK file"
@@ -4243,7 +4243,7 @@
   },
   {
     "extension": ".tmp",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "TMP dosyası",
       "en": "TMP file"
@@ -4254,7 +4254,7 @@
   },
   {
     "extension": ".dat",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "DAT dosyası",
       "en": "DAT file"
@@ -4265,7 +4265,7 @@
   },
   {
     "extension": ".bin",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "BIN dosyası",
       "en": "BIN file"
@@ -4276,7 +4276,7 @@
   },
   {
     "extension": ".hex",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "HEX dosyası",
       "en": "HEX file"
@@ -4287,7 +4287,7 @@
   },
   {
     "extension": ".mapdata",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "MAPDATA dosyası",
       "en": "MAPDATA file"
@@ -4298,7 +4298,7 @@
   },
   {
     "extension": ".shader",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "SHADER dosyası",
       "en": "SHADER file"
@@ -4309,7 +4309,7 @@
   },
   {
     "extension": ".frag",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "FRAG dosyası",
       "en": "FRAG file"
@@ -4320,7 +4320,7 @@
   },
   {
     "extension": ".vert",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "VERT dosyası",
       "en": "VERT file"
@@ -4331,7 +4331,7 @@
   },
   {
     "extension": ".ipynb",
-    "category": "Özel",
+    "category": "special",
     "displayName": {
       "tr": "IPYNB dosyası",
       "en": "IPYNB file"
@@ -4342,7 +4342,7 @@
   },
   {
     "extension": ".exe",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "EXE dosyası",
       "en": "EXE file"
@@ -4357,7 +4357,7 @@
   },
   {
     "extension": ".dll",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "DLL dosyası",
       "en": "DLL file"
@@ -4372,7 +4372,7 @@
   },
   {
     "extension": ".sys",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "SYS dosyası",
       "en": "SYS file"
@@ -4387,7 +4387,7 @@
   },
   {
     "extension": ".com",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "COM dosyası",
       "en": "COM file"
@@ -4402,7 +4402,7 @@
   },
   {
     "extension": ".bat",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "BAT dosyası",
       "en": "BAT file"
@@ -4417,7 +4417,7 @@
   },
   {
     "extension": ".cmd",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "CMD dosyası",
       "en": "CMD file"
@@ -4432,7 +4432,7 @@
   },
   {
     "extension": ".msi",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "MSI dosyası",
       "en": "MSI file"
@@ -4447,7 +4447,7 @@
   },
   {
     "extension": ".msc",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "MSC dosyası",
       "en": "MSC file"
@@ -4462,7 +4462,7 @@
   },
   {
     "extension": ".cpl",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "CPL dosyası",
       "en": "CPL file"
@@ -4477,7 +4477,7 @@
   },
   {
     "extension": ".scr",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "SCR dosyası",
       "en": "SCR file"
@@ -4492,7 +4492,7 @@
   },
   {
     "extension": ".lnk",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "LNK dosyası",
       "en": "LNK file"
@@ -4507,7 +4507,7 @@
   },
   {
     "extension": ".pif",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "PIF dosyası",
       "en": "PIF file"
@@ -4522,7 +4522,7 @@
   },
   {
     "extension": ".url",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "URL dosyası",
       "en": "URL file"
@@ -4537,7 +4537,7 @@
   },
   {
     "extension": ".job",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "JOB dosyası",
       "en": "JOB file"
@@ -4552,7 +4552,7 @@
   },
   {
     "extension": ".ocx",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "OCX dosyası",
       "en": "OCX file"
@@ -4567,7 +4567,7 @@
   },
   {
     "extension": ".drv",
-    "category": "Kilitli",
+    "category": "locked",
     "displayName": {
       "tr": "DRV dosyası",
       "en": "DRV file"
