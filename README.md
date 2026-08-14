@@ -2,7 +2,7 @@
 
 ![Runly Settings v0.1.3](docs/screenshots/runly-settings-v0.1.3.png)
 
-Runly turns Windows script files into a double-clickable experience.
+Runly is a Windows file-association hub: run scripts safely or open documents in an explicitly selected application, with searchable categories and bulk assignment.
 
 Instead of opening `.js`, `.ps1`, `.py`, `.sh`, `.ts`, and related files in an editor, Runly detects the correct interpreter, applies safety checks, and launches the script like a regular Windows application. It also adds a **Run with Runly** context-menu action with optional command-line arguments.
 
@@ -100,13 +100,12 @@ Runly is not code-signed, so Windows may show **"Windows protected your PC — U
 If you would rather confirm the download first, compare its hash against the SHA-256 published on the release page:
 
 ```powershell
-Get-FileHash .\Runly-v0.1.3-win-x64.zip -Algorithm SHA256
+Get-FileHash .\Runly-v0.2.0-win-x64.zip -Algorithm SHA256
 ```
 
 ## Release
 
-Current version: **v0.1.3**  
-Download: [Runly v0.1.3 for Windows x64](https://github.com/Teknesyum/Runly/releases/tag/v0.1.3)
+Current source version: **v0.2.0**
 
 ---
 

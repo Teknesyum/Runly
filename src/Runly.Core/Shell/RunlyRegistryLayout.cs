@@ -42,24 +42,6 @@ public static class RunlyRegistryLayout
     /// <summary>Application description shown in the Windows "Default apps" list.</summary>
     public const string ApplicationDescription = "Script dosyalarını çift tıkla çalıştırır";
 
-    private static readonly Dictionary<string, string> TypeNames = new(StringComparer.OrdinalIgnoreCase)
-    {
-        [".js"] = "JavaScript Betiği",
-        [".mjs"] = "JavaScript Modülü",
-        [".cjs"] = "CommonJS Betiği",
-        [".ts"] = "TypeScript Betiği",
-        [".ps1"] = "PowerShell Betiği",
-        [".py"] = "Python Betiği",
-        [".pyw"] = "Python Betiği (penceresiz)",
-        [".rb"] = "Ruby Betiği",
-        [".pl"] = "Perl Betiği",
-        [".lua"] = "Lua Betiği",
-        [".php"] = "PHP Betiği",
-        [".sh"] = "Shell Betiği",
-        [".r"] = "R Betiği",
-        [".jar"] = "Java Arşivi",
-    };
-
     /// <summary>Normalises an extension to the lower-case, single-dot form used in every key path.</summary>
     public static string NormalizeExtension(string extension)
     {
@@ -115,15 +97,38 @@ public static class RunlyRegistryLayout
     public static string TypeNameFor(string extension)
     {
         var ext = NormalizeExtension(extension);
-        var name = TypeNames.TryGetValue(ext, out var known)
-            ? known
-            : ext[1..].ToUpperInvariant() + " File";
-        return name + " (Runly)";
+        return ext[1..].ToUpperInvariant() + " File (Runly)";
     }
 
     /// <summary>The <c>DefaultIcon</c> value for an extension, falling back to the launcher's own icon.</summary>
-    public static string IconValue(string installDir, string? iconFileName) =>
-        string.IsNullOrWhiteSpace(iconFileName)
+    public static string IconValue(string installDir, string? iconFileName, string? category = null)
+    {
+        var selected = iconFileName;
+        if (string.IsNullOrWhiteSpace(selected) && !string.IsNullOrWhiteSpace(category))
+        {
+            selected = CategoryIconFileName(category);
+        }
+        return string.IsNullOrWhiteSpace(selected)
             ? Path.Combine(installDir, LauncherFileName) + ",0"
-            : Path.Combine(installDir, "assets", iconFileName) + ",0";
+            : Path.Combine(installDir, "assets", selected) + ",0";
+    }
+
+    /// <summary>Maps a catalog category to its single shared neon icon file.</summary>
+    public static string CategoryIconFileName(string category) => category switch
+    {
+        "Betikler" => "category-scripts.ico",
+        "Kod/Geliştirme" => "category-code.ico",
+        "Metin ve Belge" => "category-text.ico",
+        "Yapılandırma/Veri" => "category-data.ico",
+        "Web" => "category-web.ico",
+        "Görseller" => "category-images.ico",
+        "Ses" => "category-audio.ico",
+        "Video" => "category-video.ico",
+        "Arşiv" => "category-archive.ico",
+        "Ofis/Doküman" => "category-office.ico",
+        "3B ve Tasarım" => "category-design.ico",
+        "Yazı Tipleri" => "category-fonts.ico",
+        "Kilitli" => "category-locked.ico",
+        _ => "category-special.ico",
+    };
 }

@@ -75,7 +75,7 @@ public sealed class ShellRegistrarTests : IDisposable
 
         const string progId = @"Software\Classes\Runly.Script.js";
 
-        Assert.Equal("JavaScript Betiği (Runly)",
+        Assert.Equal("JS File (Runly)",
             _registry.GetValue(RegistryRoot.CurrentUser, progId, "")!.AsString());
         Assert.Equal(@"C:\Program Files\Runly\assets\js.ico,0",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\DefaultIcon", "")!.AsString());

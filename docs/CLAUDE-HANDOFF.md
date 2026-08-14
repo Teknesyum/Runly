@@ -4,18 +4,18 @@ Last updated: 2026-08-14
 
 ## Product
 
-Runly is a Windows x64 launcher that makes script files behave like normal double-clickable applications. It supports JavaScript, PowerShell, Python, shell, TypeScript, and configurable extensions; detects interpreters; performs trust/MOTW checks; and manages reversible Windows shell registrations.
+Runly 0.2 is a Windows x64 file-association hub. A mapping can safely run a script (`kind=Run`) or open a file in an explicit absolute executable (`kind=Open`). Settings provides a 408-entry embedded catalog, category/search navigation, application discovery, bulk category assignment, binding progress, and profile transfer.
 
 Repository: `https://github.com/Teknesyum/Runly`
 
 ## Current release work
 
-- Source version is `0.1.3` in `Directory.Build.props`.
+- Source version is `0.2.0` in `Directory.Build.props`.
 - `v0.1.0`, `v0.1.1` and `v0.1.2` are public on GitHub.
 - `v0.1.3` is published on GitHub with its package attached.
 - Release build command: `./scripts/build.ps1` — the version is read from `Directory.Build.props`;
   pass `-Version` only to override it deliberately.
-- Expected package: `Runly-v0.1.3-win-x64.zip`
+- Expected package: `Runly-v0.2.0-win-x64.zip`
 
 ## Default-app decision — important
 
@@ -70,7 +70,7 @@ The new cyan/pink icon was visually verified in the live Release Settings title 
 
 ## Verification baseline
 
-- Test suite: 190 tests.
+- Test suite: 195 tests before final release verification.
 - Launcher publish: NativeAOT, `win-x64`.
 - Settings publish: self-contained WinForms, `win-x64`.
 - Before publishing, run the full release build, inspect the package hash, launch `dist/RunlySettings.exe`, and visually verify the title icon and Default Apps button copy.
@@ -91,4 +91,3 @@ The new cyan/pink icon was visually verified in the live Release Settings title 
   kills all three.
 - Do not give a `DataGridView` cell a translucent `BackColor`. Cell fills ignore alpha and render
   white; pre-blend the tint against the surface colour instead.
-

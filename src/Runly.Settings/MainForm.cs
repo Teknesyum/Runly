@@ -6,6 +6,7 @@ using Runly.Core.Defaults;
 using Runly.Core.Models;
 using Runly.Core.Paths;
 using Runly.Core.Shell;
+using Runly.Core.Services;
 using Runly.Settings.Dialogs;
 using Runly.Settings.Catalog;
 using Runly.Settings.Discovery;
@@ -55,7 +56,7 @@ internal sealed class MainForm : NeonForm
     private readonly IShellRegistrar _shellRegistrar;
     private readonly RegistryBackup _registryBackup;
     private readonly ILogger _logger;
-    private readonly RunlyConfig _config;
+    private RunlyConfig _config;
 
     private bool _dirty;
     private bool _initializing = true;
@@ -209,12 +210,18 @@ internal sealed class MainForm : NeonForm
         var selectAllButton = new NeonButton { Text = "Tümünü seç", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
         var addExtButton = new NeonButton { Text = "Uzantı ekle", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
         var removeExtButton = new NeonButton { Text = "Seçili uzantıyı sil", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
+        var exportButton = new NeonButton { Text = Strings.Get("profile.export"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
+        var importButton = new NeonButton { Text = Strings.Get("profile.import"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
         selectAllButton.Click += (_, _) => SetAllExtensionsEnabled();
         addExtButton.Click += OnAddExtensionClicked;
         removeExtButton.Click += OnRemoveExtensionClicked;
+        exportButton.Click += (_, _) => ExportProfile();
+        importButton.Click += (_, _) => ImportProfile();
         extButtons.Controls.Add(selectAllButton);
         extButtons.Controls.Add(addExtButton);
         extButtons.Controls.Add(removeExtButton);
+        extButtons.Controls.Add(exportButton);
+        extButtons.Controls.Add(importButton);
         _searchBox = new TextBox { Width = 230, PlaceholderText = Strings.Get("catalog.searchPlaceholder"), BackColor = Palette.FieldBg, ForeColor = Palette.TextBody, Margin = new Padding(0, 7, 8, 4) };
         _searchBox.TextChanged += (_, _) => RefreshExtensionGrid();
         _bulkAppBox = new ComboBox { Width = 230, DropDownStyle = ComboBoxStyle.DropDownList, BackColor = Palette.FieldBg, ForeColor = Palette.TextBody, Margin = new Padding(8, 7, 4, 4) };
@@ -832,6 +839,38 @@ internal sealed class MainForm : NeonForm
         }
         MarkDirty();
         RefreshExtensionGrid();
+    }
+
+    private void ExportProfile()
+    {
+        using var picker = new SaveFileDialog { Filter = Strings.Get("profile.filter"), FileName = "runly-config.json", AddExtension = true, DefaultExt = "json" };
+        if (picker.ShowDialog(this) != DialogResult.OK) return;
+        var snapshot = _config with
+        {
+            SecurityMode = GetSelectedSecurityMode(),
+            KeepWindowOpen = GetSelectedKeepWindowMode(),
+            EditorCommand = _editorCommandBox.Text.Trim(),
+            LogEnabled = _logEnabledCheck.Checked,
+            Language = Strings.Language,
+        };
+        new ConfigStore(picker.FileName).Save(snapshot);
+        _progressLabel.Text = Strings.Get("profile.exported");
+    }
+
+    private void ImportProfile()
+    {
+        using var picker = new OpenFileDialog { Filter = Strings.Get("profile.filter"), CheckFileExists = true };
+        if (picker.ShowDialog(this) != DialogResult.OK) return;
+        var imported = new ConfigStore(picker.FileName, _logger).Load();
+        _config = imported;
+        EnsureCatalogMappings();
+        ApplySecurityRadio(imported.SecurityMode);
+        ApplyKeepWindowRadio(imported.KeepWindowOpen);
+        _editorCommandBox.Text = imported.EditorCommand;
+        _logEnabledCheck.Checked = imported.LogEnabled;
+        MarkDirty();
+        RefreshExtensionGrid();
+        _progressLabel.Text = Strings.Get("profile.imported");
     }
 
     private void OnGridCellContentClick(object? sender, DataGridViewCellEventArgs e)

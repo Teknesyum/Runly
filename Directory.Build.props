@@ -10,7 +10,7 @@
     <Deterministic>true</Deterministic>
     <IsPackable>false</IsPackable>
     <Product>Runly</Product>
-    <Version>0.1.3</Version>
+    <Version>0.2.0</Version>
     <NeutralLanguage>tr-TR</NeutralLanguage>
   </PropertyGroup>
 

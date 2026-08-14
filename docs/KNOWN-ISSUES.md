@@ -1,6 +1,6 @@
 # Runly — Bilinen Sınırlar ve Açık Sorunlar
 
-Sürüm 0.1.3 · Son güncelleme: 2026-08-14 (T0)
+Version 0.2.0 · Last updated: 2026-08-14
 
 ## 1. Windows kısıtları (çözümü yok)
 
@@ -56,6 +56,16 @@ Sürüm 0.1.3 · Son güncelleme: 2026-08-14 (T0)
   karıştırılıp opak veriliyor.
 
 ## 3. Doğrulanamayanlar — kullanıcı tarafından doğrulanmalı
+
+- **The 0.2.0 catalog UI has not been visually checked at 100%, 125%, or 150% DPI.** Build and unit
+  verification cannot prove that the category rail, seven-column table, bulk toolbar, and progress ring
+  are free of clipping. This requires an interactive Windows desktop review.
+- **Start-menu shortcut discovery was compiled but not exercised against every installed application.**
+  Broken or permission-protected `.lnk` files are intentionally skipped; vendor-specific shortcuts may
+  therefore not appear until the user browses to the executable.
+- **Permanent default-app selection still requires user interaction in Windows Settings.** Automated
+  verification deliberately does not click or forge `UserChoice`; binding counts are only truthful after
+  Windows reports Runly as the protected choice and `AssocQueryString` agrees.
 
 - **125% / 150% DPI ölçeklemede Ayarlar penceresi ve TaskDialog görünümü.** Sistem ölçeklemesini
   değiştirmek oturum açma/kapama gerektirdiği için ne T5, ne T7, ne R3 bunu deneyebildi.

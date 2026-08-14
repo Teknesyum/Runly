@@ -16,7 +16,21 @@ $icons = @(
     @{ Name = "ps1";     Label = "PS"; Bg = "#0078D4"; Fg = "#FFFFFF" },
     @{ Name = "py";      Label = "PY"; Bg = "#3776AB"; Fg = "#FFFFFF" },
     @{ Name = "sh";      Label = "SH"; Bg = "#4EAA25"; Fg = "#FFFFFF" },
-    @{ Name = "generic"; Label = "?";  Bg = "#666666"; Fg = "#FFFFFF" }
+    @{ Name = "generic"; Label = "?";  Bg = "#666666"; Fg = "#FFFFFF" },
+    @{ Name = "category-scripts"; Label = ">"; Bg = "#071A24"; Fg = "#00F3FF" },
+    @{ Name = "category-code"; Label = "{}"; Bg = "#071A24"; Fg = "#FF00EA" },
+    @{ Name = "category-text"; Label = "T"; Bg = "#071A24"; Fg = "#00F3FF" },
+    @{ Name = "category-data"; Label = "D"; Bg = "#071A24"; Fg = "#FF00EA" },
+    @{ Name = "category-web"; Label = "W"; Bg = "#071A24"; Fg = "#00F3FF" },
+    @{ Name = "category-images"; Label = "I"; Bg = "#071A24"; Fg = "#FF00EA" },
+    @{ Name = "category-audio"; Label = "A"; Bg = "#071A24"; Fg = "#00F3FF" },
+    @{ Name = "category-video"; Label = "V"; Bg = "#071A24"; Fg = "#FF00EA" },
+    @{ Name = "category-archive"; Label = "Z"; Bg = "#071A24"; Fg = "#00F3FF" },
+    @{ Name = "category-office"; Label = "O"; Bg = "#071A24"; Fg = "#FF00EA" },
+    @{ Name = "category-design"; Label = "3D"; Bg = "#071A24"; Fg = "#00F3FF" },
+    @{ Name = "category-fonts"; Label = "F"; Bg = "#071A24"; Fg = "#FF00EA" },
+    @{ Name = "category-special"; Label = "*"; Bg = "#071A24"; Fg = "#00F3FF" },
+    @{ Name = "category-locked"; Label = "!"; Bg = "#071A24"; Fg = "#FF00EA" }
 )
 
 function Remove-OuterSurface {

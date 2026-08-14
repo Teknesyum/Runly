@@ -66,5 +66,10 @@
   "catalog.searchPlaceholder": "Search .md, markdown, or notepad",
   "catalog.bulkOpen": "Open category with this app",
   "catalog.blocked": "Disabled for Windows security",
-  "binding.progress": "extensions bound"
+  "binding.progress": "extensions bound",
+  "profile.export": "Export profile",
+  "profile.import": "Import profile",
+  "profile.filter": "Runly configuration (*.json)|*.json|All files (*.*)|*.*",
+  "profile.exported": "Profile exported ✓",
+  "profile.imported": "Profile imported — remember to save"
 }

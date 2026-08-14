@@ -66,5 +66,10 @@
   "catalog.searchPlaceholder": ".md, markdown veya notepad ara",
   "catalog.bulkOpen": "Kategoriyi bu uygulamayla aç",
   "catalog.blocked": "Windows güvenliği nedeniyle devre dışı",
-  "binding.progress": "uzantı bağlı"
+  "binding.progress": "uzantı bağlı",
+  "profile.export": "Profili dışa aktar",
+  "profile.import": "Profili içe aktar",
+  "profile.filter": "Runly yapılandırması (*.json)|*.json|Tüm dosyalar (*.*)|*.*",
+  "profile.exported": "Profil dışa aktarıldı ✓",
+  "profile.imported": "Profil içe aktarıldı — kaydetmeyi unutmayın"
 }
