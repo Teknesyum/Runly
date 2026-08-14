@@ -125,7 +125,6 @@ internal sealed class MainForm : NeonForm
         _configStamp = ReadConfigStamp();
         Strings.Language = string.Equals(config.Language, "en", StringComparison.OrdinalIgnoreCase) ? "en" : "tr";
         _lastGoodSecurityMode = config.SecurityMode;
-        EnsureCatalogMappings();
         _installedApplications = new ApplicationFinder().FindAll();
 
         Text = Strings.Get("app.title");
@@ -515,29 +514,28 @@ internal sealed class MainForm : NeonForm
 
     // ---- Extension grid -----------------------------------------------------------------
 
-    private void EnsureCatalogMappings()
+    private static ExtensionMapping CatalogDefault(CatalogEntry entry) => new()
     {
-        foreach (var entry in ExtensionCatalog.Entries)
-        {
-            var extension = RunlyConfig.NormalizeExtension(entry.Extension);
-            if (_config.Extensions.ContainsKey(extension)) continue;
-            _config.Extensions[extension] = new ExtensionMapping
-            {
-                Kind = entry.DefaultKind,
-                Category = entry.Category,
-                TypeName = entry.DisplayName.Tr,
-                Interpreter = string.Empty,
-                OpenWith = null,
-                Args = "\"{script}\" {args}",
-                Enabled = false,
-            };
-        }
+        Kind = entry.DefaultKind,
+        Category = entry.Category,
+        TypeName = entry.DisplayName.Tr,
+        Args = "\"{script}\" {args}",
+        Enabled = false,
+    };
+
+    private ExtensionMapping EffectiveMapping(string extension)
+    {
+        if (_config.Extensions.TryGetValue(extension, out var configured)) return configured;
+        var entry = ExtensionCatalog.Entries.FirstOrDefault(item =>
+            string.Equals(item.Extension, extension, StringComparison.OrdinalIgnoreCase));
+        return entry is null ? new ExtensionMapping { Category = "special" } : CatalogDefault(entry);
     }
 
     private IEnumerable<string> VisibleExtensions()
     {
         var category = _categoryList.SelectedItem as string;
         var query = _searchBox.Text.Trim();
+        var yielded = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var entry in ExtensionCatalog.Entries)
         {
             if (query.Length == 0 && !string.Equals(entry.Category, category, StringComparison.Ordinal)) continue;
@@ -545,7 +543,15 @@ internal sealed class MainForm : NeonForm
                 !entry.DisplayName.Tr.Contains(query, StringComparison.CurrentCultureIgnoreCase) &&
                 !entry.DisplayName.En.Contains(query, StringComparison.OrdinalIgnoreCase) &&
                 !entry.SuggestedApps.Any(app => app.Contains(query, StringComparison.OrdinalIgnoreCase))) continue;
-            yield return RunlyConfig.NormalizeExtension(entry.Extension);
+            var extension = RunlyConfig.NormalizeExtension(entry.Extension);
+            yielded.Add(extension);
+            yield return extension;
+        }
+        foreach (var pair in _config.Extensions)
+        {
+            if (yielded.Contains(pair.Key) || (query.Length == 0 && !string.Equals(pair.Value.Category, category, StringComparison.Ordinal)) ||
+                (query.Length > 0 && !pair.Key.Contains(query, StringComparison.OrdinalIgnoreCase))) continue;
+            yield return pair.Key;
         }
     }
 
@@ -555,8 +561,7 @@ internal sealed class MainForm : NeonForm
         foreach (var pair in _config.Extensions.Where(pair => pair.Value.Enabled)) visible.Add(pair.Key);
         return _config with
         {
-            Extensions = _config.Extensions.Where(pair => visible.Contains(pair.Key))
-                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase),
+            Extensions = visible.ToDictionary(extension => extension, EffectiveMapping, StringComparer.OrdinalIgnoreCase),
         };
     }
 
@@ -577,10 +582,7 @@ internal sealed class MainForm : NeonForm
             _bindingProgress.SetProgress(statuses.Count(status => status.Bound == BindingState.Bound), statuses.Count);
             foreach (var status in statuses)
             {
-                if (!_config.Extensions.TryGetValue(status.Extension, out var mapping))
-                {
-                    continue;
-                }
+                var mapping = EffectiveMapping(status.Extension);
 
                 var row = new DataGridViewRow();
                 row.CreateCells(_grid);
@@ -590,8 +592,8 @@ internal sealed class MainForm : NeonForm
                 row.Cells[ColInterpreter].Value = mapping.Kind == HandlerKind.Run ? mapping.Interpreter : mapping.OpenWith;
                 row.Cells[ColArgs].Value = mapping.Args;
                 ApplyStatusToRow(row, status);
-                var catalogEntry = ExtensionCatalog.Entries.First(entry => string.Equals(entry.Extension, status.Extension, StringComparison.OrdinalIgnoreCase));
-                if (catalogEntry.Blocked)
+                var catalogEntry = ExtensionCatalog.Entries.FirstOrDefault(entry => string.Equals(entry.Extension, status.Extension, StringComparison.OrdinalIgnoreCase));
+                if (catalogEntry?.Blocked == true)
                 {
                     row.Cells[ColEnabled].ReadOnly = true;
                     row.Cells[ColKind].ReadOnly = true;
@@ -788,10 +790,11 @@ internal sealed class MainForm : NeonForm
         }
 
         var row = _grid.Rows[e.RowIndex];
-        if (row.Tag is not ExtensionStatus status || !_config.Extensions.TryGetValue(status.Extension, out var mapping))
+        if (row.Tag is not ExtensionStatus status)
         {
             return;
         }
+        var mapping = EffectiveMapping(status.Extension);
 
         var enabled = row.Cells[ColEnabled].Value is bool b ? b : mapping.Enabled;
         var kind = string.Equals(row.Cells[ColKind].Value as string, Strings.Get("kind.open"), StringComparison.Ordinal)
@@ -819,7 +822,7 @@ internal sealed class MainForm : NeonForm
         foreach (var extension in VisibleExtensions())
         {
             if (RunlyRegistryLayout.IsBlockedExtension(extension)) continue;
-            _config.Extensions[extension] = _config.Extensions[extension] with { Enabled = true };
+            _config.Extensions[extension] = EffectiveMapping(extension) with { Enabled = true };
         }
 
         RefreshExtensionGrid();
@@ -832,7 +835,7 @@ internal sealed class MainForm : NeonForm
         foreach (var extension in VisibleExtensions())
         {
             if (RunlyRegistryLayout.IsBlockedExtension(extension)) continue;
-            var mapping = _config.Extensions[extension];
+            var mapping = EffectiveMapping(extension);
             _config.Extensions[extension] = mapping with
             {
                 Kind = HandlerKind.Open,
@@ -858,6 +861,7 @@ internal sealed class MainForm : NeonForm
             EditorCommand = _editorCommandBox.Text.Trim(),
             LogEnabled = _logEnabledCheck.Checked,
             Language = Strings.Language,
+            Extensions = CreateSparseExtensions(),
         };
         new ConfigStore(picker.FileName).Save(snapshot);
         _progressLabel.Text = Strings.Get("profile.exported");
@@ -869,7 +873,6 @@ internal sealed class MainForm : NeonForm
         if (picker.ShowDialog(this) != DialogResult.OK) return;
         var imported = new ConfigStore(picker.FileName, _logger).Load();
         _config = imported;
-        EnsureCatalogMappings();
         ApplySecurityRadio(imported.SecurityMode);
         ApplyKeepWindowRadio(imported.KeepWindowOpen);
         _editorCommandBox.Text = imported.EditorCommand;
@@ -1068,10 +1071,18 @@ internal sealed class MainForm : NeonForm
             return;
         }
 
+        if (RunlyRegistryLayout.IsBlockedExtension(dialog.Extension))
+        {
+            NeonMessageBox.Show(this, Strings.Get("extension.blockedAdd"), Strings.Get("app.title"),
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
         _config.Extensions[dialog.Extension] = new ExtensionMapping
         {
             Interpreter = dialog.Interpreter,
             Args = dialog.Args,
+            Category = "special",
             Enabled = true,
         };
 
@@ -1465,6 +1476,7 @@ internal sealed class MainForm : NeonForm
             EditorCommand = _editorCommandBox.Text.Trim(),
             LogEnabled = _logEnabledCheck.Checked,
             Language = Strings.Language,
+            Extensions = CreateSparseExtensions(),
         };
 
         if (ReadConfigStamp() > _configStamp && !ConfirmOverwriteExternalEdit())
@@ -1486,10 +1498,31 @@ internal sealed class MainForm : NeonForm
         }
 
         _configStamp = ReadConfigStamp();
+        _config = toSave;
         _dirty = false;
         UpdateTitle();
         _progressLabel.Text = "Kaydedildi ✓";
     }
+
+    private Dictionary<string, ExtensionMapping> CreateSparseExtensions()
+    {
+        var result = RunlyConfig.CreateExtensionDictionary();
+        foreach (var pair in _config.Extensions)
+        {
+            var entry = ExtensionCatalog.Entries.FirstOrDefault(item =>
+                string.Equals(item.Extension, pair.Key, StringComparison.OrdinalIgnoreCase));
+            if (entry is null || !MatchesCatalogDefault(pair.Value, entry)) result[pair.Key] = pair.Value;
+        }
+        return result;
+    }
+
+    private static bool MatchesCatalogDefault(ExtensionMapping mapping, CatalogEntry entry) =>
+        !mapping.Enabled && mapping.Kind == entry.DefaultKind &&
+        string.Equals(mapping.Category, entry.Category, StringComparison.Ordinal) &&
+        (string.IsNullOrWhiteSpace(mapping.TypeName) || string.Equals(mapping.TypeName, entry.DisplayName.Tr, StringComparison.Ordinal)) &&
+        string.IsNullOrWhiteSpace(mapping.Interpreter) && string.IsNullOrWhiteSpace(mapping.OpenWith) &&
+        (string.IsNullOrWhiteSpace(mapping.Args) || string.Equals(mapping.Args, "\"{script}\" {args}", StringComparison.Ordinal)) &&
+        string.IsNullOrWhiteSpace(mapping.Icon);
 
     private DateTime ReadConfigStamp()
     {

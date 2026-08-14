@@ -76,5 +76,6 @@
   "category.data": "Configuration/Data", "category.web": "Web", "category.images": "Images",
   "category.audio": "Audio", "category.video": "Video", "category.archive": "Archives",
   "category.office": "Office/Documents", "category.design": "3D and Design", "category.fonts": "Fonts",
-  "category.locked": "Locked", "category.special": "Special"
+  "category.locked": "Locked", "category.special": "Special",
+  "extension.blockedAdd": "Runly cannot manage this extension because of Windows security and system integrity."
 }
