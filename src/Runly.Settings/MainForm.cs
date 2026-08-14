@@ -7,6 +7,8 @@ using Runly.Core.Models;
 using Runly.Core.Paths;
 using Runly.Core.Shell;
 using Runly.Settings.Dialogs;
+using Runly.Settings.Catalog;
+using Runly.Settings.Discovery;
 
 namespace Runly.Settings;
 
@@ -15,10 +17,11 @@ internal sealed class MainForm : NeonForm
 {
     private const int ColEnabled = 0;
     private const int ColExtension = 1;
-    private const int ColInterpreter = 2;
-    private const int ColFound = 3;
-    private const int ColArgs = 4;
-    private const int ColStatus = 5;
+    private const int ColKind = 2;
+    private const int ColInterpreter = 3;
+    private const int ColFound = 4;
+    private const int ColArgs = 5;
+    private const int ColStatus = 6;
 
     // DataGridView hücre dolgusu alfa kanalını yok sayar: yarı saydam bir BackColor beyaza dönüp
     // satırı bozar. Tint'ler bu yüzden yüzey rengiyle önceden karıştırılıp opak veriliyor.
@@ -65,6 +68,10 @@ internal sealed class MainForm : NeonForm
     private DateTime _configStamp = DateTime.MinValue;
 
     private readonly DataGridView _grid;
+    private readonly ListBox _categoryList;
+    private readonly TextBox _searchBox;
+    private readonly ComboBox _bulkAppBox;
+    private readonly IReadOnlyList<InstalledApplication> _installedApplications;
     private readonly Label _statusLabel;
     private readonly Label _exePathLabel;
     private readonly Label _versionLabel;
@@ -116,6 +123,8 @@ internal sealed class MainForm : NeonForm
         _configStamp = ReadConfigStamp();
         Strings.Language = string.Equals(config.Language, "en", StringComparison.OrdinalIgnoreCase) ? "en" : "tr";
         _lastGoodSecurityMode = config.SecurityMode;
+        EnsureCatalogMappings();
+        _installedApplications = new ApplicationFinder().FindAll();
 
         Text = Strings.Get("app.title");
         AutoScaleMode = AutoScaleMode.Dpi;
@@ -151,14 +160,22 @@ internal sealed class MainForm : NeonForm
         _configPathLink.LinkClicked += (_, _) => OpenContainingFolder(_configStore.ConfigPath);
 
         // ---- 2. Extension table + detail panel -------------------------------------------
-        var gridArea = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 2, BackColor = Palette.AppBg, Padding = new Padding(0, 8, 0, 0) };
+        var gridArea = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 2, BackColor = Palette.AppBg, Padding = new Padding(0, 8, 0, 0) };
+        gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 190));
         gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 270));
         gridArea.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         gridArea.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
 
         _grid = BuildExtensionGrid();
-        gridArea.Controls.Add(_grid, 0, 0);
+        _categoryList = new ListBox { Dock = DockStyle.Fill, BackColor = Palette.Surface, ForeColor = Palette.TextBody, BorderStyle = BorderStyle.None, Font = Palette.Body, Margin = new Padding(0, 0, 8, 0) };
+        foreach (var category in ExtensionCatalog.Entries.Select(entry => entry.Category).Distinct(StringComparer.Ordinal))
+        {
+            _categoryList.Items.Add(category);
+        }
+        _categoryList.SelectedIndexChanged += (_, _) => RefreshExtensionGrid();
+        gridArea.Controls.Add(_categoryList, 0, 0);
+        gridArea.Controls.Add(_grid, 1, 0);
 
         var detailPanel = new NeonGroupPanel(Strings.Get("details")) { Dock = DockStyle.Fill, Margin = new Padding(8, 0, 0, 0) };
         _detailPlaceholder = new Label
@@ -183,7 +200,7 @@ internal sealed class MainForm : NeonForm
         detailPanel.Controls.Add(_detailText);
         detailPanel.Controls.Add(_detailAskButton);
         detailPanel.Controls.Add(_detailPlaceholder);
-        gridArea.Controls.Add(detailPanel, 1, 0);
+        gridArea.Controls.Add(detailPanel, 2, 0);
 
         var extButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
         var selectAllButton = new NeonButton { Text = "Tümünü seç", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
@@ -195,8 +212,19 @@ internal sealed class MainForm : NeonForm
         extButtons.Controls.Add(selectAllButton);
         extButtons.Controls.Add(addExtButton);
         extButtons.Controls.Add(removeExtButton);
+        _searchBox = new TextBox { Width = 230, PlaceholderText = Strings.Get("catalog.searchPlaceholder"), BackColor = Palette.FieldBg, ForeColor = Palette.TextBody, Margin = new Padding(0, 7, 8, 4) };
+        _searchBox.TextChanged += (_, _) => RefreshExtensionGrid();
+        _bulkAppBox = new ComboBox { Width = 230, DropDownStyle = ComboBoxStyle.DropDownList, BackColor = Palette.FieldBg, ForeColor = Palette.TextBody, Margin = new Padding(8, 7, 4, 4) };
+        foreach (var app in _installedApplications) _bulkAppBox.Items.Add(app);
+        _bulkAppBox.DisplayMember = nameof(InstalledApplication.DisplayName);
+        var bulkButton = new NeonButton { Text = Strings.Get("catalog.bulkOpen"), Primary = true, AutoSize = true, Margin = new Padding(4) };
+        bulkButton.Click += (_, _) => AssignCategoryToSelectedApplication();
+        extButtons.Controls.Add(_searchBox);
+        extButtons.Controls.Add(_bulkAppBox);
+        extButtons.Controls.Add(bulkButton);
+        _categoryList.SelectedIndex = 0;
         gridArea.Controls.Add(extButtons, 0, 1);
-        gridArea.SetColumnSpan(extButtons, 1);
+        gridArea.SetColumnSpan(extButtons, 3);
 
         root.Controls.Add(gridArea, 0, 0);
 
@@ -355,7 +383,8 @@ internal sealed class MainForm : NeonForm
 
         grid.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Enabled", HeaderText = "ETKİN", Width = 82, Resizable = DataGridViewTriState.False });
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Extension", HeaderText = "UZANTI", Width = 102, ReadOnly = true });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Interpreter", HeaderText = "YORUMLAYICI", Width = 130 });
+        grid.Columns.Add(new DataGridViewComboBoxColumn { Name = "Kind", HeaderText = "TÜR", Width = 90, DataSource = new[] { Strings.Get("kind.run"), Strings.Get("kind.open") } });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Interpreter", HeaderText = "İŞLEYİCİ", Width = 160 });
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Found", HeaderText = "BULUNDU", Width = 200, ReadOnly = true });
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Args", HeaderText = "ARGÜMANLAR", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, MinimumWidth = 150 });
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "DURUM", Width = 150, ReadOnly = true });
@@ -476,6 +505,50 @@ internal sealed class MainForm : NeonForm
 
     // ---- Extension grid -----------------------------------------------------------------
 
+    private void EnsureCatalogMappings()
+    {
+        foreach (var entry in ExtensionCatalog.Entries)
+        {
+            var extension = RunlyConfig.NormalizeExtension(entry.Extension);
+            if (_config.Extensions.ContainsKey(extension)) continue;
+            _config.Extensions[extension] = new ExtensionMapping
+            {
+                Kind = entry.DefaultKind,
+                Category = entry.Category,
+                Interpreter = string.Empty,
+                OpenWith = null,
+                Args = "\"{script}\" {args}",
+                Enabled = false,
+            };
+        }
+    }
+
+    private IEnumerable<string> VisibleExtensions()
+    {
+        var category = _categoryList.SelectedItem as string;
+        var query = _searchBox.Text.Trim();
+        foreach (var entry in ExtensionCatalog.Entries)
+        {
+            if (query.Length == 0 && !string.Equals(entry.Category, category, StringComparison.Ordinal)) continue;
+            if (query.Length > 0 && !entry.Extension.Contains(query, StringComparison.OrdinalIgnoreCase) &&
+                !entry.DisplayName.Tr.Contains(query, StringComparison.CurrentCultureIgnoreCase) &&
+                !entry.DisplayName.En.Contains(query, StringComparison.OrdinalIgnoreCase) &&
+                !entry.SuggestedApps.Any(app => app.Contains(query, StringComparison.OrdinalIgnoreCase))) continue;
+            yield return RunlyConfig.NormalizeExtension(entry.Extension);
+        }
+    }
+
+    private RunlyConfig VisibleStatusConfig()
+    {
+        var visible = VisibleExtensions().ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in _config.Extensions.Where(pair => pair.Value.Enabled)) visible.Add(pair.Key);
+        return _config with
+        {
+            Extensions = _config.Extensions.Where(pair => visible.Contains(pair.Key))
+                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase),
+        };
+    }
+
     private void RefreshExtensionGrid()
     {
         _suppressGridEvents = true;
@@ -489,7 +562,7 @@ internal sealed class MainForm : NeonForm
 
             _grid.Rows.Clear();
 
-            foreach (var status in _shellRegistrar.GetStatus(_config))
+            foreach (var status in _shellRegistrar.GetStatus(VisibleStatusConfig()))
             {
                 if (!_config.Extensions.TryGetValue(status.Extension, out var mapping))
                 {
@@ -500,9 +573,19 @@ internal sealed class MainForm : NeonForm
                 row.CreateCells(_grid);
                 row.Cells[ColEnabled].Value = mapping.Enabled;
                 row.Cells[ColExtension].Value = status.Extension;
-                row.Cells[ColInterpreter].Value = mapping.Interpreter;
+                row.Cells[ColKind].Value = mapping.Kind == HandlerKind.Run ? Strings.Get("kind.run") : Strings.Get("kind.open");
+                row.Cells[ColInterpreter].Value = mapping.Kind == HandlerKind.Run ? mapping.Interpreter : mapping.OpenWith;
                 row.Cells[ColArgs].Value = mapping.Args;
                 ApplyStatusToRow(row, status);
+                var catalogEntry = ExtensionCatalog.Entries.First(entry => string.Equals(entry.Extension, status.Extension, StringComparison.OrdinalIgnoreCase));
+                if (catalogEntry.Blocked)
+                {
+                    row.Cells[ColEnabled].ReadOnly = true;
+                    row.Cells[ColKind].ReadOnly = true;
+                    row.Cells[ColInterpreter].ReadOnly = true;
+                    row.Cells[ColArgs].ReadOnly = true;
+                    row.Cells[ColStatus].Value = catalogEntry.RiskNote is null ? Strings.Get("catalog.blocked") : (Strings.Language == "en" ? catalogEntry.RiskNote.En : catalogEntry.RiskNote.Tr);
+                }
 
                 _grid.Rows.Add(row);
 
@@ -545,7 +628,8 @@ internal sealed class MainForm : NeonForm
         _autoRefreshInFlight = true;
         _lastAutoRefresh = DateTime.UtcNow;
 
-        Task.Run(() => _shellRegistrar.GetStatus(_config)).ContinueWith(t =>
+        var statusConfig = VisibleStatusConfig();
+        Task.Run(() => _shellRegistrar.GetStatus(statusConfig)).ContinueWith(t =>
         {
             _autoRefreshInFlight = false;
 
@@ -684,7 +768,7 @@ internal sealed class MainForm : NeonForm
             return;
         }
 
-        if (e.ColumnIndex is not (ColEnabled or ColInterpreter or ColArgs))
+        if (e.ColumnIndex is not (ColEnabled or ColKind or ColInterpreter or ColArgs))
         {
             return;
         }
@@ -696,23 +780,52 @@ internal sealed class MainForm : NeonForm
         }
 
         var enabled = row.Cells[ColEnabled].Value is bool b ? b : mapping.Enabled;
-        var interpreter = row.Cells[ColInterpreter].Value as string ?? mapping.Interpreter;
+        var kind = string.Equals(row.Cells[ColKind].Value as string, Strings.Get("kind.open"), StringComparison.Ordinal)
+            ? HandlerKind.Open : HandlerKind.Run;
+        var handler = row.Cells[ColInterpreter].Value as string ?? (kind == HandlerKind.Run ? mapping.Interpreter : mapping.OpenWith ?? string.Empty);
         var args = row.Cells[ColArgs].Value as string ?? mapping.Args;
 
-        _config.Extensions[status.Extension] = mapping with { Enabled = enabled, Interpreter = interpreter, Args = args };
+        _config.Extensions[status.Extension] = mapping with
+        {
+            Enabled = enabled,
+            Kind = kind,
+            Interpreter = kind == HandlerKind.Run ? handler : mapping.Interpreter,
+            OpenWith = kind == HandlerKind.Open ? handler : null,
+            Args = args,
+        };
         MarkDirty();
         UpdateSingleRowStatus(e.RowIndex, status.Extension);
     }
 
     private void SetAllExtensionsEnabled()
     {
-        foreach (var extension in _config.Extensions.Keys.ToList())
+        foreach (var extension in VisibleExtensions())
         {
+            if (RunlyRegistryLayout.IsBlockedExtension(extension)) continue;
             _config.Extensions[extension] = _config.Extensions[extension] with { Enabled = true };
         }
 
         RefreshExtensionGrid();
         MarkDirty();
+    }
+
+    private void AssignCategoryToSelectedApplication()
+    {
+        if (_bulkAppBox.SelectedItem is not InstalledApplication app) return;
+        foreach (var extension in VisibleExtensions())
+        {
+            if (RunlyRegistryLayout.IsBlockedExtension(extension)) continue;
+            var mapping = _config.Extensions[extension];
+            _config.Extensions[extension] = mapping with
+            {
+                Kind = HandlerKind.Open,
+                OpenWith = app.Path,
+                Args = "\"{script}\" {args}",
+                Enabled = true,
+            };
+        }
+        MarkDirty();
+        RefreshExtensionGrid();
     }
 
     private void OnGridCellContentClick(object? sender, DataGridViewCellEventArgs e)
@@ -1365,6 +1478,7 @@ internal sealed class MainForm : NeonForm
         Text = Strings.Get("app.title") + (_dirty ? " *" : string.Empty);
         _grid.Columns[ColEnabled].HeaderText = Strings.Get("enabled");
         _grid.Columns[ColExtension].HeaderText = Strings.Get("extension");
+        _grid.Columns[ColKind].HeaderText = Strings.Get("kind.open") + "/" + Strings.Get("kind.run");
         _grid.Columns[ColInterpreter].HeaderText = Strings.Get("interpreter");
         _grid.Columns[ColFound].HeaderText = Strings.Get("found");
         _grid.Columns[ColArgs].HeaderText = Strings.Get("arguments");
