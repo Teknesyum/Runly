@@ -63,6 +63,14 @@ public sealed class SecurityGateTests : IDisposable
     }
 
     [Fact]
+    public void Evaluate_OpenHandler_SkipsTrustPromptButNeverMotw()
+    {
+        var config = DefaultConfig.Create() with { SecurityMode = SecurityMode.AlwaysAsk };
+        Assert.Equal(SecurityVerdict.Trusted, _gate.Evaluate(MakeScript(), config, EmptyTrustStore(), HandlerKind.Open));
+        Assert.Equal(SecurityVerdict.MotwBlocked, _gate.Evaluate(MakeScript(hasMotw: true), config, EmptyTrustStore(), HandlerKind.Open));
+    }
+
+    [Fact]
     public void Evaluate_ScriptUnderTrustedFolder_ReturnsTrusted()
     {
         var scriptPath = MakeRealFile("scripts", "sub", "run.js");

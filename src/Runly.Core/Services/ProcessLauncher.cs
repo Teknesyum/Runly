@@ -124,4 +124,54 @@ public sealed class ProcessLauncher : IProcessLauncher
             return ExitCode.NoInterpreter;
         }
     }
+
+    /// <summary>Opens a file with an explicit absolute executable, without a console or wait.</summary>
+    public int Open(string executablePath, string argumentTemplate, ScriptInfo file, string[] fileArgs, string? runlyExecutablePath = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(executablePath);
+        ArgumentNullException.ThrowIfNull(file);
+        fileArgs ??= [];
+
+        if (!Path.IsPathFullyQualified(executablePath) ||
+            !string.Equals(Path.GetExtension(executablePath), ".exe", StringComparison.OrdinalIgnoreCase) ||
+            IsRunlyExecutable(executablePath, runlyExecutablePath))
+        {
+            return ExitCode.NoInterpreter;
+        }
+
+        var arguments = (argumentTemplate ?? string.Empty)
+            .Replace("{script}", file.Path, StringComparison.Ordinal)
+            .Replace("{dir}", file.DirectoryPath ?? string.Empty, StringComparison.Ordinal)
+            .Replace("{args}", string.Join(' ', fileArgs.Select(QuoteArgumentIfNeeded)), StringComparison.Ordinal);
+
+        try
+        {
+            using var process = Process.Start(new ProcessStartInfo
+            {
+                FileName = executablePath,
+                Arguments = arguments,
+                WorkingDirectory = file.DirectoryPath ?? Environment.CurrentDirectory,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            });
+            return process is null ? ExitCode.NoInterpreter : ExitCode.Success;
+        }
+        catch (Exception ex) when (ex is Win32Exception or FileNotFoundException)
+        {
+            return ExitCode.NoInterpreter;
+        }
+    }
+
+    /// <summary>Returns whether an open handler would recurse into Runly itself.</summary>
+    public static bool IsRunlyExecutable(string executablePath, string? runlyExecutablePath = null)
+    {
+        var candidate = Path.GetFullPath(executablePath);
+        var ownPath = runlyExecutablePath ?? Environment.ProcessPath;
+        return string.Equals(Path.GetFileName(candidate), "Runly.exe", StringComparison.OrdinalIgnoreCase) ||
+               (!string.IsNullOrWhiteSpace(ownPath) &&
+                string.Equals(candidate, Path.GetFullPath(ownPath), StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string QuoteArgumentIfNeeded(string argument) =>
+        argument.IndexOfAny([' ', '\t', '"']) >= 0 ? '"' + argument.Replace("\"", "\\\"") + '"' : argument;
 }

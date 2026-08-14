@@ -170,4 +170,15 @@ public sealed class ProcessLauncherTests
         Directory.CreateDirectory(dir);
         return dir;
     }
+
+    [Fact]
+    public void Open_RejectsRelativeNonExeAndRunlyTargets()
+    {
+        var launcher = new ProcessLauncher();
+        var file = new ScriptInfo { Path = @"C:\docs\readme.md" };
+
+        Assert.Equal(ExitCode.NoInterpreter, launcher.Open("notepad.exe", "\"{script}\"", file, []));
+        Assert.Equal(ExitCode.NoInterpreter, launcher.Open(@"C:\tools\handler.cmd", "\"{script}\"", file, []));
+        Assert.Equal(ExitCode.NoInterpreter, launcher.Open(@"C:\elsewhere\Runly.exe", "\"{script}\"", file, [], @"C:\installed\Runly.exe"));
+    }
 }

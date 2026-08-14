@@ -11,7 +11,7 @@ namespace Runly.Core.Services;
 public sealed class SecurityGate : ISecurityGate
 {
     /// <inheritdoc />
-    public SecurityVerdict Evaluate(ScriptInfo script, RunlyConfig config, ITrustStore trustStore)
+    public SecurityVerdict Evaluate(ScriptInfo script, RunlyConfig config, ITrustStore trustStore, HandlerKind kind = HandlerKind.Run)
     {
         ArgumentNullException.ThrowIfNull(script);
         ArgumentNullException.ThrowIfNull(config);
@@ -21,6 +21,13 @@ public sealed class SecurityGate : ISecurityGate
         if (script.HasMotw)
         {
             return SecurityVerdict.MotwBlocked;
+        }
+
+        // Opening a document is not code execution. It skips trust prompts, but only after the
+        // independent MOTW check above has run and won when applicable.
+        if (kind == HandlerKind.Open)
+        {
+            return SecurityVerdict.Trusted;
         }
 
         var data = trustStore.Data;

@@ -73,6 +73,8 @@ internal static class Program
             return RunEditVerb(config, script, pathSearcher, dialogs);
         }
 
+        config.TryGetMapping(script.Extension, out var selectedMapping);
+
         var scriptArgs = request.ScriptArgs;
         if (request.Verb == LaunchVerb.PromptArgs)
         {
@@ -86,6 +88,11 @@ internal static class Program
             }
 
             scriptArgs = [.. scriptArgs, .. ArgumentSplitter.Split(typed)];
+        }
+
+        if (selectedMapping is { Enabled: true, Kind: HandlerKind.Open })
+        {
+            return OpenFile(selectedMapping, script, scriptArgs, config, dialogs);
         }
 
         var resolver = new InterpreterResolver(pathSearcher);
@@ -109,6 +116,28 @@ internal static class Program
         }
 
         return LaunchScript(request, config, script, interpreter);
+    }
+
+    private static int OpenFile(ExtensionMapping mapping, ScriptInfo file, string[] fileArgs, RunlyConfig config, TaskDialogInterop dialogs)
+    {
+        var trustStore = new TrustStoreService(logger: s_logger);
+        trustStore.Load();
+        var verdict = new SecurityGate().Evaluate(file, config, trustStore, HandlerKind.Open);
+        if (verdict == SecurityVerdict.MotwBlocked)
+        {
+            var target = new ResolvedInterpreter
+            {
+                ExecutablePath = mapping.OpenWith,
+                ArgumentLine = mapping.Args.Replace("{script}", file.Path, StringComparison.Ordinal),
+                Source = InterpreterSource.Config,
+            };
+            if (!PassSecurityGate(file, target, verdict, trustStore, new MotwService(s_logger), dialogs))
+            {
+                return ExitCode.UserCancelled;
+            }
+        }
+
+        return new ProcessLauncher().Open(mapping.OpenWith ?? string.Empty, mapping.Args, file, fileArgs, Environment.ProcessPath);
     }
 
     /// <summary>Shows the security dialog and applies its answer; returns whether the script may run.</summary>
