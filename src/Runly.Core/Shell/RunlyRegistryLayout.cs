@@ -6,6 +6,12 @@ namespace Runly.Core.Shell;
 /// </summary>
 public static class RunlyRegistryLayout
 {
+    private static readonly HashSet<string> BlockedExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".exe", ".dll", ".sys", ".com", ".bat", ".cmd", ".msi", ".msc", ".cpl", ".scr",
+        ".lnk", ".pif", ".url", ".job", ".ocx", ".drv",
+    };
+
     /// <summary>Prefix shared by every Runly ProgID, for example <c>Runly.Script.js</c>.</summary>
     public const string ProgIdPrefix = "Runly.Script.";
 
@@ -76,6 +82,9 @@ public static class RunlyRegistryLayout
     /// <summary>Builds the ProgID for an extension, for example <c>.js</c> becomes <c>Runly.Script.js</c>.</summary>
     public static string ProgIdFor(string extension) =>
         ProgIdPrefix + NormalizeExtension(extension)[1..];
+
+    /// <summary>Whether Runly must refuse to register this Windows executable or system type.</summary>
+    public static bool IsBlockedExtension(string extension) => BlockedExtensions.Contains(NormalizeExtension(extension));
 
     /// <summary>Whether a ProgID belongs to Runly.</summary>
     public static bool IsRunlyProgId(string? progId) =>

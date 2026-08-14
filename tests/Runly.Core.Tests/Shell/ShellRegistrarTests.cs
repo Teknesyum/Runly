@@ -502,6 +502,46 @@ public sealed class ShellRegistrarTests : IDisposable
         Assert.Equal(StoreNotepadProgId, _registry.GetValue(RegistryRoot.CurrentUser, key, "ProgId")!.AsString());
     }
 
+    [Fact]
+    public void Install_RefusesBlockedSystemExtensionsEvenWhenEnabled()
+    {
+        var config = DefaultConfig.Create() with
+        {
+            Extensions = new Dictionary<string, ExtensionMapping>(StringComparer.OrdinalIgnoreCase)
+            {
+                [".exe"] = new() { Kind = HandlerKind.Open, OpenWith = ExePath, Args = "\"{script}\"", Enabled = true },
+            },
+        };
+
+        var result = NewRegistrar().Install(config, ExePath);
+
+        Assert.Empty(result.Extensions);
+        Assert.Contains(result.Skipped, item => item.Extension == ".exe" && item.Reason.Contains("güvenliği", StringComparison.Ordinal));
+        Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, RunlyRegistryLayout.ProgIdKey(".exe")));
+    }
+
+    [Fact]
+    public void Install_OpenMappingWritesOnlyOpenVerb()
+    {
+        var handler = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "notepad.exe");
+        var config = DefaultConfig.Create() with
+        {
+            Extensions = new Dictionary<string, ExtensionMapping>(StringComparer.OrdinalIgnoreCase)
+            {
+                [".md"] = new() { Kind = HandlerKind.Open, Category = "Metin ve Belge", OpenWith = handler, Args = "\"{script}\" {args}", Enabled = true },
+            },
+        };
+
+        var result = NewRegistrar().Install(config, ExePath);
+
+        Assert.True(result.Success, result.ErrorMessage);
+        var shell = RunlyRegistryLayout.ProgIdKey(".md") + @"\shell";
+        Assert.True(_registry.KeyExists(RegistryRoot.CurrentUser, shell + @"\open"));
+        Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, shell + @"\runas"));
+        Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, shell + @"\edit"));
+        Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, shell + @"\runlyargs"));
+    }
+
     /// <summary>Stands in for Windows' own association resolution (<c>AssocQueryString</c>).</summary>
     private sealed class FakeEffectiveHandlerQuery : IEffectiveHandlerQuery
     {

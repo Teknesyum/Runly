@@ -81,6 +81,12 @@ public sealed class ShellRegistrar : IShellRegistrar
                     continue;
                 }
 
+                if (RunlyRegistryLayout.IsBlockedExtension(extension))
+                {
+                    skipped.Add(new SkippedExtension { Extension = extension, Reason = "Windows güvenliği nedeniyle yönetilemez." });
+                    continue;
+                }
+
                 var interpreterPath = FindInterpreter(mapping);
                 if (interpreterPath is null)
                 {
@@ -459,6 +465,12 @@ public sealed class ShellRegistrar : IShellRegistrar
         _registry.SetValue(RegistryRoot.CurrentUser, key + @"\DefaultIcon",
             RegistryValueEntry.FromString(RegistryValueEntry.DefaultValueName, RunlyRegistryLayout.IconValue(installDir, mapping.Icon)));
 
+        if (mapping.Kind == HandlerKind.Open)
+        {
+            WriteVerb(key, "open", "Runly ile aç", command + " \"%1\" %*");
+            return;
+        }
+
         WriteVerb(key, "open", "Runly ile çalıştır", command + " \"%1\" %*");
         WriteVerb(key, "runas", "Yönetici olarak çalıştır (Runly)", command + " --verb runas \"%1\" %*");
         WriteVerb(key, "edit", "Düzenle", command + " --verb edit \"%1\"");
@@ -507,7 +519,7 @@ public sealed class ShellRegistrar : IShellRegistrar
     /// </summary>
     private string? FindInterpreter(ExtensionMapping mapping)
     {
-        var name = mapping.Interpreter?.Trim();
+        var name = (mapping.Kind == HandlerKind.Open ? mapping.OpenWith : mapping.Interpreter)?.Trim();
         if (string.IsNullOrEmpty(name))
         {
             return null;
