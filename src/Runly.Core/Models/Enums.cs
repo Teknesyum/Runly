@@ -13,6 +13,21 @@ public enum HandlerKind
     Open,
 }
 
+/// <summary>Detailed outcome of starting an explicit open handler.</summary>
+public enum OpenLaunchResult
+{
+    /// <summary>The application was started.</summary>
+    Success,
+    /// <summary>No application was selected.</summary>
+    NotSelected,
+    /// <summary>The configured value is not an absolute executable path.</summary>
+    InvalidExecutable,
+    /// <summary>The executable does not exist or could not be started.</summary>
+    NotFound,
+    /// <summary>The handler points back to Runly.</summary>
+    Recursive,
+}
+
 /// <summary>How often the security gate asks the user before a script is allowed to run (SPEC 6).</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<SecurityMode>))]
 public enum SecurityMode

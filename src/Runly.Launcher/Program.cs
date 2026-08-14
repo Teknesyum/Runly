@@ -120,6 +120,14 @@ internal static class Program
 
     private static int OpenFile(ExtensionMapping mapping, ScriptInfo file, string[] fileArgs, RunlyConfig config, TaskDialogInterop dialogs)
     {
+        if (string.IsNullOrWhiteSpace(mapping.OpenWith))
+        {
+            var openSettings = dialogs.AskOpenSettings(
+                "Uygulama seçilmedi",
+                $"\"{file.Extension}\" uzantısı için açılacak uygulama seçilmedi.\n\nRunly Ayarları açılsın mı?");
+            if (openSettings) TryStartSettings();
+            return ExitCode.NoInterpreter;
+        }
         var trustStore = new TrustStoreService(logger: s_logger);
         trustStore.Load();
         var verdict = new SecurityGate().Evaluate(file, config, trustStore, HandlerKind.Open);
@@ -137,7 +145,17 @@ internal static class Program
             }
         }
 
-        return new ProcessLauncher().Open(mapping.OpenWith ?? string.Empty, mapping.Args, file, fileArgs, Environment.ProcessPath);
+        var result = new ProcessLauncher().Open(mapping.OpenWith, mapping.Args, file, fileArgs, Environment.ProcessPath);
+        if (result == OpenLaunchResult.Success) return ExitCode.Success;
+
+        var message = result switch
+        {
+            OpenLaunchResult.InvalidExecutable => "Seçilen yol geçerli, mutlak bir .exe yolu değil.",
+            OpenLaunchResult.Recursive => "Runly kendisini dosya açma uygulaması olarak çağıramaz.",
+            _ => $"Seçilen uygulama bulunamadı veya başlatılamadı:\n{mapping.OpenWith}",
+        };
+        dialogs.ShowError("Uygulama açılamadı", message);
+        return ExitCode.NoInterpreter;
     }
 
     /// <summary>Shows the security dialog and applies its answer; returns whether the script may run.</summary>

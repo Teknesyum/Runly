@@ -738,9 +738,12 @@ internal sealed class MainForm : NeonForm
         UpdateDetailPanel();
     }
 
-    private static void ApplyStatusToRow(DataGridViewRow row, ExtensionStatus status)
+    private void ApplyStatusToRow(DataGridViewRow row, ExtensionStatus status)
     {
-        row.Cells[ColFound].Value = status.InterpreterFound ? $"✓ {status.InterpreterPath}" : "✗";
+        var mapping = EffectiveMapping(status.Extension);
+        row.Cells[ColFound].Value = mapping.Kind == HandlerKind.Open && string.IsNullOrWhiteSpace(mapping.OpenWith)
+            ? Strings.Get("handler.notSelected")
+            : status.InterpreterFound ? $"✓ {status.InterpreterPath}" : "✗";
 
         var (text, back, fore) = DescribeStatus(status.Bound);
 

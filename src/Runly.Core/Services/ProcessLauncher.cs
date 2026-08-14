@@ -126,18 +126,20 @@ public sealed class ProcessLauncher : IProcessLauncher
     }
 
     /// <summary>Opens a file with an explicit absolute executable, without a console or wait.</summary>
-    public int Open(string executablePath, string argumentTemplate, ScriptInfo file, string[] fileArgs, string? runlyExecutablePath = null)
+    public OpenLaunchResult Open(string? executablePath, string argumentTemplate, ScriptInfo file, string[] fileArgs, string? runlyExecutablePath = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(executablePath);
         ArgumentNullException.ThrowIfNull(file);
         fileArgs ??= [];
 
+        if (string.IsNullOrWhiteSpace(executablePath)) return OpenLaunchResult.NotSelected;
+
         if (!Path.IsPathFullyQualified(executablePath) ||
-            !string.Equals(Path.GetExtension(executablePath), ".exe", StringComparison.OrdinalIgnoreCase) ||
-            IsRunlyExecutable(executablePath, runlyExecutablePath))
+            !string.Equals(Path.GetExtension(executablePath), ".exe", StringComparison.OrdinalIgnoreCase))
         {
-            return ExitCode.NoInterpreter;
+            return OpenLaunchResult.InvalidExecutable;
         }
+        if (IsRunlyExecutable(executablePath, runlyExecutablePath)) return OpenLaunchResult.Recursive;
+        if (!File.Exists(executablePath)) return OpenLaunchResult.NotFound;
 
         var arguments = (argumentTemplate ?? string.Empty)
             .Replace("{script}", file.Path, StringComparison.Ordinal)
@@ -154,11 +156,11 @@ public sealed class ProcessLauncher : IProcessLauncher
                 UseShellExecute = false,
                 CreateNoWindow = true,
             });
-            return process is null ? ExitCode.NoInterpreter : ExitCode.Success;
+            return process is null ? OpenLaunchResult.NotFound : OpenLaunchResult.Success;
         }
         catch (Exception ex) when (ex is Win32Exception or FileNotFoundException)
         {
-            return ExitCode.NoInterpreter;
+            return OpenLaunchResult.NotFound;
         }
     }
 

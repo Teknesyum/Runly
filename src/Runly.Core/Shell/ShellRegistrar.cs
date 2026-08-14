@@ -93,7 +93,11 @@ public sealed class ShellRegistrar : IShellRegistrar
                     skipped.Add(new SkippedExtension
                     {
                         Extension = extension,
-                        Reason = $"Yorumlayıcı bulunamadı: {mapping.Interpreter}",
+                        Reason = mapping.Kind == HandlerKind.Open && string.IsNullOrWhiteSpace(mapping.OpenWith)
+                            ? "Bu uzantı için uygulama seçilmedi."
+                            : mapping.Kind == HandlerKind.Open
+                                ? $"Uygulama bulunamadı: {mapping.OpenWith}"
+                                : $"Yorumlayıcı bulunamadı: {mapping.Interpreter}",
                     });
                     continue;
                 }

@@ -77,5 +77,6 @@
   "category.audio": "Ses", "category.video": "Video", "category.archive": "Arşiv",
   "category.office": "Ofis/Doküman", "category.design": "3B ve Tasarım", "category.fonts": "Yazı Tipleri",
   "category.locked": "Kilitli", "category.special": "Özel",
-  "extension.blockedAdd": "Bu uzantı Windows güvenliği ve sistem bütünlüğü nedeniyle Runly tarafından yönetilemez."
+  "extension.blockedAdd": "Bu uzantı Windows güvenliği ve sistem bütünlüğü nedeniyle Runly tarafından yönetilemez.",
+  "handler.notSelected": "Bu uzantı için uygulama seçilmedi."
 }

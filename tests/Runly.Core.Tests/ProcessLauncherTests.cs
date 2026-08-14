@@ -177,8 +177,10 @@ public sealed class ProcessLauncherTests
         var launcher = new ProcessLauncher();
         var file = new ScriptInfo { Path = @"C:\docs\readme.md" };
 
-        Assert.Equal(ExitCode.NoInterpreter, launcher.Open("notepad.exe", "\"{script}\"", file, []));
-        Assert.Equal(ExitCode.NoInterpreter, launcher.Open(@"C:\tools\handler.cmd", "\"{script}\"", file, []));
-        Assert.Equal(ExitCode.NoInterpreter, launcher.Open(@"C:\elsewhere\Runly.exe", "\"{script}\"", file, [], @"C:\installed\Runly.exe"));
+        Assert.Equal(OpenLaunchResult.NotSelected, launcher.Open(null, "\"{script}\"", file, []));
+        Assert.Equal(OpenLaunchResult.InvalidExecutable, launcher.Open("notepad.exe", "\"{script}\"", file, []));
+        Assert.Equal(OpenLaunchResult.InvalidExecutable, launcher.Open(@"C:\tools\handler.cmd", "\"{script}\"", file, []));
+        Assert.Equal(OpenLaunchResult.Recursive, launcher.Open(@"C:\elsewhere\Runly.exe", "\"{script}\"", file, [], @"C:\installed\Runly.exe"));
+        Assert.Equal(OpenLaunchResult.NotFound, launcher.Open(@"C:\missing\viewer.exe", "\"{script}\"", file, []));
     }
 }
