@@ -23,6 +23,7 @@
     <EmbeddedResource Include="..\..\assets\runly.ico" LogicalName="Runly.Settings.runly.ico" />
     <EmbeddedResource Include="locale\tr.json" LogicalName="Runly.Settings.locale.tr.json" />
     <EmbeddedResource Include="locale\en.json" LogicalName="Runly.Settings.locale.en.json" />
+    <EmbeddedResource Include="Catalog\catalog.json" LogicalName="Runly.Settings.catalog.json" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,4583 @@
+[
+  {
+    "extension": ".js",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "JS dosyası",
+      "en": "JS file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mjs",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "MJS dosyası",
+      "en": "MJS file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cjs",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "CJS dosyası",
+      "en": "CJS file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ts",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "TS dosyası",
+      "en": "TS file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ps1",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "PS1 dosyası",
+      "en": "PS1 file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".py",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "PY dosyası",
+      "en": "PY file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pyw",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "PYW dosyası",
+      "en": "PYW file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".rb",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "RB dosyası",
+      "en": "RB file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pl",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "PL dosyası",
+      "en": "PL file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".lua",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "LUA dosyası",
+      "en": "LUA file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".php",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "PHP dosyası",
+      "en": "PHP file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".sh",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "SH dosyası",
+      "en": "SH file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".r",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "R dosyası",
+      "en": "R file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".jar",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "JAR dosyası",
+      "en": "JAR file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".bash",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "BASH dosyası",
+      "en": "BASH file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".zsh",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "ZSH dosyası",
+      "en": "ZSH file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".fish",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "FISH dosyası",
+      "en": "FISH file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".tcl",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "TCL dosyası",
+      "en": "TCL file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".awk",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "AWK dosyası",
+      "en": "AWK file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".psm1",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "PSM1 dosyası",
+      "en": "PSM1 file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".psd1",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "PSD1 dosyası",
+      "en": "PSD1 file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".vbs",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "VBS dosyası",
+      "en": "VBS file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".wsf",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "WSF dosyası",
+      "en": "WSF file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".wsh",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "WSH dosyası",
+      "en": "WSH file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".hta",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "HTA dosyası",
+      "en": "HTA file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".groovy",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "GROOVY dosyası",
+      "en": "GROOVY file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".kts",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "KTS dosyası",
+      "en": "KTS file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dart",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "DART dosyası",
+      "en": "DART file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".coffee",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "COFFEE dosyası",
+      "en": "COFFEE file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".exs",
+    "category": "Betikler",
+    "displayName": {
+      "tr": "EXS dosyası",
+      "en": "EXS file"
+    },
+    "defaultKind": "Run",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cs",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "CS dosyası",
+      "en": "CS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".csx",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "CSX dosyası",
+      "en": "CSX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".vb",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "VB dosyası",
+      "en": "VB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".fs",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "FS dosyası",
+      "en": "FS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".fsx",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "FSX dosyası",
+      "en": "FSX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cpp",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "CPP dosyası",
+      "en": "CPP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cc",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "CC dosyası",
+      "en": "CC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cxx",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "CXX dosyası",
+      "en": "CXX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".c",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "C dosyası",
+      "en": "C file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".h",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "H dosyası",
+      "en": "H file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".hpp",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "HPP dosyası",
+      "en": "HPP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".hxx",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "HXX dosyası",
+      "en": "HXX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".java",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "JAVA dosyası",
+      "en": "JAVA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".kt",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "KT dosyası",
+      "en": "KT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ktscript",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "KTSCRIPT dosyası",
+      "en": "KTSCRIPT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".go",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "GO dosyası",
+      "en": "GO file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".rs",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "RS dosyası",
+      "en": "RS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".swift",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "SWIFT dosyası",
+      "en": "SWIFT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".scala",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "SCALA dosyası",
+      "en": "SCALA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".clj",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "CLJ dosyası",
+      "en": "CLJ file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cljs",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "CLJS dosyası",
+      "en": "CLJS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".hs",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "HS dosyası",
+      "en": "HS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".lhs",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "LHS dosyası",
+      "en": "LHS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".erl",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "ERL dosyası",
+      "en": "ERL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".hrl",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "HRL dosyası",
+      "en": "HRL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ex",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "EX dosyası",
+      "en": "EX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".elm",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "ELM dosyası",
+      "en": "ELM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".sol",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "SOL dosyası",
+      "en": "SOL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".asm",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "ASM dosyası",
+      "en": "ASM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".s",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "S dosyası",
+      "en": "S file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pas",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "PAS dosyası",
+      "en": "PAS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pp",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "PP dosyası",
+      "en": "PP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".d",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "D dosyası",
+      "en": "D file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".nim",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "NIM dosyası",
+      "en": "NIM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".zig",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "ZIG dosyası",
+      "en": "ZIG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".v",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "V dosyası",
+      "en": "V file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".vue",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "VUE dosyası",
+      "en": "VUE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".svelte",
+    "category": "Kod/Geliştirme",
+    "displayName": {
+      "tr": "SVELTE dosyası",
+      "en": "SVELTE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".txt",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "TXT dosyası",
+      "en": "TXT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [
+      "notepad.exe",
+      "notepad++.exe",
+      "Code.exe"
+    ],
+    "blocked": false
+  },
+  {
+    "extension": ".md",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "MD dosyası",
+      "en": "MD file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [
+      "notepad++.exe",
+      "Code.exe",
+      "Typora.exe",
+      "notepad.exe"
+    ],
+    "blocked": false
+  },
+  {
+    "extension": ".markdown",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "MARKDOWN dosyası",
+      "en": "MARKDOWN file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".rst",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "RST dosyası",
+      "en": "RST file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".adoc",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "ADOC dosyası",
+      "en": "ADOC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".asciidoc",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "ASCIIDOC dosyası",
+      "en": "ASCIIDOC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".tex",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "TEX dosyası",
+      "en": "TEX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".latex",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "LATEX dosyası",
+      "en": "LATEX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".log",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "LOG dosyası",
+      "en": "LOG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".nfo",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "NFO dosyası",
+      "en": "NFO file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".readme",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "README dosyası",
+      "en": "README file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".rtf",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "RTF dosyası",
+      "en": "RTF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".textile",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "TEXTILE dosyası",
+      "en": "TEXTILE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".org",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "ORG dosyası",
+      "en": "ORG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".wiki",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "WIKI dosyası",
+      "en": "WIKI file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".man",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "MAN dosyası",
+      "en": "MAN file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".me",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "ME dosyası",
+      "en": "ME file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".asc",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "ASC dosyası",
+      "en": "ASC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".etx",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "ETX dosyası",
+      "en": "ETX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".utf8",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "UTF8 dosyası",
+      "en": "UTF8 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".text",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "TEXT dosyası",
+      "en": "TEXT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".fodt",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "FODT dosyası",
+      "en": "FODT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".uot",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "UOT dosyası",
+      "en": "UOT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".stw",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "STW dosyası",
+      "en": "STW file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".sxw",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "SXW dosyası",
+      "en": "SXW file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pages",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "PAGES dosyası",
+      "en": "PAGES file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".wpd",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "WPD dosyası",
+      "en": "WPD file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".wps",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "WPS dosyası",
+      "en": "WPS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".abw",
+    "category": "Metin ve Belge",
+    "displayName": {
+      "tr": "ABW dosyası",
+      "en": "ABW file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".json",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "JSON dosyası",
+      "en": "JSON file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [
+      "Code.exe",
+      "notepad++.exe"
+    ],
+    "blocked": false
+  },
+  {
+    "extension": ".jsonc",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "JSONC dosyası",
+      "en": "JSONC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".json5",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "JSON5 dosyası",
+      "en": "JSON5 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xml",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "XML dosyası",
+      "en": "XML file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".yaml",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "YAML dosyası",
+      "en": "YAML file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".yml",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "YML dosyası",
+      "en": "YML file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".toml",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "TOML dosyası",
+      "en": "TOML file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ini",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "INI dosyası",
+      "en": "INI file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cfg",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "CFG dosyası",
+      "en": "CFG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".conf",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "CONF dosyası",
+      "en": "CONF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".config",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "CONFIG dosyası",
+      "en": "CONFIG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".properties",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "PROPERTIES dosyası",
+      "en": "PROPERTIES file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".env",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "ENV dosyası",
+      "en": "ENV file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dotenv",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "DOTENV dosyası",
+      "en": "DOTENV file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".csv",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "CSV dosyası",
+      "en": "CSV file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".tsv",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "TSV dosyası",
+      "en": "TSV file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".sql",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "SQL dosyası",
+      "en": "SQL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".db",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "DB dosyası",
+      "en": "DB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".sqlite",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "SQLITE dosyası",
+      "en": "SQLITE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".sqlite3",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "SQLITE3 dosyası",
+      "en": "SQLITE3 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".parquet",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "PARQUET dosyası",
+      "en": "PARQUET file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".avro",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "AVRO dosyası",
+      "en": "AVRO file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".proto",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "PROTO dosyası",
+      "en": "PROTO file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".graphql",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "GRAPHQL dosyası",
+      "en": "GRAPHQL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".gql",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "GQL dosyası",
+      "en": "GQL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xsd",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "XSD dosyası",
+      "en": "XSD file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xsl",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "XSL dosyası",
+      "en": "XSL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xslt",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "XSLT dosyası",
+      "en": "XSLT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dtd",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "DTD dosyası",
+      "en": "DTD file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".plist",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "PLIST dosyası",
+      "en": "PLIST file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".reg",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "REG dosyası",
+      "en": "REG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".inf",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "INF dosyası",
+      "en": "INF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".manifest",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "MANIFEST dosyası",
+      "en": "MANIFEST file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".lock",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "LOCK dosyası",
+      "en": "LOCK file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".editorconfig",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "EDITORCONFIG dosyası",
+      "en": "EDITORCONFIG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".gitignore",
+    "category": "Yapılandırma/Veri",
+    "displayName": {
+      "tr": "GITIGNORE dosyası",
+      "en": "GITIGNORE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".html",
+    "category": "Web",
+    "displayName": {
+      "tr": "HTML dosyası",
+      "en": "HTML file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".htm",
+    "category": "Web",
+    "displayName": {
+      "tr": "HTM dosyası",
+      "en": "HTM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xhtml",
+    "category": "Web",
+    "displayName": {
+      "tr": "XHTML dosyası",
+      "en": "XHTML file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".css",
+    "category": "Web",
+    "displayName": {
+      "tr": "CSS dosyası",
+      "en": "CSS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".scss",
+    "category": "Web",
+    "displayName": {
+      "tr": "SCSS dosyası",
+      "en": "SCSS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".sass",
+    "category": "Web",
+    "displayName": {
+      "tr": "SASS dosyası",
+      "en": "SASS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".less",
+    "category": "Web",
+    "displayName": {
+      "tr": "LESS dosyası",
+      "en": "LESS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".styl",
+    "category": "Web",
+    "displayName": {
+      "tr": "STYL dosyası",
+      "en": "STYL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".svg",
+    "category": "Web",
+    "displayName": {
+      "tr": "SVG dosyası",
+      "en": "SVG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".wasm",
+    "category": "Web",
+    "displayName": {
+      "tr": "WASM dosyası",
+      "en": "WASM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".webmanifest",
+    "category": "Web",
+    "displayName": {
+      "tr": "WEBMANIFEST dosyası",
+      "en": "WEBMANIFEST file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".map",
+    "category": "Web",
+    "displayName": {
+      "tr": "MAP dosyası",
+      "en": "MAP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mht",
+    "category": "Web",
+    "displayName": {
+      "tr": "MHT dosyası",
+      "en": "MHT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mhtml",
+    "category": "Web",
+    "displayName": {
+      "tr": "MHTML dosyası",
+      "en": "MHTML file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xht",
+    "category": "Web",
+    "displayName": {
+      "tr": "XHT dosyası",
+      "en": "XHT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".shtml",
+    "category": "Web",
+    "displayName": {
+      "tr": "SHTML dosyası",
+      "en": "SHTML file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".asp",
+    "category": "Web",
+    "displayName": {
+      "tr": "ASP dosyası",
+      "en": "ASP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".aspx",
+    "category": "Web",
+    "displayName": {
+      "tr": "ASPX dosyası",
+      "en": "ASPX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".jsp",
+    "category": "Web",
+    "displayName": {
+      "tr": "JSP dosyası",
+      "en": "JSP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".twig",
+    "category": "Web",
+    "displayName": {
+      "tr": "TWIG dosyası",
+      "en": "TWIG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".hbs",
+    "category": "Web",
+    "displayName": {
+      "tr": "HBS dosyası",
+      "en": "HBS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".handlebars",
+    "category": "Web",
+    "displayName": {
+      "tr": "HANDLEBARS dosyası",
+      "en": "HANDLEBARS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ejs",
+    "category": "Web",
+    "displayName": {
+      "tr": "EJS dosyası",
+      "en": "EJS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pug",
+    "category": "Web",
+    "displayName": {
+      "tr": "PUG dosyası",
+      "en": "PUG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".jade",
+    "category": "Web",
+    "displayName": {
+      "tr": "JADE dosyası",
+      "en": "JADE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".razor",
+    "category": "Web",
+    "displayName": {
+      "tr": "RAZOR dosyası",
+      "en": "RAZOR file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cshtml",
+    "category": "Web",
+    "displayName": {
+      "tr": "CSHTML dosyası",
+      "en": "CSHTML file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".rss",
+    "category": "Web",
+    "displayName": {
+      "tr": "RSS dosyası",
+      "en": "RSS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".atom",
+    "category": "Web",
+    "displayName": {
+      "tr": "ATOM dosyası",
+      "en": "ATOM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".webloc",
+    "category": "Web",
+    "displayName": {
+      "tr": "WEBLOC dosyası",
+      "en": "WEBLOC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".png",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "PNG dosyası",
+      "en": "PNG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [
+      "mspaint.exe"
+    ],
+    "blocked": false
+  },
+  {
+    "extension": ".jpg",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "JPG dosyası",
+      "en": "JPG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [
+      "mspaint.exe"
+    ],
+    "blocked": false
+  },
+  {
+    "extension": ".jpeg",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "JPEG dosyası",
+      "en": "JPEG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".jpe",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "JPE dosyası",
+      "en": "JPE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".gif",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "GIF dosyası",
+      "en": "GIF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".bmp",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "BMP dosyası",
+      "en": "BMP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".tif",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "TIF dosyası",
+      "en": "TIF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".tiff",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "TIFF dosyası",
+      "en": "TIFF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".webp",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "WEBP dosyası",
+      "en": "WEBP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".avif",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "AVIF dosyası",
+      "en": "AVIF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".heic",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "HEIC dosyası",
+      "en": "HEIC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".heif",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "HEIF dosyası",
+      "en": "HEIF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ico",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "ICO dosyası",
+      "en": "ICO file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cur",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "CUR dosyası",
+      "en": "CUR file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".raw",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "RAW dosyası",
+      "en": "RAW file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dng",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "DNG dosyası",
+      "en": "DNG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cr2",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "CR2 dosyası",
+      "en": "CR2 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".nef",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "NEF dosyası",
+      "en": "NEF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".arw",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "ARW dosyası",
+      "en": "ARW file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".orf",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "ORF dosyası",
+      "en": "ORF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".rw2",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "RW2 dosyası",
+      "en": "RW2 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".psd",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "PSD dosyası",
+      "en": "PSD file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xcf",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "XCF dosyası",
+      "en": "XCF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".kra",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "KRA dosyası",
+      "en": "KRA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ora",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "ORA dosyası",
+      "en": "ORA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pbm",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "PBM dosyası",
+      "en": "PBM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pgm",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "PGM dosyası",
+      "en": "PGM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ppm",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "PPM dosyası",
+      "en": "PPM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pnm",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "PNM dosyası",
+      "en": "PNM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".tga",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "TGA dosyası",
+      "en": "TGA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dds",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "DDS dosyası",
+      "en": "DDS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".jxl",
+    "category": "Görseller",
+    "displayName": {
+      "tr": "JXL dosyası",
+      "en": "JXL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mp3",
+    "category": "Ses",
+    "displayName": {
+      "tr": "MP3 dosyası",
+      "en": "MP3 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [
+      "vlc.exe"
+    ],
+    "blocked": false
+  },
+  {
+    "extension": ".wav",
+    "category": "Ses",
+    "displayName": {
+      "tr": "WAV dosyası",
+      "en": "WAV file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".flac",
+    "category": "Ses",
+    "displayName": {
+      "tr": "FLAC dosyası",
+      "en": "FLAC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".aac",
+    "category": "Ses",
+    "displayName": {
+      "tr": "AAC dosyası",
+      "en": "AAC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".m4a",
+    "category": "Ses",
+    "displayName": {
+      "tr": "M4A dosyası",
+      "en": "M4A file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ogg",
+    "category": "Ses",
+    "displayName": {
+      "tr": "OGG dosyası",
+      "en": "OGG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".oga",
+    "category": "Ses",
+    "displayName": {
+      "tr": "OGA dosyası",
+      "en": "OGA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".opus",
+    "category": "Ses",
+    "displayName": {
+      "tr": "OPUS dosyası",
+      "en": "OPUS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".wma",
+    "category": "Ses",
+    "displayName": {
+      "tr": "WMA dosyası",
+      "en": "WMA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".aiff",
+    "category": "Ses",
+    "displayName": {
+      "tr": "AIFF dosyası",
+      "en": "AIFF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".aif",
+    "category": "Ses",
+    "displayName": {
+      "tr": "AIF dosyası",
+      "en": "AIF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mid",
+    "category": "Ses",
+    "displayName": {
+      "tr": "MID dosyası",
+      "en": "MID file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".midi",
+    "category": "Ses",
+    "displayName": {
+      "tr": "MIDI dosyası",
+      "en": "MIDI file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".amr",
+    "category": "Ses",
+    "displayName": {
+      "tr": "AMR dosyası",
+      "en": "AMR file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ape",
+    "category": "Ses",
+    "displayName": {
+      "tr": "APE dosyası",
+      "en": "APE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".alac",
+    "category": "Ses",
+    "displayName": {
+      "tr": "ALAC dosyası",
+      "en": "ALAC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ac3",
+    "category": "Ses",
+    "displayName": {
+      "tr": "AC3 dosyası",
+      "en": "AC3 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dts",
+    "category": "Ses",
+    "displayName": {
+      "tr": "DTS dosyası",
+      "en": "DTS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mka",
+    "category": "Ses",
+    "displayName": {
+      "tr": "MKA dosyası",
+      "en": "MKA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ra",
+    "category": "Ses",
+    "displayName": {
+      "tr": "RA dosyası",
+      "en": "RA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ram",
+    "category": "Ses",
+    "displayName": {
+      "tr": "RAM dosyası",
+      "en": "RAM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".caf",
+    "category": "Ses",
+    "displayName": {
+      "tr": "CAF dosyası",
+      "en": "CAF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".au",
+    "category": "Ses",
+    "displayName": {
+      "tr": "AU dosyası",
+      "en": "AU file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".snd",
+    "category": "Ses",
+    "displayName": {
+      "tr": "SND dosyası",
+      "en": "SND file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".voc",
+    "category": "Ses",
+    "displayName": {
+      "tr": "VOC dosyası",
+      "en": "VOC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".weba",
+    "category": "Ses",
+    "displayName": {
+      "tr": "WEBA dosyası",
+      "en": "WEBA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mp4",
+    "category": "Video",
+    "displayName": {
+      "tr": "MP4 dosyası",
+      "en": "MP4 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [
+      "vlc.exe"
+    ],
+    "blocked": false
+  },
+  {
+    "extension": ".m4v",
+    "category": "Video",
+    "displayName": {
+      "tr": "M4V dosyası",
+      "en": "M4V file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mkv",
+    "category": "Video",
+    "displayName": {
+      "tr": "MKV dosyası",
+      "en": "MKV file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".avi",
+    "category": "Video",
+    "displayName": {
+      "tr": "AVI dosyası",
+      "en": "AVI file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mov",
+    "category": "Video",
+    "displayName": {
+      "tr": "MOV dosyası",
+      "en": "MOV file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".wmv",
+    "category": "Video",
+    "displayName": {
+      "tr": "WMV dosyası",
+      "en": "WMV file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".webm",
+    "category": "Video",
+    "displayName": {
+      "tr": "WEBM dosyası",
+      "en": "WEBM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mpeg",
+    "category": "Video",
+    "displayName": {
+      "tr": "MPEG dosyası",
+      "en": "MPEG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mpg",
+    "category": "Video",
+    "displayName": {
+      "tr": "MPG dosyası",
+      "en": "MPG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mpe",
+    "category": "Video",
+    "displayName": {
+      "tr": "MPE dosyası",
+      "en": "MPE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".tsvdo",
+    "category": "Video",
+    "displayName": {
+      "tr": "TSVDO dosyası",
+      "en": "TSVDO file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mts",
+    "category": "Video",
+    "displayName": {
+      "tr": "MTS dosyası",
+      "en": "MTS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".m2ts",
+    "category": "Video",
+    "displayName": {
+      "tr": "M2TS dosyası",
+      "en": "M2TS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".3gp",
+    "category": "Video",
+    "displayName": {
+      "tr": "3GP dosyası",
+      "en": "3GP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".3g2",
+    "category": "Video",
+    "displayName": {
+      "tr": "3G2 dosyası",
+      "en": "3G2 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".flv",
+    "category": "Video",
+    "displayName": {
+      "tr": "FLV dosyası",
+      "en": "FLV file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".f4v",
+    "category": "Video",
+    "displayName": {
+      "tr": "F4V dosyası",
+      "en": "F4V file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ogv",
+    "category": "Video",
+    "displayName": {
+      "tr": "OGV dosyası",
+      "en": "OGV file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".vob",
+    "category": "Video",
+    "displayName": {
+      "tr": "VOB dosyası",
+      "en": "VOB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".rm",
+    "category": "Video",
+    "displayName": {
+      "tr": "RM dosyası",
+      "en": "RM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".rmvb",
+    "category": "Video",
+    "displayName": {
+      "tr": "RMVB dosyası",
+      "en": "RMVB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".asf",
+    "category": "Video",
+    "displayName": {
+      "tr": "ASF dosyası",
+      "en": "ASF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".divx",
+    "category": "Video",
+    "displayName": {
+      "tr": "DIVX dosyası",
+      "en": "DIVX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mxf",
+    "category": "Video",
+    "displayName": {
+      "tr": "MXF dosyası",
+      "en": "MXF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".zip",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "ZIP dosyası",
+      "en": "ZIP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".7z",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "7Z dosyası",
+      "en": "7Z file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".rar",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "RAR dosyası",
+      "en": "RAR file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".tar",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "TAR dosyası",
+      "en": "TAR file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".gz",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "GZ dosyası",
+      "en": "GZ file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".gzip",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "GZIP dosyası",
+      "en": "GZIP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".bz2",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "BZ2 dosyası",
+      "en": "BZ2 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".bzip2",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "BZIP2 dosyası",
+      "en": "BZIP2 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xz",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "XZ dosyası",
+      "en": "XZ file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".lz",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "LZ dosyası",
+      "en": "LZ file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".lzma",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "LZMA dosyası",
+      "en": "LZMA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".zst",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "ZST dosyası",
+      "en": "ZST file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cab",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "CAB dosyası",
+      "en": "CAB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".iso",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "ISO dosyası",
+      "en": "ISO file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".img",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "IMG dosyası",
+      "en": "IMG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dmg",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "DMG dosyası",
+      "en": "DMG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".tgz",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "TGZ dosyası",
+      "en": "TGZ file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".tbz",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "TBZ dosyası",
+      "en": "TBZ file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".tbz2",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "TBZ2 dosyası",
+      "en": "TBZ2 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".txz",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "TXZ dosyası",
+      "en": "TXZ file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cpio",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "CPIO dosyası",
+      "en": "CPIO file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ar",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "AR dosyası",
+      "en": "AR file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".deb",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "DEB dosyası",
+      "en": "DEB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".rpm",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "RPM dosyası",
+      "en": "RPM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".apk",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "APK dosyası",
+      "en": "APK file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xpi",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "XPI dosyası",
+      "en": "XPI file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".crx",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "CRX dosyası",
+      "en": "CRX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pak",
+    "category": "Arşiv",
+    "displayName": {
+      "tr": "PAK dosyası",
+      "en": "PAK file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".doc",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "DOC dosyası",
+      "en": "DOC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".docx",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "DOCX dosyası",
+      "en": "DOCX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [
+      "WINWORD.EXE"
+    ],
+    "blocked": false
+  },
+  {
+    "extension": ".docm",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "DOCM dosyası",
+      "en": "DOCM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dot",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "DOT dosyası",
+      "en": "DOT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dotx",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "DOTX dosyası",
+      "en": "DOTX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xls",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "XLS dosyası",
+      "en": "XLS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xlsx",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "XLSX dosyası",
+      "en": "XLSX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [
+      "EXCEL.EXE"
+    ],
+    "blocked": false
+  },
+  {
+    "extension": ".xlsm",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "XLSM dosyası",
+      "en": "XLSM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xlt",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "XLT dosyası",
+      "en": "XLT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xltx",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "XLTX dosyası",
+      "en": "XLTX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ppt",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "PPT dosyası",
+      "en": "PPT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pptx",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "PPTX dosyası",
+      "en": "PPTX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [
+      "POWERPNT.EXE"
+    ],
+    "blocked": false
+  },
+  {
+    "extension": ".pptm",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "PPTM dosyası",
+      "en": "PPTM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pot",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "POT dosyası",
+      "en": "POT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".potx",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "POTX dosyası",
+      "en": "POTX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".odt",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "ODT dosyası",
+      "en": "ODT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ods",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "ODS dosyası",
+      "en": "ODS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".odp",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "ODP dosyası",
+      "en": "ODP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".odg",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "ODG dosyası",
+      "en": "ODG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pdf",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "PDF dosyası",
+      "en": "PDF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [
+      "AcroRd32.exe",
+      "msedge.exe"
+    ],
+    "blocked": false
+  },
+  {
+    "extension": ".epub",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "EPUB dosyası",
+      "en": "EPUB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mobi",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "MOBI dosyası",
+      "en": "MOBI file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".azw",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "AZW dosyası",
+      "en": "AZW file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".azw3",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "AZW3 dosyası",
+      "en": "AZW3 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".xps",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "XPS dosyası",
+      "en": "XPS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".oxps",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "OXPS dosyası",
+      "en": "OXPS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pub",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "PUB dosyası",
+      "en": "PUB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".vsd",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "VSD dosyası",
+      "en": "VSD file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".vsdx",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "VSDX dosyası",
+      "en": "VSDX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".one",
+    "category": "Ofis/Doküman",
+    "displayName": {
+      "tr": "ONE dosyası",
+      "en": "ONE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".obj",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "OBJ dosyası",
+      "en": "OBJ file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".fbx",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "FBX dosyası",
+      "en": "FBX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".stl",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "STL dosyası",
+      "en": "STL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".3ds",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "3DS dosyası",
+      "en": "3DS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".blend",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "BLEND dosyası",
+      "en": "BLEND file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dae",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "DAE dosyası",
+      "en": "DAE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".gltf",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "GLTF dosyası",
+      "en": "GLTF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".glb",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "GLB dosyası",
+      "en": "GLB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ply",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "PLY dosyası",
+      "en": "PLY file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".step",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "STEP dosyası",
+      "en": "STEP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".stp",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "STP dosyası",
+      "en": "STP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".iges",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "IGES dosyası",
+      "en": "IGES file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".igs",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "IGS dosyası",
+      "en": "IGS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dwg",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "DWG dosyası",
+      "en": "DWG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dxf",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "DXF dosyası",
+      "en": "DXF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".skp",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "SKP dosyası",
+      "en": "SKP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".3dm",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "3DM dosyası",
+      "en": "3DM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".max",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "MAX dosyası",
+      "en": "MAX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ma",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "MA dosyası",
+      "en": "MA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mb",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "MB dosyası",
+      "en": "MB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".c4d",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "C4D dosyası",
+      "en": "C4D file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".usd",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "USD dosyası",
+      "en": "USD file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".usda",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "USDA dosyası",
+      "en": "USDA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".usdc",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "USDC dosyası",
+      "en": "USDC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".usdz",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "USDZ dosyası",
+      "en": "USDZ file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".sldprt",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "SLDPRT dosyası",
+      "en": "SLDPRT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".sldasm",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "SLDASM dosyası",
+      "en": "SLDASM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ipt",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "IPT dosyası",
+      "en": "IPT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".iam",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "IAM dosyası",
+      "en": "IAM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".fcstd",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "FCSTD dosyası",
+      "en": "FCSTD file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".scad",
+    "category": "3B ve Tasarım",
+    "displayName": {
+      "tr": "SCAD dosyası",
+      "en": "SCAD file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ttf",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "TTF dosyası",
+      "en": "TTF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".otf",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "OTF dosyası",
+      "en": "OTF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".woff",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "WOFF dosyası",
+      "en": "WOFF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".woff2",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "WOFF2 dosyası",
+      "en": "WOFF2 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".eot",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "EOT dosyası",
+      "en": "EOT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".fon",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "FON dosyası",
+      "en": "FON file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".fnt",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "FNT dosyası",
+      "en": "FNT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pfb",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "PFB dosyası",
+      "en": "PFB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pfm",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "PFM dosyası",
+      "en": "PFM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ttc",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "TTC dosyası",
+      "en": "TTC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".otc",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "OTC dosyası",
+      "en": "OTC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".bdf",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "BDF dosyası",
+      "en": "BDF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pcf",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "PCF dosyası",
+      "en": "PCF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".sfd",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "SFD dosyası",
+      "en": "SFD file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ufo",
+    "category": "Yazı Tipleri",
+    "displayName": {
+      "tr": "UFO dosyası",
+      "en": "UFO file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".torrent",
+    "category": "Özel",
+    "displayName": {
+      "tr": "TORRENT dosyası",
+      "en": "TORRENT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ics",
+    "category": "Özel",
+    "displayName": {
+      "tr": "ICS dosyası",
+      "en": "ICS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".vcf",
+    "category": "Özel",
+    "displayName": {
+      "tr": "VCF dosyası",
+      "en": "VCF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".eml",
+    "category": "Özel",
+    "displayName": {
+      "tr": "EML dosyası",
+      "en": "EML file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".msg",
+    "category": "Özel",
+    "displayName": {
+      "tr": "MSG dosyası",
+      "en": "MSG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mbox",
+    "category": "Özel",
+    "displayName": {
+      "tr": "MBOX dosyası",
+      "en": "MBOX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".bib",
+    "category": "Özel",
+    "displayName": {
+      "tr": "BIB dosyası",
+      "en": "BIB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ris",
+    "category": "Özel",
+    "displayName": {
+      "tr": "RIS dosyası",
+      "en": "RIS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".opml",
+    "category": "Özel",
+    "displayName": {
+      "tr": "OPML dosyası",
+      "en": "OPML file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".gpx",
+    "category": "Özel",
+    "displayName": {
+      "tr": "GPX dosyası",
+      "en": "GPX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".kml",
+    "category": "Özel",
+    "displayName": {
+      "tr": "KML dosyası",
+      "en": "KML file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".kmz",
+    "category": "Özel",
+    "displayName": {
+      "tr": "KMZ dosyası",
+      "en": "KMZ file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".fit",
+    "category": "Özel",
+    "displayName": {
+      "tr": "FIT dosyası",
+      "en": "FIT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".sav",
+    "category": "Özel",
+    "displayName": {
+      "tr": "SAV dosyası",
+      "en": "SAV file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".rom",
+    "category": "Özel",
+    "displayName": {
+      "tr": "ROM dosyası",
+      "en": "ROM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".nes",
+    "category": "Özel",
+    "displayName": {
+      "tr": "NES dosyası",
+      "en": "NES file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".sfc",
+    "category": "Özel",
+    "displayName": {
+      "tr": "SFC dosyası",
+      "en": "SFC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".gba",
+    "category": "Özel",
+    "displayName": {
+      "tr": "GBA dosyası",
+      "en": "GBA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".iso2",
+    "category": "Özel",
+    "displayName": {
+      "tr": "ISO2 dosyası",
+      "en": "ISO2 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cue",
+    "category": "Özel",
+    "displayName": {
+      "tr": "CUE dosyası",
+      "en": "CUE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".patch",
+    "category": "Özel",
+    "displayName": {
+      "tr": "PATCH dosyası",
+      "en": "PATCH file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".diff",
+    "category": "Özel",
+    "displayName": {
+      "tr": "DIFF dosyası",
+      "en": "DIFF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".desktop",
+    "category": "Özel",
+    "displayName": {
+      "tr": "DESKTOP dosyası",
+      "en": "DESKTOP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".url2",
+    "category": "Özel",
+    "displayName": {
+      "tr": "URL2 dosyası",
+      "en": "URL2 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pem",
+    "category": "Özel",
+    "displayName": {
+      "tr": "PEM dosyası",
+      "en": "PEM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".crt",
+    "category": "Özel",
+    "displayName": {
+      "tr": "CRT dosyası",
+      "en": "CRT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".cer",
+    "category": "Özel",
+    "displayName": {
+      "tr": "CER dosyası",
+      "en": "CER file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".key",
+    "category": "Özel",
+    "displayName": {
+      "tr": "KEY dosyası",
+      "en": "KEY file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".csr",
+    "category": "Özel",
+    "displayName": {
+      "tr": "CSR dosyası",
+      "en": "CSR file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".pfx",
+    "category": "Özel",
+    "displayName": {
+      "tr": "PFX dosyası",
+      "en": "PFX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".p12",
+    "category": "Özel",
+    "displayName": {
+      "tr": "P12 dosyası",
+      "en": "P12 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".der",
+    "category": "Özel",
+    "displayName": {
+      "tr": "DER dosyası",
+      "en": "DER file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".torrent2",
+    "category": "Özel",
+    "displayName": {
+      "tr": "TORRENT2 dosyası",
+      "en": "TORRENT2 file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".bak",
+    "category": "Özel",
+    "displayName": {
+      "tr": "BAK dosyası",
+      "en": "BAK file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".tmp",
+    "category": "Özel",
+    "displayName": {
+      "tr": "TMP dosyası",
+      "en": "TMP file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".dat",
+    "category": "Özel",
+    "displayName": {
+      "tr": "DAT dosyası",
+      "en": "DAT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".bin",
+    "category": "Özel",
+    "displayName": {
+      "tr": "BIN dosyası",
+      "en": "BIN file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".hex",
+    "category": "Özel",
+    "displayName": {
+      "tr": "HEX dosyası",
+      "en": "HEX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".mapdata",
+    "category": "Özel",
+    "displayName": {
+      "tr": "MAPDATA dosyası",
+      "en": "MAPDATA file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".shader",
+    "category": "Özel",
+    "displayName": {
+      "tr": "SHADER dosyası",
+      "en": "SHADER file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".frag",
+    "category": "Özel",
+    "displayName": {
+      "tr": "FRAG dosyası",
+      "en": "FRAG file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".vert",
+    "category": "Özel",
+    "displayName": {
+      "tr": "VERT dosyası",
+      "en": "VERT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".ipynb",
+    "category": "Özel",
+    "displayName": {
+      "tr": "IPYNB dosyası",
+      "en": "IPYNB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": false
+  },
+  {
+    "extension": ".exe",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "EXE dosyası",
+      "en": "EXE file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".dll",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "DLL dosyası",
+      "en": "DLL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".sys",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "SYS dosyası",
+      "en": "SYS file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".com",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "COM dosyası",
+      "en": "COM file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".bat",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "BAT dosyası",
+      "en": "BAT file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".cmd",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "CMD dosyası",
+      "en": "CMD file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".msi",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "MSI dosyası",
+      "en": "MSI file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".msc",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "MSC dosyası",
+      "en": "MSC file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".cpl",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "CPL dosyası",
+      "en": "CPL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".scr",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "SCR dosyası",
+      "en": "SCR file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".lnk",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "LNK dosyası",
+      "en": "LNK file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".pif",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "PIF dosyası",
+      "en": "PIF file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".url",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "URL dosyası",
+      "en": "URL file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".job",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "JOB dosyası",
+      "en": "JOB file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".ocx",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "OCX dosyası",
+      "en": "OCX file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  },
+  {
+    "extension": ".drv",
+    "category": "Kilitli",
+    "displayName": {
+      "tr": "DRV dosyası",
+      "en": "DRV file"
+    },
+    "defaultKind": "Open",
+    "suggestedApps": [],
+    "blocked": true,
+    "riskNote": {
+      "tr": "Windows güvenliği ve sistem bütünlüğü nedeniyle yönetilemez.",
+      "en": "Cannot be managed due to Windows security and system integrity."
+    }
+  }
+]

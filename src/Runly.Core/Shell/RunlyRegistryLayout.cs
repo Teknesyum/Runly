@@ -108,8 +108,7 @@ public static class RunlyRegistryLayout
         var ext = NormalizeExtension(extension);
         var name = TypeNames.TryGetValue(ext, out var known)
             ? known
-            : ext[1..].ToUpperInvariant() + " Betiği";
-
+            : ext[1..].ToUpperInvariant() + " File";
         return name + " (Runly)";
     }
 
