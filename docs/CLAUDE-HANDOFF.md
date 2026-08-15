@@ -1,6 +1,6 @@
 # Runly — Claude Handoff
 
-Last updated: 2026-08-14
+Last updated: 2026-08-15
 
 ## Product
 
@@ -70,10 +70,22 @@ The new cyan/pink icon was visually verified in the live Release Settings title 
 
 ## Verification baseline
 
-- Test suite: 195 tests before final release verification.
+- Test suite: 197 tests before final release verification.
 - Launcher publish: NativeAOT, `win-x64`.
 - Settings publish: self-contained WinForms, `win-x64`.
 - Before publishing, run the full release build, inspect the package hash, launch `dist/RunlySettings.exe`, and visually verify the title icon and Default Apps button copy.
+
+### 0.2.0 catalog review
+
+- Catalog/category configuration is sparse: the UI projects catalog ∪ config, while saves and exports
+  retain only explicit mappings. Disabled custom `.foo` projection is regression-tested.
+- Real desktop testing verified three category transitions, localized category labels, counts, icons,
+  `.md`'s no-handler reason, and TR → EN switching. The live run exposed and fixed both inaccessible
+  Start Menu enumeration and a DataGridView ComboBox error during language changes.
+- Measured category rebuilds were 15.8–47 ms for 30–43 visible rows. Activation status refreshes were
+  69.5–82.2 ms for 30 enabled mappings; status discovery is not run for all 408 catalog entries.
+- Remaining manual checks are recorded in `docs/KNOWN-ISSUES.md`: 125%/150% DPI, typing `.foo` through
+  the owned Add Extension modal, and conclusively toggling `.md`'s enable checkbox.
 
 ## Do not regress
 

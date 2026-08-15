@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <RootNamespace>Runly.Core.Tests</RootNamespace>
     <AssemblyName>Runly.Core.Tests</AssemblyName>
     <IsTestProject>true</IsTestProject>
@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Runly.Core\Runly.Core.csproj" />
     <ProjectReference Include="..\..\src\Runly.Launcher\Runly.Launcher.csproj" />
+    <ProjectReference Include="..\..\src\Runly.Settings\Runly.Settings.csproj" />
   </ItemGroup>
 
   <ItemGroup>

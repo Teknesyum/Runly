@@ -1,6 +1,6 @@
 # Runly — Bilinen Sınırlar ve Açık Sorunlar
 
-Version 0.2.0 · Last updated: 2026-08-14
+Version 0.2.0 · Last updated: 2026-08-15
 
 ## 1. Windows kısıtları (çözümü yok)
 
@@ -57,12 +57,19 @@ Version 0.2.0 · Last updated: 2026-08-14
 
 ## 3. Doğrulanamayanlar — kullanıcı tarafından doğrulanmalı
 
-- **The 0.2.0 catalog UI has not been visually checked at 100%, 125%, or 150% DPI.** Build and unit
-  verification cannot prove that the category rail, seven-column table, bulk toolbar, and progress ring
-  are free of clipping. This requires an interactive Windows desktop review.
-- **Start-menu shortcut discovery was compiled but not exercised against every installed application.**
-  Broken or permission-protected `.lnk` files are intentionally skipped; vendor-specific shortcuts may
-  therefore not appear until the user browses to the executable.
+- **The 0.2.0 catalog UI was visually checked at 100% DPI only.** The category rail, localized names,
+  icons, selected cyan strip, enabled/total badges, seven-column table, and TR/EN live switch were
+  exercised on the real Windows desktop. 125% and 150% DPI remain unverified.
+- **The complete custom-extension flow was not completed through desktop automation.** The Add Extension
+  dialog opened, but the automation driver could not enter text into its owned modal input. The exact
+  disabled `.foo` → Special projection is covered by `CatalogGridProjectionTests` and does not throw;
+  manual entry through that modal remains to be checked.
+- **The `.md` no-handler explanation was visually verified, but its enable-checkbox transition was not.**
+  The Text category displayed `.md` and the localized "No application is selected" reason. Desktop
+  automation could not conclusively toggle that checkbox, so the enabled state needs one manual click.
+- **Start-menu shortcut discovery was exercised on this machine, not every installed application.** An
+  access-denied folder found during the live run is now skipped with `IgnoreInaccessible`; broken or
+  vendor-specific shortcuts may still be absent until the user browses to the executable.
 - **Permanent default-app selection still requires user interaction in Windows Settings.** Automated
   verification deliberately does not click or forge `UserChoice`; binding counts are only truthful after
   Windows reports Runly as the protected choice and `AssocQueryString` agrees.

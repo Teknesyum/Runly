@@ -56,7 +56,8 @@ internal sealed class ApplicationFinder
         };
         foreach (var root in roots.Where(Directory.Exists))
         {
-            foreach (var shortcut in Directory.EnumerateFiles(root, "*.lnk", SearchOption.AllDirectories))
+            var options = new EnumerationOptions { RecurseSubdirectories = true, IgnoreInaccessible = true };
+            foreach (var shortcut in Directory.EnumerateFiles(root, "*.lnk", options))
             {
                 var target = ShortcutTargetReader.TryRead(shortcut);
                 Add(found, target, Path.GetFileNameWithoutExtension(shortcut), "Start menu");

@@ -586,24 +586,7 @@ internal sealed class MainForm : NeonForm
     {
         var category = _categoryList.SelectedItem as string;
         var query = _searchBox.Text.Trim();
-        var yielded = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var entry in ExtensionCatalog.Entries)
-        {
-            if (query.Length == 0 && !string.Equals(entry.Category, category, StringComparison.Ordinal)) continue;
-            if (query.Length > 0 && !entry.Extension.Contains(query, StringComparison.OrdinalIgnoreCase) &&
-                !entry.DisplayName.Tr.Contains(query, StringComparison.CurrentCultureIgnoreCase) &&
-                !entry.DisplayName.En.Contains(query, StringComparison.OrdinalIgnoreCase) &&
-                !entry.SuggestedApps.Any(app => app.Contains(query, StringComparison.OrdinalIgnoreCase))) continue;
-            var extension = RunlyConfig.NormalizeExtension(entry.Extension);
-            yielded.Add(extension);
-            yield return extension;
-        }
-        foreach (var pair in _config.Extensions)
-        {
-            if (yielded.Contains(pair.Key) || (query.Length == 0 && !string.Equals(pair.Value.Category, category, StringComparison.Ordinal)) ||
-                (query.Length > 0 && !pair.Key.Contains(query, StringComparison.OrdinalIgnoreCase))) continue;
-            yield return pair.Key;
-        }
+        return CatalogGridProjection.GetExtensions(ExtensionCatalog.Entries, _config, category, query);
     }
 
     private RunlyConfig VisibleStatusConfig()
@@ -618,6 +601,7 @@ internal sealed class MainForm : NeonForm
 
     private void RefreshExtensionGrid()
     {
+        var refreshTimer = Stopwatch.StartNew();
         _suppressGridEvents = true;
         string? selectedExtension = null;
         try
@@ -667,6 +651,8 @@ internal sealed class MainForm : NeonForm
         }
 
         UpdateDetailPanel();
+        refreshTimer.Stop();
+        _logger.Info($"Kategori ızgarası yenilendi: {_grid.Rows.Count} satır, {refreshTimer.Elapsed.TotalMilliseconds:F1} ms.");
     }
 
     /// <summary>
@@ -695,6 +681,7 @@ internal sealed class MainForm : NeonForm
         _lastAutoRefresh = DateTime.UtcNow;
 
         var statusConfig = VisibleStatusConfig();
+        var refreshTimer = Stopwatch.StartNew();
         Task.Run(() => _shellRegistrar.GetStatus(statusConfig)).ContinueWith(t =>
         {
             _autoRefreshInFlight = false;
@@ -715,6 +702,8 @@ internal sealed class MainForm : NeonForm
 
                 ApplyStatusesToGrid(statuses);
                 RefreshStatusStrip();
+                refreshTimer.Stop();
+                _logger.Info($"Etkin pencere durumu yenilendi: {statuses.Count} uzantı, {refreshTimer.Elapsed.TotalMilliseconds:F1} ms.");
             }
 
             if (InvokeRequired)
@@ -1615,20 +1604,28 @@ internal sealed class MainForm : NeonForm
 
     private void ApplyLanguage()
     {
+        _suppressGridEvents = true;
+        _grid.Rows.Clear();
         Strings.Apply(this);
         Text = Strings.Get("app.title") + (_dirty ? " *" : string.Empty);
         _grid.Columns[ColEnabled].HeaderText = Strings.Get("enabled");
         _grid.Columns[ColExtension].HeaderText = Strings.Get("extension");
-        _grid.Columns[ColKind].HeaderText = Strings.Get("kind.open") + "/" + Strings.Get("kind.run");
+        _grid.Columns[ColKind].HeaderText = Strings.Get("kind.column");
+        if (_grid.Columns[ColKind] is DataGridViewComboBoxColumn kindColumn)
+        {
+            kindColumn.DataSource = new[] { Strings.Get("kind.run"), Strings.Get("kind.open") };
+        }
         _grid.Columns[ColInterpreter].HeaderText = Strings.Get("interpreter");
         _grid.Columns[ColFound].HeaderText = Strings.Get("found");
         _grid.Columns[ColArgs].HeaderText = Strings.Get("arguments");
         _grid.Columns[ColStatus].HeaderText = Strings.Get("status");
+        _searchBox.PlaceholderText = Strings.Get("catalog.searchPlaceholder");
         _languageToggle.Text = Strings.Language == "tr" ? "TR | en" : "tr | EN";
         RefreshExtensionGrid();
         RefreshTrustedFilesLabel();
         RefreshStatusStrip();
         UpdateDetailPanel();
+        _suppressGridEvents = false;
     }
 
     private void OnFormClosing(object? sender, FormClosingEventArgs e)

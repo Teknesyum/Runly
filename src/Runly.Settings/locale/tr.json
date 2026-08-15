@@ -62,6 +62,7 @@
   "keepNever": "Hiç açık tutma",
   "log": "Günlük kaydı açık",
   "kind.run": "Çalıştır",
+  "kind.column": "TÜR",
   "kind.open": "Aç",
   "catalog.searchPlaceholder": ".md, markdown veya notepad ara",
   "catalog.bulkOpen": "Kategoriyi bu uygulamayla aç",

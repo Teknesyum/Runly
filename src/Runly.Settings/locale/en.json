@@ -62,6 +62,7 @@
   "keepNever": "Never keep open",
   "log": "Logging enabled",
   "kind.run": "Run",
+  "kind.column": "TYPE",
   "kind.open": "Open",
   "catalog.searchPlaceholder": "Search .md, markdown, or notepad",
   "catalog.bulkOpen": "Open category with this app",
