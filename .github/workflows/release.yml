@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Package and publish
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # A tag that disagrees with Directory.Build.props would publish an archive whose name
+      # does not match the binaries inside it. Fail before anything is built.
+      - name: Verify tag matches Directory.Build.props
+        id: version
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $expected = $tag -replace '^v', ''
+          $match = Select-String -Path 'Directory.Build.props' -Pattern '<Version>([^<]+)</Version>' | Select-Object -First 1
+          if (-not $match) {
+              Write-Host "::error::Directory.Build.props does not contain a <Version> element."
+              exit 1
+          }
+          $declared = $match.Matches[0].Groups[1].Value.Trim()
+          if ($declared -ne $expected) {
+              Write-Host "::error::Tag $tag expects version $expected but Directory.Build.props declares $declared."
+              exit 1
+          }
+          Write-Host "Tag $tag matches Directory.Build.props version $declared."
+          "version=$declared" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Verify formatting
+        run: dotnet format --verify-no-changes
+
+      # build.ps1 runs the test suite, publishes both applications, creates the archive
+      # and writes the matching .sha256 file next to it.
+      - name: Build package
+        shell: pwsh
+        run: .\build.ps1 -Configuration Release
+
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $zip = "Runly-v${{ steps.version.outputs.version }}-win-x64.zip"
+          $hash = "$zip.sha256"
+          foreach ($file in @($zip, $hash)) {
+              if (-not (Test-Path -LiteralPath $file)) {
+                  Write-Host "::error::Expected release asset was not produced: $file"
+                  exit 1
+              }
+          }
+          gh release create $env:GITHUB_REF_NAME --title "Runly $env:GITHUB_REF_NAME" --generate-notes $zip $hash

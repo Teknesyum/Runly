@@ -16,6 +16,8 @@ irm https://raw.githubusercontent.com/Teknesyum/Runly/main/scripts/install.ps1 |
 
 The installer downloads the latest Windows x64 release, installs Runly to `%LOCALAPPDATA%\Programs\Runly`, creates a **Runly** shortcut on the desktop, and opens Runly Settings. Select the extensions you want and click **Install / Update** to finish the Windows file-association setup.
 
+Before the archive is extracted, the installer downloads the `.sha256` checksum published with the release and verifies the download against it; installation stops if the hashes do not match.
+
 > Runly does not silently replace Windows file associations. Windows 11 may require your confirmation for individual extensions.
 
 ## What Runly does
@@ -85,7 +87,7 @@ cd Runly
 .\build.ps1
 ```
 
-The build runs the test suite, publishes the NativeAOT launcher and self-contained settings application, and creates `Runly-v<version>-win-x64.zip`. The version comes from `Directory.Build.props`, so the archive name always matches the binaries inside it.
+The build runs the test suite, publishes the NativeAOT launcher and self-contained settings application, and creates `Runly-v<version>-win-x64.zip` together with a `Runly-v<version>-win-x64.zip.sha256` checksum file. The version comes from `Directory.Build.props`, so the archive name always matches the binaries inside it.
 
 ## Security
 
