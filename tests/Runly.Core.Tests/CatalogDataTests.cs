@@ -8,12 +8,24 @@ public sealed class CatalogDataTests
     private static readonly HashSet<string> Categories =
     ["scripts", "code", "text", "data", "web", "images", "audio", "video", "archive", "office", "design", "fonts", "locked", "special"];
 
-    [Fact]
-    public void Catalog_HasUniqueExtensionsValidCategoriesAndCompleteMetadata()
+    /// <summary>
+    /// Script types that run with the full privileges of the signed-in user once bound to Run.
+    /// They stay unblocked on purpose, so the risk note is the only thing that warns the user.
+    /// </summary>
+    private static readonly string[] RiskyScriptExtensions =
+    [".hta", ".vbs", ".wsf", ".jar", ".js", ".ps1"];
+
+    private static JsonDocument LoadCatalog()
     {
         var path = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,
             "..", "..", "..", "..", "..", "src", "Runly.Settings", "Catalog", "catalog.json"));
-        using var document = JsonDocument.Parse(File.ReadAllText(path));
+        return JsonDocument.Parse(File.ReadAllText(path));
+    }
+
+    [Fact]
+    public void Catalog_HasUniqueExtensionsValidCategoriesAndCompleteMetadata()
+    {
+        using var document = LoadCatalog();
         var entries = document.RootElement.EnumerateArray().ToArray();
         Assert.InRange(entries.Length, 390, 420);
 
@@ -36,8 +48,23 @@ public sealed class CatalogDataTests
             else
             {
                 Assert.NotEmpty(entry.GetProperty("suggestedApps").EnumerateArray());
-                Assert.False(entry.TryGetProperty("riskNote", out _));
             }
+        }
+    }
+
+    [Fact]
+    public void Catalog_KeepsRiskNoteOnUnblockedScriptTypesThatRunWithFullPrivileges()
+    {
+        using var document = LoadCatalog();
+        var entries = document.RootElement.EnumerateArray()
+            .ToDictionary(entry => entry.GetProperty("extension").GetString()!, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var extension in RiskyScriptExtensions)
+        {
+            Assert.True(entries.TryGetValue(extension, out var entry), $"Missing catalog entry: {extension}");
+            Assert.True(entry.TryGetProperty("riskNote", out var riskNote), $"Missing riskNote: {extension}");
+            Assert.False(string.IsNullOrWhiteSpace(riskNote.GetProperty("tr").GetString()), $"Empty Turkish riskNote: {extension}");
+            Assert.False(string.IsNullOrWhiteSpace(riskNote.GetProperty("en").GetString()), $"Empty English riskNote: {extension}");
         }
     }
 }
