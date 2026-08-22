@@ -99,14 +99,10 @@ internal sealed class ChooseApplicationDialog : NeonForm
         };
         layout.Controls.Add(prompt, 0, 0);
 
-        _searchBox = new TextBox
+        _searchBox = new NeonTextBox
         {
             Dock = DockStyle.Fill,
             PlaceholderText = Strings.Get("chooseApp.searchPlaceholder"),
-            BackColor = Palette.FieldBg,
-            ForeColor = Palette.NeonBlue,
-            Font = Palette.MonoBody,
-            BorderStyle = BorderStyle.FixedSingle,
             Margin = new Padding(0, 0, 0, Metrics.Px(8)),
         };
 

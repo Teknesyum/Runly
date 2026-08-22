@@ -23,17 +23,13 @@ internal sealed class RestoreBackupDialog : NeonForm
         ForeColor = Palette.TextBody;
         Font = Palette.Body;
 
-        _list = new ListView
+        _list = new NeonListView
         {
             Dock = DockStyle.Fill,
             View = View.Details,
             FullRowSelect = true,
             MultiSelect = false,
             HideSelection = false,
-            BackColor = Palette.Surface,
-            ForeColor = Palette.TextBody,
-            Font = Palette.MonoBody,
-            BorderStyle = BorderStyle.FixedSingle,
         };
         _list.Columns.Add("Tarih", Metrics.Px(160));
         _list.Columns.Add("Dosya", Metrics.Px(240));

@@ -50,6 +50,21 @@ internal static class NeonTheme
     [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
     private static extern int SetWindowTheme(nint hwnd, string? subAppName, string? subIdList);
 
+    /// <summary>Outline of a control that is interactive but currently off. Deliberately not
+    /// <see cref="Palette.TextLabel"/>: grey means "cannot be clicked" everywhere else in this theme, so
+    /// an unchecked box drawn grey reads as a disabled one.</summary>
+    public static readonly Color IdleOutline = Color.FromArgb(120, Palette.NeonBlue);
+
+    /// <summary>The one grey in the theme, and the only thing allowed to use it.</summary>
+    public static readonly Color DisabledOutline = Palette.TextLabel;
+
+    // The opacity ladder every neon surface uses: rest, hover, pressed, outline. Values outside it make
+    // two controls that should look identical drift apart.
+    public const int FillAlpha = 26;
+    public const int HoverAlpha = 51;
+    public const int PressedAlpha = 77;
+    public const int OutlineAlpha = 77;
+
     // uxtheme.dll ordinal 135 = SetPreferredAppMode. Undocumented but the only way to make Win32
     // scrollbars dark; without it a white scrollbar sits inside every grid and list box and breaks
     // the theme. Wrapped in try/catch: if a future Windows build drops the ordinal, the scrollbars
@@ -94,13 +109,123 @@ internal static class NeonTheme
     {
         if (control.IsHandleCreated)
         {
-            SetWindowTheme(control.Handle, "DarkMode_Explorer", null);
+            SetWindowTheme(control.Handle, ThemeClassFor(control), null);
         }
 
         foreach (Control child in control.Controls)
         {
             ApplyDarkScrollBarsCore(child);
         }
+    }
+
+    /// <summary>A combo box owns a second, separate window for its drop-down list, and
+    /// <c>DarkMode_Explorer</c> does not reach it — the list keeps the white system frame the rest of this
+    /// class exists to remove. <c>DarkMode_CFD</c> is the class that covers both.</summary>
+    private static string ThemeClassFor(Control control) => control is ComboBox ? "DarkMode_CFD" : "DarkMode_Explorer";
+
+    /// <summary>Applies the dark theme class to one control, for callers that theme themselves on handle
+    /// creation instead of waiting for the window-wide sweep.</summary>
+    public static void ApplyDarkTheme(Control control)
+    {
+        if (!control.IsHandleCreated)
+        {
+            return;
+        }
+
+        try
+        {
+            SetWindowTheme(control.Handle, ThemeClassFor(control), null);
+        }
+        catch (EntryPointNotFoundException)
+        {
+        }
+        catch (DllNotFoundException)
+        {
+        }
+    }
+
+    [DllImport("user32.dll")]
+    private static extern bool GetComboBoxInfo(nint hwnd, ref ComboBoxInfo info);
+
+    /// <summary>Themes the drop-down list of a combo box. The list is a window of its own with a scroll bar
+    /// of its own, and the class set on the combo makes the list dark without reaching that bar — which then
+    /// stands in the open popup as a white column.</summary>
+    public static void ApplyDarkDropDown(ComboBox combo)
+    {
+        if (!combo.IsHandleCreated)
+        {
+            return;
+        }
+
+        try
+        {
+            var info = new ComboBoxInfo { Size = Marshal.SizeOf<ComboBoxInfo>() };
+            if (GetComboBoxInfo(combo.Handle, ref info) && info.List != 0)
+            {
+                SetWindowTheme(info.List, "DarkMode_Explorer", null);
+            }
+        }
+        catch (EntryPointNotFoundException)
+        {
+        }
+        catch (DllNotFoundException)
+        {
+        }
+    }
+
+    /// <summary>The check-box glyph, shared by the stand-alone control and the grid cell so the two cannot
+    /// drift apart. Every offset is a fraction of <paramref name="box"/>, so it draws at any size.</summary>
+    public static void DrawCheckGlyph(Graphics g, Rectangle box, bool isChecked, Color accent, Color outline)
+    {
+        using var path = RoundedRect(box, Metrics.Px(3));
+
+        if (isChecked)
+        {
+            using var fill = new SolidBrush(accent);
+            g.FillPath(fill, path);
+        }
+
+        using (var ring = new Pen(outline, 1.5f * Metrics.Scale))
+        {
+            g.DrawPath(ring, path);
+        }
+
+        if (!isChecked)
+        {
+            return;
+        }
+
+        const int grid = NeonRadioButton.GlyphGrid;
+        var d = box.Width;
+        using var check = new Pen(Palette.Surface, 2f * Metrics.Scale);
+        Point[] points =
+        [
+            new Point(box.X + (d * 3 / grid), box.Y + (d * 7 / grid)),
+            new Point(box.X + (d * 6 / grid), box.Y + (d * 10 / grid)),
+            new Point(box.X + (d * 11 / grid), box.Y + (d * 4 / grid)),
+        ];
+        g.DrawLines(check, points);
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeRect
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct ComboBoxInfo
+    {
+        public int Size;
+        public NativeRect Item;
+        public NativeRect Button;
+        public int ButtonState;
+        public nint ComboBox;
+        public nint Edit;
+        public nint List;
     }
 
     public static GraphicsPath RoundedRect(Rectangle bounds, int radius)
@@ -258,7 +383,7 @@ internal sealed class NeonRadioButton : RadioButton
         var d = Metrics.Px(GlyphGrid);
         var circle = new Rectangle(0, (Height - d) / 2, d, d);
 
-        using (var ring = new Pen(Checked ? Palette.NeonBlue : Palette.TextLabel, 1.5f * Metrics.Scale))
+        using (var ring = new Pen(Checked ? Palette.NeonBlue : NeonTheme.IdleOutline, 1.5f * Metrics.Scale))
         {
             g.DrawEllipse(ring, circle);
         }
@@ -302,33 +427,9 @@ internal sealed class NeonCheckBox : CheckBox
         var g = pevent.Graphics;
         g.Clear(BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
-        const int grid = NeonRadioButton.GlyphGrid;
-        var d = Metrics.Px(grid);
+        var d = Metrics.Px(NeonRadioButton.GlyphGrid);
         var box = new Rectangle(0, (Height - d) / 2, d, d);
-        using var path = NeonTheme.RoundedRect(box, Metrics.Px(3));
-
-        if (Checked)
-        {
-            using var fill = new SolidBrush(Palette.NeonBlue);
-            g.FillPath(fill, path);
-        }
-
-        using (var ring = new Pen(Checked ? Palette.NeonBlue : Palette.TextLabel, 1.5f * Metrics.Scale))
-        {
-            g.DrawPath(ring, path);
-        }
-
-        if (Checked)
-        {
-            using var check = new Pen(Palette.Surface, 2f * Metrics.Scale);
-            Point[] checkPoints =
-            [
-                new Point(box.X + (d * 3 / grid), box.Y + (d * 7 / grid)),
-                new Point(box.X + (d * 6 / grid), box.Y + (d * 10 / grid)),
-                new Point(box.X + (d * 11 / grid), box.Y + (d * 4 / grid)),
-            ];
-            g.DrawLines(check, checkPoints);
-        }
+        NeonTheme.DrawCheckGlyph(g, box, Checked, Palette.NeonBlue, Checked ? Palette.NeonBlue : NeonTheme.IdleOutline);
 
         var gap = Metrics.Px(8);
         var textBounds = new Rectangle(d + gap, 0, Width - d - gap, Height);
@@ -340,6 +441,8 @@ internal sealed class NeonCheckBox : CheckBox
 /// system colours, which reads as a white hole in this theme once the control is actually visible.</summary>
 internal sealed class NeonComboBox : ComboBox
 {
+    private const int WmPaint = 0x000F;
+
     public NeonComboBox()
     {
         DropDownStyle = ComboBoxStyle.DropDownList;
@@ -348,6 +451,24 @@ internal sealed class NeonComboBox : ComboBox
         BackColor = Palette.FieldBg;
         ForeColor = Palette.TextBody;
         ApplyItemHeight();
+    }
+
+    /// <summary>The drop-down list is a window of its own, created the first time the list opens and not
+    /// covered by the window-wide sweep in <see cref="NeonTheme.ApplyDarkScrollBars"/> that runs on Shown.
+    /// Theming the combo here is what makes the popup open dark instead of white.</summary>
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        NeonTheme.ApplyDarkTheme(this);
+        NeonTheme.ApplyDarkDropDown(this);
+    }
+
+    protected override void OnDropDown(EventArgs e)
+    {
+        // Repeated on every open: the list window is recreated when the item count changes, and the theme
+        // set on the previous one goes with it.
+        NeonTheme.ApplyDarkDropDown(this);
+        base.OnDropDown(e);
     }
 
     /// <summary>The item height of an owner-drawn combo is never scaled by WinForms and never follows
@@ -379,10 +500,55 @@ internal sealed class NeonComboBox : ComboBox
             TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
     }
 
-    protected override void OnPaint(PaintEventArgs e)
+    /// <summary>The closed field is drawn by <c>ComboBox.FlatComboAdapter</c>, which hard-codes
+    /// <c>SystemColors.Window</c> for the frame and <c>SystemColors.Control</c> for the drop button — a
+    /// white outline and a light grey box that no property on the control can recolour. OnPaint is not
+    /// raised for a drop-down list combo either, so the only place left to cover them is after the default
+    /// WM_PAINT has finished.</summary>
+    protected override void WndProc(ref Message m)
     {
-        base.OnPaint(e);
-        using var border = new Pen(Color.FromArgb(120, Palette.NeonBlue));
-        e.Graphics.DrawRectangle(border, 0, 0, Width - 1, Height - 1);
+        base.WndProc(ref m);
+        if (m.Msg == WmPaint)
+        {
+            PaintField();
+        }
     }
+
+    private void PaintField() => NeonField.PaintWindow(this, g =>
+    {
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+
+        // The whole field is repainted rather than only the button: the adapter's frame width is a private
+        // detail that has already moved between framework versions, and covering it by guess leaves a white
+        // hairline the moment it changes.
+        using (var fill = new SolidBrush(Palette.FieldBg))
+        {
+            g.FillRectangle(fill, 0, 0, Width, Height);
+        }
+
+        var button = new Rectangle(Width - Metrics.Px(24), 0, Metrics.Px(24), Height);
+        var inset = Metrics.Px(8);
+        var caption = SelectedIndex >= 0 ? GetItemText(Items[SelectedIndex]) : string.Empty;
+        TextRenderer.DrawText(g, caption, Font,
+            new Rectangle(inset, 0, Math.Max(0, button.X - inset), Height), ForeColor,
+            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+
+        var d = button.Width;
+        var centre = new Point(button.X + (d / 2), button.Y + (button.Height / 2));
+        Point[] chevron =
+        [
+            new Point(centre.X - (d * 3 / 12), centre.Y - (d * 1 / 12)),
+            new Point(centre.X, centre.Y + (d * 2 / 12)),
+            new Point(centre.X + (d * 3 / 12), centre.Y - (d * 1 / 12)),
+        ];
+        using (var arrow = new Pen(Palette.NeonBlue, 1.5f * Metrics.Scale))
+        {
+            g.DrawLines(arrow, chevron);
+        }
+
+        var stroke = Focused ? Math.Max(1, Metrics.Px(2)) : Math.Max(1, Metrics.Px(1));
+        using var border = new Pen(Focused ? Palette.NeonBlue : NeonTheme.IdleOutline, stroke);
+        var edge = stroke / 2f;
+        g.DrawRectangle(border, edge, edge, Width - stroke, Height - stroke);
+    });
 }
