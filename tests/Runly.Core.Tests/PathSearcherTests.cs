@@ -2,7 +2,7 @@
 
 namespace Runly.Core.Tests;
 
-/// <summary>Covers absolute-path pass-through, PATH/PATHEXT scanning, the zero-byte stub skip and cache staleness.</summary>
+/// <summary>Covers absolute-path pass-through, PATH/PATHEXT scanning, the unresolvable zero-byte fallback and cache staleness.</summary>
 public sealed class PathSearcherTests : IDisposable
 {
     private readonly string _tempDir;

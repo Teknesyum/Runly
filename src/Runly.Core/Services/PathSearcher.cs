@@ -100,11 +100,11 @@ public sealed class PathSearcher : IPathSearcher
         var extensions = GetPathExtensions();
         var hasExtension = Path.HasExtension(exeName);
 
-        // Zero-byte candidates are app-execution aliases. Most are Store install stubs that just open
-        // the Store, but a working alias (py.exe on this machine) is byte-identical, so size alone
-        // cannot tell them apart. Prefer any real executable; accept an alias only if nothing else
-        // exists (decision K9).
-        string? zeroByteFallback = null;
+        // Zero-byte candidates are app-execution aliases: the file is a reparse point, so it has no data
+        // stream. Size alone cannot tell a working alias from a dead Store install stub, so the APPEXECLINK
+        // reparse data decides instead (decision K9). Candidates whose reparse point cannot be read at all
+        // stay on the old size-only rule: skipped, but remembered as a last resort.
+        string? unresolvedAliasFallback = null;
 
         foreach (var directory in directories)
         {
@@ -119,24 +119,34 @@ public sealed class PathSearcher : IPathSearcher
                     continue;
                 }
 
-                // Store deep-link stubs report zero bytes (SPEC 8, SPEC 2); skip and keep searching.
-                if (new FileInfo(candidate).Length == 0)
+                if (new FileInfo(candidate).Length != 0)
                 {
-                    _logger?.Info($"Sıfır boyutlu Store stub'ı atlandı: {candidate}");
-                    zeroByteFallback ??= candidate;
-                    continue;
+                    return candidate;
                 }
 
-                return candidate;
+                if (AppExecutionAliasReader.TryRead(candidate, out var alias) && alias is not null)
+                {
+                    if (alias.IsStoreRedirector)
+                    {
+                        _logger?.Info($"Store yönlendiricisine bağlı alias atlandı: {candidate} -> {alias.TargetPath}");
+                        continue;
+                    }
+
+                    _logger?.Info($"Çalışan app-execution alias kabul edildi: {candidate} -> {alias.TargetPath}");
+                    return candidate;
+                }
+
+                _logger?.Info($"Sıfır boyutlu aday çözümlenemedi, atlandı: {candidate}");
+                unresolvedAliasFallback ??= candidate;
             }
         }
 
-        if (zeroByteFallback is not null)
+        if (unresolvedAliasFallback is not null)
         {
-            _logger?.Warn($"Yalnızca sıfır boyutlu aday bulundu, son çare olarak kabul edildi: {zeroByteFallback}");
+            _logger?.Warn($"Yalnızca çözümlenemeyen sıfır boyutlu aday bulundu, son çare olarak kabul edildi: {unresolvedAliasFallback}");
         }
 
-        return zeroByteFallback;
+        return unresolvedAliasFallback;
     }
 
     private string[] GetPathExtensions() =>
