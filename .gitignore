@@ -3,5 +3,6 @@ obj/
 dist/
 dist-e2e/
 *.zip
+*.zip.sha256
 CODEX_CLAUDE_HANDOFF.md
 docs/reports/

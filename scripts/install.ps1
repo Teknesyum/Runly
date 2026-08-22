@@ -35,12 +35,39 @@ try {
             throw "The latest release does not contain a Windows x64 package."
         }
 
+        $checksumAsset = $release.assets |
+            Where-Object { $_.name -eq ($asset.name + ".sha256") } |
+            Select-Object -First 1
+
         $temporaryPath = Join-Path ([IO.Path]::GetTempPath()) ("Runly-" + [Guid]::NewGuid().ToString("N"))
         $archivePath = Join-Path $temporaryPath $asset.name
         $packagePath = Join-Path $temporaryPath "package"
         New-Item -ItemType Directory -Path $packagePath -Force | Out-Null
 
         Invoke-WebRequest $asset.browser_download_url -Headers $headers -OutFile $archivePath
+
+        # Verify before extracting, never after: an altered archive must not reach the disk as files.
+        # Releases published before checksums existed have no .sha256 asset, so warn instead of failing.
+        if ($checksumAsset) {
+            $checksumPath = "$archivePath.sha256"
+            Invoke-WebRequest $checksumAsset.browser_download_url -Headers $headers -OutFile $checksumPath
+
+            $checksumLine = Get-Content -LiteralPath $checksumPath -TotalCount 1
+            $expectedHash = ($checksumLine -split '\s+' | Where-Object { $_ }) | Select-Object -First 1
+            if ($expectedHash -notmatch '^[0-9a-fA-F]{64}$') {
+                throw "The published checksum for $($asset.name) could not be read."
+            }
+
+            $actualHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash
+            if ($actualHash -ne $expectedHash) {
+                throw "Checksum mismatch for $($asset.name). Expected $($expectedHash.ToLowerInvariant()) but the download is $($actualHash.ToLowerInvariant()). Installation stopped."
+            }
+
+            Write-Host "SHA-256 checksum verified." -ForegroundColor DarkGray
+        } else {
+            Write-Warning "This release does not publish a .sha256 checksum, so the download could not be verified."
+        }
+
         Expand-Archive -LiteralPath $archivePath -DestinationPath $packagePath -Force
     }
 

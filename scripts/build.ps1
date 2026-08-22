@@ -167,9 +167,20 @@ if (Test-Path $zipName) {
 }
 Compress-Archive -Path "$Output\*" -DestinationPath $zipName -CompressionLevel Optimal
 $zipInfo = Get-Item $zipName
-$zipHash = (Get-FileHash $zipName -Algorithm SHA256).Hash
+$zipHash = (Get-FileHash $zipName -Algorithm SHA256).Hash.ToLowerInvariant()
+
+# Kurulum betiği indirdiği paketi bu dosyayla doğrular, o yüzden hash yalnız ekrana basılamaz.
+# Biçim `sha256sum -c` ile uyumlu olmalı: küçük harf hash, iki boşluk, dosya adı ve LF satır sonu.
+# Set-Content CRLF yazar, sha256sum da dosya adının sonuna takılan CR'yi ada dahil eder.
+$hashName = "$zipName.sha256"
+[System.IO.File]::WriteAllText(
+    "$($zipInfo.FullName).sha256",
+    "$zipHash  $($zipInfo.Name)`n",
+    [System.Text.Encoding]::ASCII)
+
 Write-Host "  * $zipName — $([math]::Round($zipInfo.Length / 1MB, 2)) MB"
 Write-Host "  * SHA-256: $zipHash" -ForegroundColor Yellow
+Write-Host "  * $hashName yazıldı"
 
 Write-Host ""
 Write-Host "* İnşa başarılı." -ForegroundColor Green
