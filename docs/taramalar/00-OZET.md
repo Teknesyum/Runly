@@ -94,3 +94,39 @@ hatası); uygulama seçme listesi Runly'nin kendisini eliyor (özyineleme).
   `doğrulanamadı` işaretli.
 - ScoopInstaller/Shim benchmark'ında C#'ın native'lerden hızlı görünmesinin nedeni depoda
   açıklanmamış — `03` içinde `doğrulanamadı` işaretli.
+
+---
+
+## 6. İkinci dalga — depo başına inceleme (50/50)
+
+Sekiz tematik raporun üstüne 41 depo başına dosya eklendi. Tema ekseninde görülmeyen dört bulgu:
+
+- **Mutlak yol riski — doğrulandı.** `Squirrel.Windows` #1805: güncellemeden sonra kısayolun
+  "Start in" alanı silinmiş klasörü göstermeye devam ediyor; hedef sabit shim'e taşınmış ama ikinci
+  alan unutulmuş, hata yıllarca görünmemiş. Aynı sınıf `OpenWithPlusPlus` #5'te ve README'sinin
+  "kurulumdan sonra klasörü taşımayın" uyarısında da var. Runly'de karşılığı kodda doğrulandı:
+  `ShellRegistrar.WriteVerb` ve `WriteApplicationRegistration` dört verb'e ve Applications open
+  komutuna **mutlak exe yolu** yazıyor. Bugün yaşanan ölü yol hatası bunun ilk tezahürüydü.
+  `Squirrel` #788 çözümü söylüyor: ilişkilendirme install/update olayında yeniden yazılmalı,
+  uninstall'da silinmeli.
+
+- **Sahipliği dolaylı yoldan çıkarma.** `winget` #6215 başka paketin symlink'lerini siliyor,
+  `Scoop` #6721 `current` junction'ı yüzünden Explorer ikon çözümünü bozuyor. Ortak ders: sahiplik
+  yalnız kendi yazdığın gerçek hedef yolla doğrulanır, dosya adından çıkarılmaz.
+
+- **LOLBAS denetimi.** Bugün eklenen risk notları doğru çerçevede ama katalogda beş uzantı **hiç
+  yok**: `.vbe`, `.jse`, `.wsc`, `.sct`, `.chm`; `.wsh` var ama notsuz. `.vbe`/`.jse` aynı `wscript`
+  ile aynı yetkiyle çalışıyor ve **kodlanmış** oldukları için desen taraması onlarda iş görmüyor.
+  Ayrıca ADS'te saklanan yük (`belge.txt:script.vbs`) kapının kapsamı dışında — SPEC'te yazılmalı.
+  (Uyarı: LOLBAS'ta `.vbe`/`.jse` için ayrı girdi yok, sonuç `//e:` belgesinden çıkarım; kataloğa
+  eklemeden önce elle sınanmalı.)
+
+- **Konsol/GUI ayrımı dışarıdan doğrulandı.** `nvm-windows` ayırmamış ve issue #1068'de kullanıcıya
+  "bunu terminalden çalıştır" diyor — A6'nın negatif örneği. `uv`'nin "hata yüzeyini handle'ın
+  varlığına bağla" dersi Runly'de zaten uygulanmış: her iki hata yolu `LauncherSurface`'a göre
+  dallanıyor.
+
+**Lisans tablosu (veri veya kod alınabilirliği):** `mime-db` MIT — alınabilir, ama görünen ad ve
+kategori taşımıyor. `shared-mime-info` GPL-2.0, `fnm` GPL-3.0, `LOLBAS` GPL-3.0,
+`ContextMenuForWindows11` LGPL-3.0, `EarTrumpet` OSI değil — hiçbirinden kod veya veri alınamaz,
+yalnız desen. `duti` kamu malı beyanı, SPDX karşılığı yok.

@@ -26,7 +26,6 @@ daraltmak, sessizce değil sürüm sınırında ilan ederek.
 **Yol eşleştirme.** `~/<yol>` ev dizinine, `%(prefix)/<yol>` çalışma önekine genişler.
 Sonuna `/*` eklenen dizin altındaki tüm depoları kapsar — yani **öneki miras alma açıkça
 işaretlenir**, örtük değil. Runly'de klasör güveni bugün örtük olarak alt ağacı kapsıyor.
-
 **Kaçış deliği.** `safe.directory = *` denetimi tümüyle kapatır; belge, sistem config'inde
 `*` varsa korumayı geri açmak için listeyi **boş değerle sıfırlamayı** öneriyor.
 **Symlink/junction.** Belge symlink çözümünden söz etmiyor (*doğrulanamadı*).
@@ -50,8 +49,8 @@ kopyalanacak komutu ekrana yazar. Kesişmiyor.
   eklenemiyor, `%(prefix)/` UNC'de belirsiz. Yol tabanlı allow-list'in ikinci kırılma
   noktası hep ağ yolları. **#6359 (açık):** v2.55'te sıkılaştırılan doğrulamalar UNC'de
   "ya çok sıkı ya hiç denetlemiyor" hâline geldi — sürüm içi sıkılaştırma uyarısız kırar.
-- **#3809 (kapalı): `safe.directory = *` çalışmıyor.** Kaçış deliği bile bozulabiliyor ve
-  kullanıcı o noktada tıkanıyor, çünkü gidecek başka yeri yok.
+- **#3809 (kapalı): `safe.directory = *` çalışmıyor.** Kaçış deliği bile bozulabiliyor;
+  kullanıcı orada tıkanır, gidecek başka yeri yoktur.
 
 ## 6. Doğrulama
 Okudum: `gh api repos/git-for-windows/git` + `releases/latest`; depodaki
