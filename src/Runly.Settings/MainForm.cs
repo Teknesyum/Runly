@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
+using Microsoft.Win32;
 using System.Reflection;
 using Runly.Core.Abstractions;
 using Runly.Core.Defaults;
@@ -72,6 +74,8 @@ internal sealed class MainForm : NeonForm
     private readonly DataGridView _grid;
     private readonly ListBox _categoryList;
     private readonly TextBox _searchBox;
+    private readonly Label _searchResultLabel;
+    private readonly Button _chooseAppButton;
     private readonly ComboBox _bulkAppBox;
     private readonly IReadOnlyList<InstalledApplication> _installedApplications;
     private readonly Dictionary<string, Icon> _categoryIcons = new(StringComparer.Ordinal);
@@ -82,6 +86,7 @@ internal sealed class MainForm : NeonForm
     private readonly Button _refreshButton;
     private readonly RichTextBox _detailText;
     private readonly Button _detailAskButton;
+    private readonly Button _detailChooseButton;
     private readonly Label _detailPlaceholder;
     private readonly BindingProgressRing _bindingProgress;
 
@@ -163,19 +168,27 @@ internal sealed class MainForm : NeonForm
         _configPathLink.LinkClicked += (_, _) => OpenContainingFolder(_configStore.ConfigPath);
 
         // ---- 2. Extension table + detail panel -------------------------------------------
-        var gridArea = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 2, BackColor = Palette.AppBg, Padding = new Padding(0, 8, 0, 0) };
+        var gridArea = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 3, BackColor = Palette.AppBg, Padding = new Padding(0, 8, 0, 0) };
         gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 190));
         gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 270));
+        // The search strip sits above the table, not below it: buried at the bottom of a
+        // WrapContents=false button flow it was pushed past the right edge and never found.
+        gridArea.RowStyles.Add(new RowStyle(SizeType.Absolute, 46));
         gridArea.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         gridArea.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
 
         _grid = BuildExtensionGrid();
         _categoryList = new ListBox
         {
-            Dock = DockStyle.Fill, BackColor = Palette.AppBg, ForeColor = Palette.TextBody,
-            BorderStyle = BorderStyle.None, Font = Palette.Body, Margin = new Padding(0, 0, 8, 0),
-            DrawMode = DrawMode.OwnerDrawFixed, ItemHeight = 34,
+            Dock = DockStyle.Fill,
+            BackColor = Palette.AppBg,
+            ForeColor = Palette.TextBody,
+            BorderStyle = BorderStyle.None,
+            Font = Palette.Body,
+            Margin = new Padding(0, 0, 8, 0),
+            DrawMode = DrawMode.OwnerDrawFixed,
+            ItemHeight = 34,
         };
         LoadCategoryIcons();
         foreach (var category in ExtensionCatalog.Entries.Select(entry => entry.Category).Distinct(StringComparer.Ordinal))
@@ -184,8 +197,8 @@ internal sealed class MainForm : NeonForm
         }
         _categoryList.SelectedIndexChanged += (_, _) => RefreshExtensionGrid();
         _categoryList.DrawItem += DrawCategoryItem;
-        gridArea.Controls.Add(_categoryList, 0, 0);
-        gridArea.Controls.Add(_grid, 1, 0);
+        gridArea.Controls.Add(_categoryList, 0, 1);
+        gridArea.Controls.Add(_grid, 1, 1);
 
         var detailPanel = new NeonGroupPanel(Strings.Get("details")) { Dock = DockStyle.Fill, Margin = new Padding(8, 0, 0, 0) };
         _detailPlaceholder = new Label
@@ -206,13 +219,16 @@ internal sealed class MainForm : NeonForm
             Visible = false,
         };
         _detailAskButton = new NeonButton { Dock = DockStyle.Bottom, AutoSize = true, Visible = false };
+        _detailChooseButton = new NeonButton { Dock = DockStyle.Bottom, AutoSize = true, Visible = false, Primary = false, Text = Strings.Get("catalog.chooseApp") };
         _bindingProgress = new BindingProgressRing();
         _detailAskButton.Click += OnDetailAskButtonClicked;
+        _detailChooseButton.Click += (_, _) => ChooseApplicationForSelectedRow();
         detailPanel.Controls.Add(_detailText);
         detailPanel.Controls.Add(_detailAskButton);
+        detailPanel.Controls.Add(_detailChooseButton);
         detailPanel.Controls.Add(_detailPlaceholder);
         detailPanel.Controls.Add(_bindingProgress);
-        gridArea.Controls.Add(detailPanel, 2, 0);
+        gridArea.Controls.Add(detailPanel, 2, 1);
 
         var extButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
         var selectAllButton = new NeonButton { Text = "Tümünü seç", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
@@ -230,19 +246,50 @@ internal sealed class MainForm : NeonForm
         extButtons.Controls.Add(removeExtButton);
         extButtons.Controls.Add(exportButton);
         extButtons.Controls.Add(importButton);
-        _searchBox = new TextBox { Width = 230, PlaceholderText = Strings.Get("catalog.searchPlaceholder"), BackColor = Palette.FieldBg, ForeColor = Palette.TextBody, Margin = new Padding(0, 7, 8, 4) };
+        _chooseAppButton = new NeonButton { Text = Strings.Get("catalog.chooseApp"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
+        _chooseAppButton.Click += (_, _) => ChooseApplicationForSelectedRow();
+        extButtons.Controls.Add(_chooseAppButton);
+
+        // Two columns, not one flow: the bulk-assign pair is AutoSize on the right and the search
+        // group absorbs the slack, so neither can be pushed off the edge at MinimumSize.
+        var searchStrip = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent, Margin = new Padding(0, 0, 0, 6) };
+        searchStrip.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        searchStrip.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
+        var searchGroup = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
+        var searchLabel = new Label { Text = Strings.Get("catalog.searchLabel"), AutoSize = true, Font = Palette.H3, ForeColor = Palette.NeonBlue, Margin = new Padding(0, 11, 8, 4) };
+        _searchBox = new TextBox { Width = 280, PlaceholderText = Strings.Get("catalog.searchPlaceholder"), BackColor = Palette.FieldBg, ForeColor = Palette.NeonBlue, Font = Palette.MonoBody, BorderStyle = BorderStyle.FixedSingle, Margin = new Padding(0, 8, 8, 4) };
         _searchBox.TextChanged += (_, _) => RefreshExtensionGrid();
-        _bulkAppBox = new ComboBox { Width = 230, DropDownStyle = ComboBoxStyle.DropDownList, BackColor = Palette.FieldBg, ForeColor = Palette.TextBody, Margin = new Padding(8, 7, 4, 4) };
+        _searchBox.KeyDown += OnSearchBoxKeyDown;
+        var clearSearchButton = new NeonButton { Text = Strings.Get("catalog.searchClear"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 5, 12, 4) };
+        clearSearchButton.Click += (_, _) => ClearSearch();
+        _searchResultLabel = new Label { AutoSize = true, Font = Palette.MonoBody, ForeColor = Palette.NeonPink, Margin = new Padding(0, 11, 0, 4) };
+        searchGroup.Controls.Add(searchLabel);
+        searchGroup.Controls.Add(_searchBox);
+        searchGroup.Controls.Add(clearSearchButton);
+        searchGroup.Controls.Add(_searchResultLabel);
+
+        var bulkGroup = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
+        _bulkAppBox = new NeonComboBox { Width = 220, Margin = new Padding(8, 8, 8, 4) };
         foreach (var app in _installedApplications) _bulkAppBox.Items.Add(app);
         _bulkAppBox.DisplayMember = nameof(InstalledApplication.DisplayName);
-        var bulkButton = new NeonButton { Text = Strings.Get("catalog.bulkOpen"), Primary = true, AutoSize = true, Margin = new Padding(4) };
+        var bulkButton = new NeonButton { Text = Strings.Get("catalog.bulkOpen"), Primary = true, AutoSize = true, Margin = new Padding(0, 5, 0, 4) };
         bulkButton.Click += (_, _) => AssignCategoryToSelectedApplication();
-        extButtons.Controls.Add(_searchBox);
-        extButtons.Controls.Add(_bulkAppBox);
-        extButtons.Controls.Add(bulkButton);
+        bulkGroup.Controls.Add(_bulkAppBox);
+        bulkGroup.Controls.Add(bulkButton);
+
+        searchStrip.Controls.Add(searchGroup, 0, 0);
+        searchStrip.Controls.Add(bulkGroup, 1, 0);
+
         _categoryList.SelectedIndex = 0;
-        gridArea.Controls.Add(extButtons, 0, 1);
+        gridArea.Controls.Add(searchStrip, 0, 0);
+        gridArea.SetColumnSpan(searchStrip, 3);
+        gridArea.Controls.Add(extButtons, 0, 2);
         gridArea.SetColumnSpan(extButtons, 3);
+
+        Shown += (_, _) => _searchBox.Focus();
+        KeyPreview = true;
+        KeyDown += OnMainFormKeyDown;
 
         root.Controls.Add(gridArea, 0, 0);
 
@@ -364,7 +411,13 @@ internal sealed class MainForm : NeonForm
             MultiSelect = false,
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,
             EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2,
-            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None,
+            // No cell carries a tooltip of its own, so the only thing this produced was a stray
+            // "False" bubble over the enabled checkbox.
+            ShowCellToolTips = false,
+            // Fill, not fixed widths: at 1280 the fixed layout ran ~160px past the viewport and pushed
+            // the "Durum" column — the one carrying the "Varsayılan yap" button — off screen behind a
+            // horizontal scrollbar. Weights keep every column reachable at MinimumSize too.
+            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
             RowTemplate = { Height = 26 },
             BackgroundColor = Palette.Surface,
             GridColor = ColorTranslator.FromHtml("#152229"), // opaque, dim blue-tinted line (GridColor rejects alpha)
@@ -399,13 +452,13 @@ internal sealed class MainForm : NeonForm
             SelectionBackColor = ColorTranslator.FromHtml("#123238"),
         };
 
-        grid.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Enabled", HeaderText = "ETKİN", Width = 82, Resizable = DataGridViewTriState.False });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Extension", HeaderText = "UZANTI", Width = 102, ReadOnly = true });
-        grid.Columns.Add(new DataGridViewComboBoxColumn { Name = "Kind", HeaderText = "TÜR", Width = 90, DataSource = new[] { Strings.Get("kind.run"), Strings.Get("kind.open") } });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Interpreter", HeaderText = "İŞLEYİCİ", Width = 160 });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Found", HeaderText = "BULUNDU", Width = 200, ReadOnly = true });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Args", HeaderText = "ARGÜMANLAR", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, MinimumWidth = 150 });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "DURUM", Width = 150, ReadOnly = true });
+        grid.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Enabled", HeaderText = "ETKİN", FillWeight = 8, MinimumWidth = 60, Resizable = DataGridViewTriState.False });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Extension", HeaderText = "UZANTI", FillWeight = 10, MinimumWidth = 72, ReadOnly = true });
+        grid.Columns.Add(new DataGridViewComboBoxColumn { Name = "Kind", HeaderText = "TÜR", FillWeight = 13, MinimumWidth = 90, DataSource = new[] { Strings.Get("kind.run"), Strings.Get("kind.open") } });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Interpreter", HeaderText = "İŞLEYİCİ", FillWeight = 20, MinimumWidth = 130 });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Found", HeaderText = "BULUNDU", FillWeight = 18, MinimumWidth = 130, ReadOnly = true });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Args", HeaderText = "ARGÜMANLAR", FillWeight = 12, MinimumWidth = 90 });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "DURUM", FillWeight = 19, MinimumWidth = 110, ReadOnly = true });
 
         grid.CurrentCellDirtyStateChanged += (_, _) =>
         {
@@ -416,6 +469,7 @@ internal sealed class MainForm : NeonForm
         };
         grid.CellValueChanged += OnGridCellValueChanged;
         grid.CellContentClick += OnGridCellContentClick;
+        grid.CellDoubleClick += OnGridCellDoubleClick;
         grid.SelectionChanged += (_, _) => UpdateDetailPanel();
 
         return grid;
@@ -592,7 +646,14 @@ internal sealed class MainForm : NeonForm
     private RunlyConfig VisibleStatusConfig()
     {
         var visible = VisibleExtensions().ToHashSet(StringComparer.OrdinalIgnoreCase);
-        foreach (var pair in _config.Extensions.Where(pair => pair.Value.Enabled)) visible.Add(pair.Key);
+
+        // Outside a search every enabled mapping is appended, so an enabled extension can never hide
+        // in a category the user is not looking at. During a search that union is wrong: it answered
+        // "6 sonuç" to a query that matches nothing, because those six were merely enabled.
+        if (_searchBox.Text.Trim().Length == 0)
+        {
+            foreach (var pair in _config.Extensions.Where(pair => pair.Value.Enabled)) visible.Add(pair.Key);
+        }
         return _config with
         {
             Extensions = visible.ToDictionary(extension => extension, EffectiveMapping, StringComparer.OrdinalIgnoreCase),
@@ -624,7 +685,15 @@ internal sealed class MainForm : NeonForm
                 row.Cells[ColEnabled].Value = mapping.Enabled;
                 row.Cells[ColExtension].Value = status.Extension;
                 row.Cells[ColKind].Value = mapping.Kind == HandlerKind.Run ? Strings.Get("kind.run") : Strings.Get("kind.open");
-                row.Cells[ColInterpreter].Value = mapping.Kind == HandlerKind.Run ? mapping.Interpreter : mapping.OpenWith;
+                // NullValue rather than a placeholder string: the hint has to be visible in the cell
+                // without ever becoming the cell's value, which OnGridCellValueChanged would save.
+                var handler = mapping.Kind == HandlerKind.Run ? mapping.Interpreter : mapping.OpenWith;
+                row.Cells[ColInterpreter].Value = string.IsNullOrWhiteSpace(handler) ? null : handler;
+                if (string.IsNullOrWhiteSpace(handler))
+                {
+                    row.Cells[ColInterpreter].Style.NullValue = Strings.Get("handler.choosePrompt");
+                    row.Cells[ColInterpreter].Style.ForeColor = Palette.TextDim;
+                }
                 row.Cells[ColArgs].Value = mapping.Args;
                 ApplyStatusToRow(row, status);
                 var catalogEntry = ExtensionCatalog.Entries.FirstOrDefault(entry => string.Equals(entry.Extension, status.Extension, StringComparison.OrdinalIgnoreCase));
@@ -650,6 +719,7 @@ internal sealed class MainForm : NeonForm
             _suppressGridEvents = false;
         }
 
+        UpdateSearchResultLabel();
         UpdateDetailPanel();
         refreshTimer.Stop();
         _logger.Info($"Kategori ızgarası yenilendi: {_grid.Rows.Count} satır, {refreshTimer.Elapsed.TotalMilliseconds:F1} ms.");
@@ -945,7 +1015,157 @@ internal sealed class MainForm : NeonForm
             return;
         }
 
-        AskWindows();
+        AskWindows(status.Extension);
+    }
+
+    private void OnGridCellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+    {
+        if (e.RowIndex < 0 || _grid.Rows[e.RowIndex].Tag is not ExtensionStatus status)
+        {
+            return;
+        }
+
+        if (e.ColumnIndex is ColEnabled or ColKind or ColArgs)
+        {
+            return;
+        }
+
+        ChooseApplicationFor(status.Extension);
+    }
+
+    private void ChooseApplicationForSelectedRow()
+    {
+        if (_grid.SelectedRows.Count == 0 || _grid.SelectedRows[0].Tag is not ExtensionStatus status)
+        {
+            NeonMessageBox.Show(this, Strings.Get("chooseApp.noRow"), Strings.Get("app.title"),
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
+        ChooseApplicationFor(status.Extension);
+    }
+
+    /// <summary>Opens the picker for one extension and writes the choice back. A "Run" mapping keeps its
+    /// kind and receives the executable as its interpreter; an "Open" mapping receives it as its handler.</summary>
+    private void ChooseApplicationFor(string extension)
+    {
+        if (IsBlocked(extension))
+        {
+            NeonMessageBox.Show(this, Strings.Get("extension.blockedAdd"), Strings.Get("app.title"),
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        _grid.EndEdit();
+        var mapping = EffectiveMapping(extension);
+        var catalogEntry = ExtensionCatalog.Entries.FirstOrDefault(entry =>
+            string.Equals(entry.Extension, extension, StringComparison.OrdinalIgnoreCase));
+        var runMode = mapping.Kind == HandlerKind.Run;
+
+        using var dialog = new ChooseApplicationDialog(
+            extension,
+            mapping.Kind,
+            _installedApplications,
+            catalogEntry?.SuggestedApps ?? [],
+            runMode ? mapping.Interpreter : mapping.OpenWith);
+
+        if (dialog.ShowDialog(this) != DialogResult.OK)
+        {
+            return;
+        }
+
+        _config.Extensions[extension] = mapping with
+        {
+            Enabled = true,
+            Interpreter = runMode ? dialog.SelectedPath : mapping.Interpreter,
+            OpenWith = runMode ? mapping.OpenWith : dialog.SelectedPath,
+            TypeName = catalogEntry?.DisplayName.Tr ?? mapping.TypeName,
+            Args = string.IsNullOrWhiteSpace(mapping.Args) ? DefaultConfig.ScriptThenArgs : mapping.Args,
+        };
+
+        MarkDirty();
+        RefreshCategoryRail();
+        RefreshExtensionGrid();
+        SelectExtensionRow(extension);
+        _progressLabel.Text = Strings.Get("chooseApp.assigned")
+            .Replace("{extension}", extension, StringComparison.Ordinal)
+            .Replace("{app}", dialog.SelectedDisplayName, StringComparison.Ordinal);
+        _logger.Info($"Uzantı eşlemesi seçildi: {extension} -> {dialog.SelectedPath}");
+    }
+
+    private static bool IsBlocked(string extension) =>
+        RunlyRegistryLayout.IsBlockedExtension(extension) ||
+        ExtensionCatalog.Entries.Any(entry =>
+            string.Equals(entry.Extension, extension, StringComparison.OrdinalIgnoreCase) && entry.Blocked);
+
+    private void SelectExtensionRow(string extension)
+    {
+        foreach (DataGridViewRow row in _grid.Rows)
+        {
+            if (row.Tag is ExtensionStatus status &&
+                string.Equals(status.Extension, extension, StringComparison.OrdinalIgnoreCase))
+            {
+                row.Selected = true;
+                _grid.FirstDisplayedScrollingRowIndex = row.Index;
+                return;
+            }
+        }
+    }
+
+    private void ClearSearch()
+    {
+        if (_searchBox.Text.Length > 0)
+        {
+            _searchBox.Text = string.Empty;
+        }
+
+        _searchBox.Focus();
+    }
+
+    private void OnSearchBoxKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.Escape)
+        {
+            ClearSearch();
+            e.Handled = true;
+            e.SuppressKeyPress = true;
+            return;
+        }
+
+        if (e.KeyCode is Keys.Enter or Keys.Down && _grid.Rows.Count > 0)
+        {
+            _grid.Focus();
+            _grid.Rows[0].Selected = true;
+            e.Handled = true;
+            e.SuppressKeyPress = true;
+        }
+    }
+
+    private void OnMainFormKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (!e.Control || e.KeyCode != Keys.F)
+        {
+            return;
+        }
+
+        _searchBox.Focus();
+        _searchBox.SelectAll();
+        e.Handled = true;
+        e.SuppressKeyPress = true;
+    }
+
+    private void UpdateSearchResultLabel()
+    {
+        if (_searchBox.Text.Trim().Length == 0)
+        {
+            _searchResultLabel.Text = string.Empty;
+            return;
+        }
+
+        _searchResultLabel.Text = _grid.Rows.Count == 0
+            ? Strings.Get("catalog.searchNoResults")
+            : Strings.Get("catalog.searchResults")
+                .Replace("{count}", _grid.Rows.Count.ToString(CultureInfo.CurrentCulture), StringComparison.Ordinal);
     }
 
     private void OnDetailAskButtonClicked(object? sender, EventArgs e)
@@ -955,15 +1175,78 @@ internal sealed class MainForm : NeonForm
             return;
         }
 
-        AskWindows();
+        AskWindows(status.Extension);
     }
 
-    private void AskWindows()
+    /// <summary>
+    /// Opens Runly's Default apps page for one extension. Windows only lists extensions that are
+    /// present in <c>Capabilities\FileAssociations</c>, and only "Install / Update" writes that key —
+    /// "Save" writes the config file and nothing else. Sending the user to a page that cannot contain
+    /// their extension is what made the button look broken, so an unregistered extension is offered
+    /// registration first.
+    /// </summary>
+    private async void AskWindows(string? extension)
     {
+        if (extension is not null && !IsRegisteredWithWindows(extension))
+        {
+            var answer = NeonMessageBox.Show(this,
+                Strings.Get("bind.needsInstall").Replace("{extension}", extension, StringComparison.Ordinal),
+                Strings.Get("app.title"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (answer != DialogResult.Yes)
+            {
+                return;
+            }
+
+            if (_dirty)
+            {
+                SaveAll();
+            }
+
+            var (success, _) = await RunInstallAsync();
+            if (!success)
+            {
+                return;
+            }
+
+            if (!IsRegisteredWithWindows(extension))
+            {
+                NeonMessageBox.Show(this,
+                    Strings.Get("bind.notRegistered").Replace("{extension}", extension, StringComparison.Ordinal),
+                    Strings.Get("app.title"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+        }
+
         // SHOpenWithDialog is intentionally not used here: Windows 11 exposes only "Just once"
-        // through that API. The registered-app deep link opens Runly's Default apps page, where
-        // the user can make a persistent per-extension choice.
-        OpenDefaultAppsSettings(forRunly: true);
+        // through that API. The file-type deep link opens the list where a persistent choice can be
+        // made; see OpenDefaultAppsForExtension for why the per-app page cannot serve this.
+        if (extension is null)
+        {
+            OpenDefaultAppsSettings(forRunly: true);
+            return;
+        }
+
+        OpenDefaultAppsForExtension(extension);
+    }
+
+    private bool IsRegisteredWithWindows(string extension)
+    {
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(RunlyRegistryLayout.FileAssociationsKey, writable: false);
+            return key?.GetValue(RunlyConfig.NormalizeExtension(extension)) is not null;
+        }
+        catch (System.Security.SecurityException ex)
+        {
+            _logger.Error("Capabilities anahtarı okunamadı", ex);
+            return false;
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.Error("Capabilities anahtarı okunamadı", ex);
+            return false;
+        }
     }
 
     private void UpdateDetailPanel()
@@ -973,16 +1256,30 @@ internal sealed class MainForm : NeonForm
             _detailPlaceholder.Visible = true;
             _detailText.Visible = false;
             _detailAskButton.Visible = false;
+            _detailChooseButton.Visible = false;
             return;
         }
 
         _detailPlaceholder.Visible = false;
         _detailText.Visible = true;
+        _detailChooseButton.Text = Strings.Get("catalog.chooseApp");
+        _detailChooseButton.Visible = !IsBlocked(status.Extension);
+
+        var selectedMapping = EffectiveMapping(status.Extension);
+        if (selectedMapping.Kind == HandlerKind.Open && string.IsNullOrWhiteSpace(selectedMapping.OpenWith))
+        {
+            RenderMarkdownLite(_detailText, Strings.Get("handler.notSelectedDetail")
+                .Replace("{extension}", status.Extension, StringComparison.Ordinal)
+                .Replace("{button}", Strings.Get("catalog.chooseApp"), StringComparison.Ordinal));
+            _detailAskButton.Visible = false;
+            return;
+        }
 
         if (status.Bound == BindingState.NeedsUserChoice)
         {
             RenderMarkdownLite(_detailText, BuildNeedsChoiceExplanation(status.Extension, status.UserChoiceOwnerName));
-            _detailAskButton.Text = Strings.Language == "en" ? "Open Runly default-app settings" : "Runly varsayılan uygulama ayarlarını aç";
+            _detailAskButton.Text = Strings.Get("bind.openFileTypePage")
+                .Replace("{extension}", status.Extension, StringComparison.Ordinal);
             _detailAskButton.Visible = true;
         }
         else if (status.Bound == BindingState.Bound)
@@ -1015,8 +1312,9 @@ internal sealed class MainForm : NeonForm
                 : $"Windows currently opens this extension with **{ownerName}**.";
             return englishSituation + $"\n\nTo bind **{extension}** permanently, right-click a `{extension}` file in Explorer → " +
                    "**Open with** → **Choose another app** → **Runly** → **Always**. " +
-                   "The button below opens Runly’s Windows Default apps page, where you can make the same " +
-                   "persistent choice for each extension.";
+                   "The button below opens the Windows file-type page. Type " +
+                   $"**{extension}** into the box at the top of that page — Windows only fills it in on a " +
+                   "cold start of Settings, so type it yourself — then pick **Runly** in the row that appears.";
         }
 
         var situation = string.IsNullOrWhiteSpace(ownerName)
@@ -1034,8 +1332,9 @@ internal sealed class MainForm : NeonForm
         $"1. Bir `{extension}` dosyasına **sağ tıklayın** → **Birlikte aç** → **Başka bir uygulama seç**.\n" +
         "2. Açılan listeden **Runly**'yi seçin.\n" +
         "3. **\"Her zaman\"** düğmesine basın.\n\n" +
-        "Aşağıdaki düğme Runly'nin Windows **Varsayılan uygulamalar** sayfasını açar; " +
-        "buradan her uzantı için kalıcı seçimi yapabilirsiniz.\n\n" +
+        "Aşağıdaki düğme Windows'un dosya türü sayfasını açar. Sayfanın en üstündeki kutuya " +
+        $"**{extension}** yazın — Windows kutuyu yalnız Ayarlar kapalıyken açılırsa kendi dolduruyor, " +
+        "o yüzden elle yazmak gerekiyor — sonra beliren satırdan **Runly**'yi seçin.\n\n" +
         $"Bu adımı atlarsanız Runly çalışmaya devam eder; yalnızca `{extension}` dosyalarına çift tıklamak " +
         "Runly'yi açmaz. Dosyaya sağ tıklayıp **\"Birlikte aç → Runly\"** diyerek yine de çalıştırabilirsiniz.";
     }
@@ -1311,30 +1610,64 @@ internal sealed class MainForm : NeonForm
 
     private async void OnInstallClicked(object? sender, EventArgs e)
     {
+        var (success, pending) = await RunInstallAsync();
+        if (!success || pending.Count == 0)
+        {
+            return;
+        }
+
+        // Registration succeeded. Windows protects the final UserChoice value, so continue directly
+        // in the settings list where the choice is made. A single pending extension goes straight to
+        // its own row; several of them get the unfiltered list, since ftfilter takes one extension.
+        if (pending.Count == 1)
+        {
+            OpenDefaultAppsForExtension(pending[0]);
+        }
+        else
+        {
+            OpenDefaultAppsSettings();
+        }
+    }
+
+    private async Task<(bool Success, IReadOnlyList<string> Pending)> RunInstallAsync()
+    {
+        var exePath = ExePath;
+
+        // Registration writes this path into every ProgID's shell\open\command. Running the settings
+        // window straight out of its build output has no Runly.exe beside it — the launcher is a
+        // separate project — so installing from there used to silently register a path that does not
+        // exist and break every association it touched.
+        if (!File.Exists(exePath))
+        {
+            NeonMessageBox.Show(this,
+                Strings.Get("install.launcherMissing").Replace("{path}", exePath, StringComparison.Ordinal),
+                Strings.Get("app.title"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            _logger.Error($"Kurulum reddedildi, başlatıcı yok: {exePath}", new FileNotFoundException(exePath));
+            return (false, []);
+        }
+
         SetBusy(true, "Kuruluyor…");
         try
         {
-            var exePath = ExePath;
             var result = await Task.Run(() => _shellRegistrar.Install(_config, exePath));
-
-            var pending = result.Extensions.Where(x => x.Bound == BindingState.NeedsUserChoice).ToList();
 
             if (!result.Success)
             {
                 ResultDialog.Show(this, "Kurulum hatası", false, result.Actions, result.ErrorMessage);
+                return (false, []);
             }
-            else if (pending.Count > 0)
-            {
-                // Registration succeeded. Windows protects the final UserChoice value, so continue
-                // directly in the Runly-specific settings page without another result/prompt dialog.
-                OpenDefaultAppsSettings(forRunly: true);
-            }
+
+            return (true, result.Extensions
+                .Where(x => x.Bound == BindingState.NeedsUserChoice)
+                .Select(x => x.Extension)
+                .ToArray());
         }
         catch (Exception ex)
         {
             _logger.Error("Kurulum sırasında hata", ex);
             NeonMessageBox.Show(this, $"Kurulum sırasında beklenmeyen bir hata oluştu: {ex.Message}", "Runly Ayarları",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return (false, []);
         }
         finally
         {
@@ -1439,13 +1772,28 @@ internal sealed class MainForm : NeonForm
         OpenDefaultAppsSettings();
     }
 
-    private void OpenDefaultAppsSettings(bool forRunly = false)
+    /// <summary>
+    /// Opens the Windows page where a per-extension default can actually be granted.
+    /// <para>
+    /// <c>registeredAppUser=Runly</c> is deliberately not used for a single extension. Measured on
+    /// Windows 11: that page lists the file types Runly is <b>already</b> the default for, not the
+    /// ones it declares in <c>Capabilities\FileAssociations</c> — this machine listed <c>.pl</c> and
+    /// <c>.sh</c> (present only as a UserChoice) while omitting <c>.md</c> (present only in
+    /// capabilities). An extension therefore appears there only after it is bound, which is exactly
+    /// too late to be useful. <c>ftfilter</c> opens the "choose a default by file type" list already
+    /// filtered to the extension, where the choice can be made.
+    /// </para>
+    /// </summary>
+    private void OpenDefaultAppsForExtension(string extension) =>
+        OpenSettingsUri("ms-settings:defaultapps?ftfilter=" + RunlyConfig.NormalizeExtension(extension));
+
+    private void OpenDefaultAppsSettings(bool forRunly = false) =>
+        OpenSettingsUri(forRunly ? "ms-settings:defaultapps?registeredAppUser=Runly" : "ms-settings:defaultapps");
+
+    private void OpenSettingsUri(string settingsUri)
     {
         try
         {
-            var settingsUri = forRunly
-                ? "ms-settings:defaultapps?registeredAppUser=Runly"
-                : "ms-settings:defaultapps";
             Process.Start(new ProcessStartInfo { FileName = settingsUri, UseShellExecute = true })?.Dispose();
         }
         catch (Exception ex)

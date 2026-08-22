@@ -4,29 +4,28 @@ using System.Runtime.Versioning;
 namespace Runly.Core.Shell;
 
 /// <summary>
-/// Shows the Windows "Open with" dialog through <c>SHOpenWithDialog</c>. For an extension that already carries a
-/// <c>UserChoice</c> key — <c>.ps1</c> on this machine — this is the only legitimate way to bind it to Runly:
-/// the key is hash protected and SPEC 2 forbids forging it. The user picks Runly and ticks
-/// "Her zaman bu uygulamayı kullan".
+/// Shows the Windows "Open with" dialog through <c>SHOpenWithDialog</c> so a file can be run with Runly once.
+/// It cannot bind an extension: since Windows 10 this dialog is documented as unable to change the default
+/// program, whatever flags it is given (see <see cref="OaifExec"/>). Binding is the user's to make, through
+/// Explorer's "Her zaman" or the Settings page — <c>UserChoice</c> is hash protected and SPEC 2 forbids forging it.
 /// </summary>
 [SupportedOSPlatform("windows")]
 public static class OpenWithDialog
 {
-    /// <summary>Let the user register a new application from the dialog.</summary>
-    private const int OaifAllowRegistration = 0x00000001;
-
-    /// <summary>Persist the choice for the file type, which is what writes <c>UserChoice</c>.</summary>
-    private const int OaifRegisterExt = 0x00000002;
-
     /// <summary>
-    /// Run the chosen application on the sample file once the user confirms.
+    /// Run the chosen application on the sample file once the user confirms. The only flag Windows still acts on
+    /// here, so it is the only one sent.
     /// </summary>
     /// <remarks>
-    /// Measured on Windows 11 during R1: this dialog can no longer set the default handler at all. With these
-    /// flags it offers only "Yalnızca bir kez"; adding <c>OAIF_FORCE_REGISTRATION</c> (0x8) makes Windows refuse
-    /// outright with "Varsayılan uygulamalarınızı değiştirmek için Ayarlar'a gidin". Binding therefore has to go
-    /// through Explorer's "Birlikte aç → Başka bir uygulama seç → Her zaman" or the Settings page; the settings
-    /// GUI offers both. The dialog is kept because it is still the fastest way to run a file with Runly once.
+    /// The registration flags — <c>OAIF_ALLOW_REGISTRATION</c> (0x1), <c>OAIF_REGISTER_EXT</c> (0x2),
+    /// <c>OAIF_FORCE_REGISTRATION</c> (0x8), <c>OAIF_HIDE_REGISTRATION</c> (0x20) — are not merely weak here, they
+    /// are ignored: Microsoft's own <c>OPENASINFO</c> reference states that as of Windows 10 "the Open With dialog
+    /// box can no longer be used to change the default program". R1 measured this on Windows 11 and recorded it as
+    /// a Windows 11 trait (decision K23); it is in fact documented behaviour two releases older, so no future
+    /// Windows version is going to give the flags back. Sending them only invited the reader to try them again.
+    /// Binding therefore goes through Explorer's "Birlikte aç → Başka bir uygulama seç → Her zaman" or the Settings
+    /// page; the settings GUI offers both. This dialog is kept because it is still the fastest way to run a file
+    /// with Runly once.
     /// </remarks>
     private const int OaifExec = 0x00000004;
 
@@ -76,7 +75,7 @@ public static class OpenWithDialog
             {
                 FileName = target,
                 ClassName = null,
-                Flags = OaifAllowRegistration | OaifRegisterExt | OaifExec,
+                Flags = OaifExec,
             };
 
             var hr = SHOpenWithDialog(owner, ref info);

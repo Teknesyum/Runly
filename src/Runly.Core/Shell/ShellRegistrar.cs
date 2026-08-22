@@ -120,7 +120,11 @@ public sealed class ShellRegistrar : IShellRegistrar
 
             // 3-4. Application registration, so Runly shows up in the "Open with" list.
             WriteApplicationRegistration(command, candidates.Select(c => c.Extension).ToList());
-            actions.Add("Uygulama kaydı yazıldı (Birlikte aç listesi, Varsayılan uygulamalar).");
+
+            // The path goes into the action text, not just the registry: when associations later point at an
+            // executable that no longer exists, the only question worth answering is which install wrote it,
+            // and "Uygulama kaydı yazıldı" alone could not answer it.
+            actions.Add($"Uygulama kaydı yazıldı (Birlikte aç listesi, Varsayılan uygulamalar). Başlatıcı: {Path.GetFullPath(exePath)}");
 
             foreach (var (extension, mapping, interpreterPath) in candidates)
             {

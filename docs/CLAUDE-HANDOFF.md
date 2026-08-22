@@ -103,3 +103,25 @@ The new cyan/pink icon was visually verified in the live Release Settings title 
   kills all three.
 - Do not give a `DataGridView` cell a translucent `BackColor`. Cell fills ignore alpha and render
   white; pre-blend the tint against the surface colour instead.
+- Do not move the search box back into the bottom button strip. That strip is
+  `WrapContents = false`; with five buttons ahead of it the search box and the bulk-assign pair were
+  pushed past the right edge and were effectively invisible. Search lives in its own row above the
+  table, and the bulk pair sits in an AutoSize column so it can never be clipped.
+- Do not return the extension grid to fixed column widths. At 1280 the fixed layout overflowed by
+  ~160px and hid the "Durum" column — the one carrying the "Varsayılan yap" button — behind a
+  horizontal scrollbar. Columns are `Fill` with weights plus minimum widths.
+- Do not remove the per-row application picker (`ChooseApplicationDialog`). Before it, the only way
+  to give an extension a handler was to type an absolute `.exe` path into the grid cell, and the
+  grid's `EditOnKeystrokeOrF2` edit mode meant double-clicking a row did nothing at all.
+- Do not put the "choose an application" hint into the handler cell's `Value`. It goes into
+  `Style.NullValue`, otherwise `OnGridCellValueChanged` saves the hint text as the handler.
+- Do not send a single extension to `ms-settings:defaultapps?registeredAppUser=Runly`. Measured on
+  Windows 11 (22.08.2026): that page lists the file types Runly is **already** the default for, not
+  the ones it declares. On this machine it listed `.pl` and `.sh` — present only as a `UserChoice`,
+  absent from `Capabilities\FileAssociations` — while omitting `.md`, which was present in
+  capabilities, in `SupportedTypes`, in `OpenWithProgids` and had a valid ProgID `shell\open\command`.
+  An extension shows up there only after it is bound, which is exactly too late. Per-extension
+  binding uses `ms-settings:defaultapps?ftfilter=<ext>`.
+- Do not assume "Save" registers anything. `SaveAll` writes the config file and the trust store and
+  touches no registry key; only `ShellRegistrar.Install`, reached through "Install / Update", writes
+  `Capabilities\FileAssociations`. `AskWindows` checks that key first and offers to install.

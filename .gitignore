@@ -5,3 +5,4 @@ dist-e2e/
 *.zip
 CODEX_CLAUDE_HANDOFF.md
 docs/reports/
+.claude/

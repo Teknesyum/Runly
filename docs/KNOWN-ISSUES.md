@@ -55,6 +55,26 @@ Version 0.2.0 · Last updated: 2026-08-15
   hücre dolgusu alfa kanalını yok sayıyor, yarı saydam tint'ler yüzey rengiyle önceden
   karıştırılıp opak veriliyor.
 
+### Kapatılanlar (devam)
+
+- **B12** ("Varsayılan yap" düğmesine basınca açılan Windows sayfasında uzantı yok) — kapatıldı.
+  İki ayrı sebep vardı. Birincisi: `Kaydet` registry'ye hiçbir şey yazmıyor, yalnız `Kur / Güncelle`
+  yazıyor; uygulama seçip kaydeden kullanıcının uzantısı `Capabilities\FileAssociations` altına hiç
+  girmiyordu. İkincisi ve asıl olanı: `registeredAppUser=Runly` sayfası, uygulamanın **bildirdiği**
+  dosya türlerini değil **hâlihazırda varsayılanı olduğu** türleri listeliyor. 22.08.2026'da bu
+  makinede ölçüldü — sayfa `.pl` ve `.sh` gösteriyordu (yalnızca `UserChoice` olarak varlar,
+  capabilities'te yoklar), `.md`'yi göstermiyordu (capabilities, `SupportedTypes`, `OpenWithProgids`
+  ve geçerli ProgID komutu hepsi yerindeydi). Yani o sayfa bağlanmamış bir uzantıyı hiçbir zaman
+  gösteremez. Tek uzantılık bağlama artık `ms-settings:defaultapps?ftfilter=<uzantı>` adresine
+  gidiyor ve düğme, uzantı tanıtılmamışsa önce kurulum öneriyor.
+
+- **B11** (uzantı listesinde arama kutusu bulunamıyor, satıra çift tıklayınca uygulama seçilemiyordu)
+  — kapatıldı. Üç ayrı sebep vardı: arama kutusu `WrapContents = false` bir düğme şeridinin
+  sonundaydı ve pencere kenarının dışına itiliyordu; ızgaranın `EditMode` değeri
+  `EditOnKeystrokeOrF2` olduğu için çift tık hiçbir şey yapmıyordu; işleyici hücresi de yalnız elle
+  yazılan mutlak `.exe` yolunu kabul ediyordu. Arama kendi satırına alındı, satıra çift tıklamak
+  `ChooseApplicationDialog`'u açıyor, boş işleyici hücresi "Çift tıklayın" ipucunu gösteriyor.
+
 ## 3. Doğrulanamayanlar — kullanıcı tarafından doğrulanmalı
 
 - **The 0.2.0 catalog UI was visually checked at 100% DPI only.** The category rail, localized names,
@@ -73,6 +93,17 @@ Version 0.2.0 · Last updated: 2026-08-15
 - **Permanent default-app selection still requires user interaction in Windows Settings.** Automated
   verification deliberately does not click or forge `UserChoice`; binding counts are only truthful after
   Windows reports Runly as the protected choice and `AssocQueryString` agrees.
+
+- **Yeni arama satırı ve uygulama seçme diyaloğu yalnız Türkçe arayüzde ve %100 DPI'da gözle
+  doğrulandı.** Metinler `locale/*.json` üzerinden geliyor ve anahtar eşliği testle korunuyor, ama
+  İngilizce arayüzde taşma kontrolü canlı yapılmadı.
+
+- **`ftfilter` yalnız Ayarlar kapalıyken açılışta doluyor.** 22.08.2026'da iki kez ölçüldü.
+  `SystemSettings` süreci öldürülüp `ms-settings:defaultapps?ftfilter=.md` açıldığında UI Automation
+  ağacında kutunun değeri `.md` oluyor. Ayarlar zaten açıkken aynı bağlantı doğru sayfaya gidiyor ama
+  kutuyu **boş** bırakıyor. Runly başka bir uygulamanın penceresini kapatmaz; ayrıntılar panelindeki
+  metin bu yüzden "kutuya uzantıyı yazın" diyor. Bağlantı yine de doğru bölüme gidiyor — eski
+  `registeredAppUser` sayfası bağlanmamış uzantıyı hiç gösteremiyordu.
 
 - **125% / 150% DPI ölçeklemede Ayarlar penceresi ve TaskDialog görünümü.** Sistem ölçeklemesini
   değiştirmek oturum açma/kapama gerektirdiği için ne T5, ne T7, ne R3 bunu deneyebildi.

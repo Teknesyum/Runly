@@ -20,4 +20,23 @@ public sealed class CatalogGridProjectionTests
 
         Assert.Contains(".foo", result);
     }
+
+    [Fact]
+    public void Search_FindsExtensionOutsideTheSelectedCategory()
+    {
+        var config = new RunlyConfig();
+
+        var result = CatalogGridProjection.GetExtensions(ExtensionCatalog.Entries, config, "scripts", "md");
+
+        Assert.Contains(".md", result);
+    }
+
+    [Fact]
+    public void Search_MatchesLocalisedTypeNameAndSuggestedApplication()
+    {
+        var config = new RunlyConfig();
+
+        Assert.Contains(".md", CatalogGridProjection.GetExtensions(ExtensionCatalog.Entries, config, "images", "markdown"));
+        Assert.Contains(".md", CatalogGridProjection.GetExtensions(ExtensionCatalog.Entries, config, "images", "notepad.exe"));
+    }
 }

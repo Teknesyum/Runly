@@ -312,6 +312,46 @@ internal class NeonLink : LinkLabel
     }
 }
 
+/// <summary>Owner-drawn dark combo box. A native ComboBox paints its list and its closed field with
+/// system colours, which reads as a white hole in this theme once the control is actually visible.</summary>
+internal sealed class NeonComboBox : ComboBox
+{
+    public NeonComboBox()
+    {
+        DropDownStyle = ComboBoxStyle.DropDownList;
+        DrawMode = DrawMode.OwnerDrawFixed;
+        FlatStyle = FlatStyle.Flat;
+        BackColor = Palette.FieldBg;
+        ForeColor = Palette.TextBody;
+        ItemHeight = 22;
+    }
+
+    protected override void OnDrawItem(DrawItemEventArgs e)
+    {
+        if (e.Index < 0)
+        {
+            base.OnDrawItem(e);
+            return;
+        }
+
+        var selected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
+        using var background = new SolidBrush(selected ? ColorTranslator.FromHtml("#123238") : Palette.FieldBg);
+        e.Graphics.FillRectangle(background, e.Bounds);
+
+        TextRenderer.DrawText(e.Graphics, GetItemText(Items[e.Index]), Font,
+            new Rectangle(e.Bounds.Left + 4, e.Bounds.Top, e.Bounds.Width - 8, e.Bounds.Height),
+            selected ? Palette.NeonBlue : Palette.TextBody,
+            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+        using var border = new Pen(Color.FromArgb(120, Palette.NeonBlue));
+        e.Graphics.DrawRectangle(border, 0, 0, Width - 1, Height - 1);
+    }
+}
+
 /// <summary>Signature block, R5 §"İmza bloğu": exactly one instance, bottom-right of the settings window.</summary>
 internal sealed class SignatureBlock : NeonLink
 {
