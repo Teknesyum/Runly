@@ -25,6 +25,8 @@ internal sealed class MainForm : NeonForm
     private const int ColArgs = 5;
     private const int ColStatus = 6;
 
+    private const int SearchDebounceMs = 180;
+
     // DataGridView hücre dolgusu alfa kanalını yok sayar: yarı saydam bir BackColor beyaza dönüp
     // satırı bozar. Tint'ler bu yüzden yüzey rengiyle önceden karıştırılıp opak veriliyor.
     private static readonly Color BoundBack = Tint(Palette.Success, 40);
@@ -72,6 +74,7 @@ internal sealed class MainForm : NeonForm
     private readonly DataGridView _grid;
     private readonly ListBox _categoryList;
     private readonly TextBox _searchBox;
+    private readonly System.Windows.Forms.Timer _searchDebounce;
     private readonly ComboBox _bulkAppBox;
     private readonly IReadOnlyList<InstalledApplication> _installedApplications;
     private readonly Dictionary<string, Icon> _categoryIcons = new(StringComparer.Ordinal);
@@ -231,7 +234,21 @@ internal sealed class MainForm : NeonForm
         extButtons.Controls.Add(exportButton);
         extButtons.Controls.Add(importButton);
         _searchBox = new TextBox { Width = 230, PlaceholderText = Strings.Get("catalog.searchPlaceholder"), BackColor = Palette.FieldBg, ForeColor = Palette.TextBody, Margin = new Padding(0, 7, 8, 4) };
-        _searchBox.TextChanged += (_, _) => RefreshExtensionGrid();
+
+        // The catalog carries 400+ rows and every refresh reprojects and refills the whole grid, so
+        // rebuilding on each keystroke makes typing stutter. Only typing is delayed: ApplyLanguage and
+        // the other call sites keep calling RefreshExtensionGrid directly and stay immediate.
+        _searchDebounce = new System.Windows.Forms.Timer { Interval = SearchDebounceMs };
+        _searchDebounce.Tick += (_, _) =>
+        {
+            _searchDebounce.Stop();
+            RefreshExtensionGrid();
+        };
+        _searchBox.TextChanged += (_, _) =>
+        {
+            _searchDebounce.Stop();
+            _searchDebounce.Start();
+        };
         _bulkAppBox = new ComboBox { Width = 230, DropDownStyle = ComboBoxStyle.DropDownList, BackColor = Palette.FieldBg, ForeColor = Palette.TextBody, Margin = new Padding(8, 7, 4, 4) };
         foreach (var app in _installedApplications) _bulkAppBox.Items.Add(app);
         _bulkAppBox.DisplayMember = nameof(InstalledApplication.DisplayName);
@@ -1626,6 +1643,16 @@ internal sealed class MainForm : NeonForm
         RefreshStatusStrip();
         UpdateDetailPanel();
         _suppressGridEvents = false;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _searchDebounce.Dispose();
+        }
+
+        base.Dispose(disposing);
     }
 
     private void OnFormClosing(object? sender, FormClosingEventArgs e)

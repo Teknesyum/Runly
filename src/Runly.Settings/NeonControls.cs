@@ -9,6 +9,10 @@ internal static class NeonTheme
 {
     private const int DwmwaUseImmersiveDarkMode = 20;
 
+    // DWMWA_USE_IMMERSIVE_DARK_MODE was attribute 19 before Windows 10 build 19041 and 20 from that
+    // build on. Sending only 20 leaves the title bar white on older builds.
+    private const int DwmwaUseImmersiveDarkModeLegacy = 19;
+
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(nint hwnd, int attribute, ref int value, int size);
 
@@ -16,7 +20,14 @@ internal static class NeonTheme
     public static void ApplyDarkTitleBar(Form form)
     {
         var value = 1;
-        DwmSetWindowAttribute(form.Handle, DwmwaUseImmersiveDarkMode, ref value, sizeof(int));
+
+        // DwmSetWindowAttribute reports an unknown attribute through its HRESULT instead of throwing,
+        // so the pre-19041 fallback only happens if the result is actually read. Both failing is left
+        // silent on purpose: a light title bar must not stop the window from opening.
+        if (DwmSetWindowAttribute(form.Handle, DwmwaUseImmersiveDarkMode, ref value, sizeof(int)) < 0)
+        {
+            DwmSetWindowAttribute(form.Handle, DwmwaUseImmersiveDarkModeLegacy, ref value, sizeof(int));
+        }
     }
 
     [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
