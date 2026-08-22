@@ -1,4 +1,4 @@
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
 using Runly.Core.Models;
 using Runly.Core.Services;
 using Runly.Settings.Discovery;
@@ -9,6 +9,7 @@ namespace Runly.Settings.Dialogs;
 /// escape hatch. Replaces typing an absolute executable path into the grid's handler cell.</summary>
 internal sealed class ChooseApplicationDialog : NeonForm
 {
+    private const int SearchDebounceMs = 180;
     private const int RowHeight = 48;
     private const int IconSize = 32;
 
@@ -22,6 +23,7 @@ internal sealed class ChooseApplicationDialog : NeonForm
     private readonly List<AppChoice> _all;
     private readonly Dictionary<string, Image?> _iconCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly TextBox _searchBox;
+    private readonly System.Windows.Forms.Timer _searchDebounce;
     private readonly ListBox _list;
     private readonly Label _emptyLabel;
 
@@ -99,7 +101,20 @@ internal sealed class ChooseApplicationDialog : NeonForm
             BorderStyle = BorderStyle.FixedSingle,
             Margin = new Padding(0, 0, 0, 8),
         };
-        _searchBox.TextChanged += (_, _) => ApplyFilter();
+
+        // Same reason as the main window: every keystroke rebuilt the whole owner-drawn list, and each
+        // newly visible row pulls an icon out of the shell on first paint.
+        _searchDebounce = new System.Windows.Forms.Timer { Interval = SearchDebounceMs };
+        _searchDebounce.Tick += (_, _) =>
+        {
+            _searchDebounce.Stop();
+            ApplyFilter();
+        };
+        _searchBox.TextChanged += (_, _) =>
+        {
+            _searchDebounce.Stop();
+            _searchDebounce.Start();
+        };
         layout.Controls.Add(_searchBox, 0, 1);
 
         var listHost = new Panel { Dock = DockStyle.Fill, BackColor = Palette.FieldBg, Padding = new Padding(1) };
@@ -323,6 +338,8 @@ internal sealed class ChooseApplicationDialog : NeonForm
 
     protected override void OnFormClosed(FormClosedEventArgs e)
     {
+        _searchDebounce.Dispose();
+
         foreach (var image in _iconCache.Values)
         {
             image?.Dispose();
