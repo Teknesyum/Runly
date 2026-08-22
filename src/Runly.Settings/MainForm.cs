@@ -49,7 +49,7 @@ internal sealed class MainForm : NeonForm
     /// </summary>
     private static Label SectionLabel(string text, Padding margin) => new()
     {
-        Text = string.Join(" ", text.ToCharArray()),
+        Text = text,
         AutoSize = true,
         Font = Palette.LabelFont,
         ForeColor = Palette.TextLabel,
@@ -560,7 +560,7 @@ internal sealed class MainForm : NeonForm
         radios.Controls.Add(neverAsk);
         layout.Controls.Add(radios, 0, 0);
 
-        layout.Controls.Add(SectionLabel("GÜVENİLEN KLASÖRLER", new Padding(0, Metrics.Px(6), 0, Metrics.Px(2))), 0, 1);
+        layout.Controls.Add(SectionLabel(Strings.Get("trustedFolders"), new Padding(0, Metrics.Px(6), 0, Metrics.Px(2))), 0, 1);
 
         var foldersArea = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent };
         foldersArea.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -604,7 +604,7 @@ internal sealed class MainForm : NeonForm
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, EditorRowHeight));
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
-        layout.Controls.Add(SectionLabel("PENCEREYİ AÇIK TUT", new Padding(0, 0, 0, Metrics.Px(2))), 0, 0);
+        layout.Controls.Add(SectionLabel(Strings.Get("windowOpen"), new Padding(0, 0, 0, Metrics.Px(2))), 0, 0);
         var keepRadios = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.TopDown, WrapContents = false, BackColor = Color.Transparent };
         var always = new NeonRadioButton { Text = "Her zaman", AutoSize = true };
         var onError = new NeonRadioButton { Text = "Sadece hata olursa", AutoSize = true };
@@ -618,7 +618,7 @@ internal sealed class MainForm : NeonForm
         editorRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         editorRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         editorRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        var editorLabel = SectionLabel("DÜZENLEYİCİ KOMUTU", new Padding(0, Metrics.Px(8), Metrics.Px(6), 0));
+        var editorLabel = SectionLabel(Strings.Get("editorCommand"), new Padding(0, Metrics.Px(8), Metrics.Px(6), 0));
         editorLabel.Anchor = AnchorStyles.Left;
         var editorBox = new TextBox { Dock = DockStyle.Fill, BackColor = Palette.FieldBg, ForeColor = Palette.NeonBlue, Font = Palette.MonoBody, BorderStyle = BorderStyle.FixedSingle };
         var testButton = new NeonButton { Text = "Test et", Primary = false, AutoSize = true, Margin = new Padding(Metrics.Px(6), 0, 0, 0) };

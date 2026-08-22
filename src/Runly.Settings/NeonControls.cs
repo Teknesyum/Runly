@@ -1,4 +1,4 @@
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 
 namespace Runly.Settings;
@@ -167,14 +167,15 @@ internal sealed class NeonButton : Button
     }
 }
 
-/// <summary>Replaces <see cref="GroupBox"/>: a rounded, glow-bordered panel with an uppercase neon title.</summary>
+/// <summary>Replaces <see cref="GroupBox"/>: a rounded, glow-bordered panel with a neon title.</summary>
 internal sealed class NeonGroupPanel : Panel
 {
     public string Title { get; set; }
 
     public NeonGroupPanel(string title)
     {
-        Title = title.ToUpperInvariant();
+        // Uppercase is banned by the standard: it slows reading and destroys the Turkish İ/I pair.
+        Title = title;
         SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw, true);
         DoubleBuffered = true;
         BackColor = Palette.Surface;
