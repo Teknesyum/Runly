@@ -34,7 +34,6 @@ internal static class Metrics
     private static int s_buttonMinHeight;
     private static int s_captionHeight;
     private static int s_sectionLabelHeight;
-    private static int s_footerLineHeight;
     private static int s_textBoxHeight;
     private static int s_groupTitleBand;
     private static int s_gridRowHeight;
@@ -43,6 +42,7 @@ internal static class Metrics
     private static int s_categoryRowHeight;
     private static int s_radioRowHeight;
     private static int s_captionButtonWidth;
+    private static int s_captionItemHeight;
     private static int s_captionIconSize;
     private static int s_windowCornerRadius;
     private static int s_resizeBorder;
@@ -155,16 +155,6 @@ internal static class Metrics
         }
     }
 
-    /// <summary>The footer strip: label line plus its descender. Smaller clips, larger opens a gap.</summary>
-    public static int FooterLineHeight
-    {
-        get
-        {
-            Ensure();
-            return s_footerLineHeight;
-        }
-    }
-
     /// <summary>Single-line <see cref="TextBox"/> including its border.</summary>
     public static int TextBoxHeight
     {
@@ -243,6 +233,18 @@ internal static class Metrics
         }
     }
 
+    /// <summary>Slot for one caption-bar element — the sponsor button, the signature, the language
+    /// switch, the version. Kept past the 24 DIP pointer-target floor at every scale, and it is what
+    /// sets <see cref="CaptionHeight"/> now that the band carries more than three glyphs.</summary>
+    public static int CaptionItemHeight
+    {
+        get
+        {
+            Ensure();
+            return s_captionItemHeight;
+        }
+    }
+
     public static int CaptionIconSize
     {
         get
@@ -304,13 +306,13 @@ internal static class Metrics
 
         s_buttonHeight = Row(Palette.Body, 13);
         s_buttonMinHeight = Row(Palette.Body, 11);
-        s_captionHeight = Math.Max(Line(Palette.Body), Line(Palette.CaptionGlyph)) + Px(14);
+        s_captionItemHeight = Math.Max(Px(24), Row(Palette.Body, 10));
+        s_captionHeight = Math.Max(Math.Max(Line(Palette.Body), Line(Palette.CaptionGlyph)), s_captionItemHeight) + Px(14);
         s_sectionLabelHeight = Row(Palette.LabelFont, 8);
-        s_footerLineHeight = Row(Palette.LabelFont, 4);
         s_textBoxHeight = Row(Palette.MonoBody, 13);
         s_groupTitleBand = Row(Palette.H3, 15);
-        s_gridRowHeight = Row(Palette.MonoBody, 9);
-        s_gridHeaderHeight = Row(Palette.H3, 11);
+        s_gridRowHeight = Row(Palette.MonoBody, 16);
+        s_gridHeaderHeight = Row(Palette.H3, 16);
         s_categoryIconSize = Px(20);
         s_categoryRowHeight = Math.Max(s_categoryIconSize, Line(Palette.Body)) + Px(14);
         s_radioRowHeight = Row(Palette.Body, 13);

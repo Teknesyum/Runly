@@ -73,16 +73,24 @@ internal sealed class MainForm : NeonForm
 
     private static int EditorRowHeight => Metrics.ButtonHeight + Metrics.Px(12);
 
-    private static int SearchStripHeight => Metrics.ButtonHeight + Metrics.Px(14);
+    /// The strip's own slot plus the 12-pixel gap its bottom margin opens to the table. The margin is
+    /// part of the row: an Absolute row does not grow for it, and the difference lands as a clipped
+    /// button rather than as a shorter gap.
+    private static int SearchStripHeight => Metrics.ButtonHeight + Metrics.Px(16) + Metrics.Px(12);
 
-    private static int ExtensionButtonsHeight => Metrics.ButtonHeight + Metrics.Px(8);
+    private static int ExtensionButtonsHeight => Metrics.ButtonHeight + Metrics.Px(16);
 
     /// The security panel is the taller of the two, so it sets the row both of them share.
+    /// The security panel is the taller of the two, so it sets the row both of them share. The leading
+    /// term is the gap above the pair, which belongs to the row as well: the panels are docked into it,
+    /// so padding the container without paying for it here just eats the panel's own bottom padding.
     private static int PanelsRowHeight =>
-        Metrics.GroupTitleBand + Metrics.Px(16) + RadioStackHeight + Metrics.SectionLabelHeight +
-        FoldersAreaHeight + TrustedFilesRowHeight + Metrics.Px(24);
+        Metrics.Px(24) + Metrics.GroupTitleBand + Metrics.Px(16) + RadioStackHeight +
+        Metrics.SectionLabelHeight + FoldersAreaHeight + TrustedFilesRowHeight + Metrics.Px(24);
 
-    private static int BottomBarHeight => Metrics.ButtonHeight + Metrics.FooterLineHeight + Metrics.Px(26);
+    /// One button row inside the strip's 16/16 padding. The footer that used to sit under it moved into
+    /// the caption band, so nothing else shares this row any more.
+    private static int BottomBarHeight => Metrics.ButtonHeight + Metrics.Px(32);
 
     private readonly IConfigStore _configStore;
     private readonly ITrustStore _trustStore;
@@ -112,7 +120,6 @@ internal sealed class MainForm : NeonForm
     private readonly Dictionary<string, Icon> _categoryIcons = new(StringComparer.Ordinal);
     private readonly Label _statusLabel;
     private readonly Label _exePathLabel;
-    private readonly Label _versionLabel;
     private readonly LinkLabel _configPathLink;
     private readonly Button _refreshButton;
     private readonly RichTextBox _detailText;
@@ -141,9 +148,10 @@ internal sealed class MainForm : NeonForm
     private readonly Button _restoreButton;
     private readonly Button _saveButton;
     private readonly Label _progressLabel;
-    private readonly Label _footerDot;
-    private readonly Label _footerStatusLabel;
-    private readonly LinkLabel _languageToggle;
+    private readonly CaptionItem _captionStatus;
+    private readonly CaptionItem _captionVersion;
+    private readonly CaptionItem _captionLanguage;
+    private readonly CaptionItem _captionSponsor;
 
     /// <summary>Builds the whole window from code; see SPEC 10 for the layout this follows.</summary>
     public MainForm(
@@ -172,14 +180,16 @@ internal sealed class MainForm : NeonForm
         Text = Strings.Get("app.title");
         AutoScaleMode = AutoScaleMode.Dpi;
         AutoScaleDimensions = new SizeF(96f, 96f);
-        var workArea = Screen.PrimaryScreen?.WorkingArea.Size ?? new Size(Metrics.Px(1280), Metrics.Px(900));
+        var workArea = Screen.PrimaryScreen?.WorkingArea.Size ?? new Size(Metrics.Px(1480), Metrics.Px(1000));
         Size = new Size(
-            Math.Min(Metrics.Px(1280), (int)(workArea.Width * 0.85)),
-            Math.Min(Metrics.Px(900), (int)(workArea.Height * 0.85)));
-        // Height dropped 74 design pixels with the status strip removed and the footer strip tightened.
+            Math.Min(Metrics.Px(1480), (int)(workArea.Width * 0.9)),
+            Math.Min(Metrics.Px(1000), (int)(workArea.Height * 0.9)));
+        // The floor is what the layout actually needs, not a round number: the caption band now carries
+        // the status, the version, the language switch, the support button and the signature next to
+        // three window buttons, and the panels below grew with the 24 design-pixel spacing scale.
         MinimumSize = new Size(
-            Math.Min(Metrics.Px(1180), workArea.Width),
-            Math.Min(Metrics.Px(750), workArea.Height));
+            Math.Min(Metrics.Px(1320), workArea.Width),
+            Math.Min(Metrics.Px(860), workArea.Height));
         StartPosition = FormStartPosition.CenterScreen;
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
@@ -198,20 +208,19 @@ internal sealed class MainForm : NeonForm
 
         // The status strip was removed: it repeated the footer indicator and its 13.5pt line clipped
         // descenders. These four stay unparented — code paths still set their Text without a UI slot.
-        var buttonGap = new Padding(Metrics.Px(8), 0, 0, 0);
+        var buttonGap = new Padding(Metrics.Px(12), 0, 0, 0);
         _refreshButton = new NeonButton { Text = "Yenile", Primary = false, AutoSize = true, Margin = buttonGap };
         _refreshButton.Click += (_, _) => RefreshStatusOnly(force: true);
         _statusLabel = new Label { Visible = false };
         _exePathLabel = new Label { Visible = false };
-        _versionLabel = new Label { AutoSize = true, Font = Palette.MonoBody, ForeColor = Palette.NeonBlue };
         _configPathLink = new LinkLabel { Visible = false };
         _configPathLink.LinkClicked += (_, _) => OpenContainingFolder(_configStore.ConfigPath);
 
         // ---- 2. Extension table + detail panel -------------------------------------------
-        var gridArea = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 3, BackColor = Palette.AppBg, Padding = new Padding(0, Metrics.Px(8), 0, 0) };
-        gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Metrics.Px(190)));
+        var gridArea = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 3, BackColor = Palette.AppBg, Padding = new Padding(Metrics.Px(24), Metrics.Px(16), Metrics.Px(24), 0) };
+        gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Metrics.Px(210)));
         gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Metrics.Px(270)));
+        gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Metrics.Px(300)));
         // The search strip sits above the table, not below it: buried at the bottom of a
         // WrapContents=false button flow it was pushed past the right edge and never found.
         gridArea.RowStyles.Add(new RowStyle(SizeType.Absolute, SearchStripHeight));
@@ -226,7 +235,7 @@ internal sealed class MainForm : NeonForm
             ForeColor = Palette.TextBody,
             BorderStyle = BorderStyle.None,
             Font = Palette.Body,
-            Margin = new Padding(0, 0, Metrics.Px(8), 0),
+            Margin = new Padding(0, 0, Metrics.Px(16), 0),
             DrawMode = DrawMode.OwnerDrawFixed,
             // Owner-drawn item heights are the one thing WinForms is documented never to scale
             // (dotnet/winforms#6382): the row has to hold the icon and one line of the label at whatever
@@ -243,7 +252,7 @@ internal sealed class MainForm : NeonForm
         gridArea.Controls.Add(_categoryList, 0, 1);
         gridArea.Controls.Add(_grid, 1, 1);
 
-        var detailPanel = new NeonGroupPanel(Strings.Get("details")) { Dock = DockStyle.Fill, Margin = new Padding(Metrics.Px(8), 0, 0, 0) };
+        var detailPanel = new NeonGroupPanel(Strings.Get("details")) { Dock = DockStyle.Fill, Margin = new Padding(Metrics.Px(16), 0, 0, 0) };
         _detailPlaceholder = new Label
         {
             Dock = DockStyle.Fill,
@@ -273,8 +282,8 @@ internal sealed class MainForm : NeonForm
         detailPanel.Controls.Add(_bindingProgress);
         gridArea.Controls.Add(detailPanel, 2, 1);
 
-        var extButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
-        var extButtonMargin = new Padding(0, Metrics.Px(4), Metrics.Px(8), Metrics.Px(4));
+        var extButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent, Margin = Padding.Empty };
+        var extButtonMargin = new Padding(0, Metrics.Px(4), Metrics.Px(12), Metrics.Px(4));
         var selectAllButton = new NeonButton { Text = "Tümünü seç", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
         var addExtButton = new NeonButton { Text = "Uzantı ekle", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
         var removeExtButton = new NeonButton { Text = "Seçili uzantıyı sil", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
@@ -296,7 +305,7 @@ internal sealed class MainForm : NeonForm
 
         // Two columns, not one flow: the bulk-assign pair is AutoSize on the right and the search
         // group absorbs the slack, so neither can be pushed off the edge at MinimumSize.
-        var searchStrip = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent, Margin = new Padding(0, 0, 0, Metrics.Px(6)) };
+        var searchStrip = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent, Margin = new Padding(0, 0, 0, Metrics.Px(12)) };
         searchStrip.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         searchStrip.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
@@ -352,7 +361,7 @@ internal sealed class MainForm : NeonForm
         root.Controls.Add(gridArea, 0, 0);
 
         // ---- 3 & 4. Security + behavior panels --------------------------------------------
-        var panelsRow = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Palette.AppBg, Padding = new Padding(0, Metrics.Px(8), 0, 0) };
+        var panelsRow = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Palette.AppBg, Padding = new Padding(Metrics.Px(24), Metrics.Px(24), Metrics.Px(24), 0) };
         panelsRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
         panelsRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
 
@@ -363,20 +372,20 @@ internal sealed class MainForm : NeonForm
         panelsRow.Controls.Add(behaviorGroup, 1, 0);
         root.Controls.Add(panelsRow, 0, 1);
 
-        // ---- 5. Bottom bar (+ İmza bloğu, R5 zorunlu: ayarlar penceresinin en altında sağda) ----
-        var bottomBar = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 2, Padding = new Padding(Metrics.Px(12), Metrics.Px(6), Metrics.Px(12), Metrics.Px(3)), BackColor = Palette.Surface };
+        // ---- 5. Bottom bar --------------------------------------------------------------------
+        var bottomBar = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 1, Padding = new Padding(Metrics.Px(24), Metrics.Px(16), Metrics.Px(24), Metrics.Px(16)), BackColor = Palette.Surface };
         bottomBar.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        // The signature line is the label font plus its descender — smaller clips, larger opens a gap.
-        bottomBar.RowStyles.Add(new RowStyle(SizeType.Absolute, Metrics.FooterLineHeight));
 
         // Two columns instead of a Dock=Left label: a fixed 320px label starved the RightToLeft button
         // flow at MinimumSize and clipped the leftmost button ("Kur / Güncelle" rendered as "Güncelle").
         // The buttons now take the width they need and the progress label absorbs whatever is left.
-        var buttonsRow = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent };
+        var buttonsRow = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent, Margin = Padding.Empty };
         buttonsRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         buttonsRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        _progressLabel = new Label { Dock = DockStyle.Fill, AutoEllipsis = true, TextAlign = ContentAlignment.MiddleLeft, Font = Palette.MonoBody, ForeColor = Palette.NeonBlue };
-        var buttonsFlow = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.RightToLeft, WrapContents = false, BackColor = Color.Transparent };
+        _progressLabel = new Label { Dock = DockStyle.Fill, AutoEllipsis = true, TextAlign = ContentAlignment.MiddleLeft, Font = Palette.MonoBody, ForeColor = Palette.NeonBlue, Margin = Padding.Empty };
+        // Both layout panels default to a 3px margin. Nested three deep under a strip sized to exactly
+        // one button, that is what pushed the row past the window edge and sliced the buttons in half.
+        var buttonsFlow = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.RightToLeft, WrapContents = false, BackColor = Color.Transparent, Margin = Padding.Empty };
 
         var closeButton = new NeonButton { Text = "Kapat", Primary = false, AutoSize = true, Margin = buttonGap };
         _saveButton = new NeonButton { Text = "Kaydet", Primary = false, AutoSize = true, Margin = buttonGap };
@@ -401,35 +410,42 @@ internal sealed class MainForm : NeonForm
         buttonsRow.Controls.Add(buttonsFlow, 1, 0);
         bottomBar.Controls.Add(buttonsRow, 0, 0);
 
-        var footer = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, BackColor = Color.Transparent, Margin = Padding.Empty };
-        footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        footer.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        var footerLeft = new FlowLayoutPanel { Dock = DockStyle.Fill, WrapContents = false, BackColor = Color.Transparent, Margin = Padding.Empty };
-        var footerGap = new Padding(0, Metrics.Px(1), Metrics.Px(12), 0);
-        _footerDot = new Label { Text = "●", AutoSize = true, Font = Palette.LabelFont, ForeColor = Palette.TextHint, Margin = new Padding(0, Metrics.Px(1), Metrics.Px(4), 0) };
-        _footerStatusLabel = new Label { AutoSize = true, Font = Palette.LabelFont, ForeColor = Palette.NeonBlue, Margin = footerGap };
-        var footerVersion = _versionLabel;
-        footerVersion.Margin = footerGap;
-        footerVersion.Font = Palette.LabelFont;
-        footerVersion.Visible = true;
-        _languageToggle = new LinkLabel { Text = "TR | EN", AutoSize = true, Font = Palette.LabelFont, LinkColor = Palette.NeonBlue, ActiveLinkColor = Palette.NeonPink, BackColor = Color.Transparent, Margin = footerGap };
-        _languageToggle.LinkClicked += (_, _) => ChangeLanguage(Strings.Language == "tr" ? "en" : "tr");
-        footerLeft.Controls.Add(_footerDot);
-        footerLeft.Controls.Add(_footerStatusLabel);
-        footerLeft.Controls.Add(footerVersion);
-        footerLeft.Controls.Add(_languageToggle);
-        footer.Controls.Add(footerLeft, 0, 0);
-
-        // Support link and signature stay together on the right, sponsor first.
-        var footerRight = new FlowLayoutPanel { Anchor = AnchorStyles.Top | AnchorStyles.Right, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, WrapContents = false, BackColor = Color.Transparent, Margin = Padding.Empty };
-        footerRight.Controls.Add(new NeonLink("Buy me a coffee", Palette.SponsorUrl) { Margin = footerGap });
-        footerRight.Controls.Add(new SignatureBlock { AutoSize = true, Margin = new Padding(0, Metrics.Px(1), 0, 0) });
-        footer.Controls.Add(footerRight, 1, 0);
-        bottomBar.Controls.Add(footer, 0, 1);
-
         root.Controls.Add(bottomBar, 0, 2);
 
         Controls.Add(root);
+
+        // ---- 6. Caption band: status, version, language, support link, signature ----------------
+        // R5 4 and 5.3: the support link and the signature belong immediately left of the window
+        // buttons, and the strip they used to live in is gone. Items are handed over right to left.
+        _captionStatus = new CaptionItem { Font = Palette.Body, Color = Palette.TextStrong, Dot = Palette.TextHint };
+        _captionVersion = new CaptionItem { Font = Palette.MonoBody, Color = Palette.NeonBlue };
+        _captionLanguage = new CaptionItem
+        {
+            Style = CaptionItemStyle.Link,
+            Font = Palette.Mono,
+            Color = Palette.NeonBlue,
+            Accent = Palette.NeonPink,
+            Click = () => ChangeLanguage(Strings.Language == "tr" ? "en" : "tr"),
+        };
+        _captionSponsor = new CaptionItem
+        {
+            Text = Strings.Get("caption.sponsor"),
+            Style = CaptionItemStyle.Outline,
+            Icon = CaptionItemIcon.Coffee,
+            Font = Palette.Body,
+            Accent = Palette.NeonPurple,
+            Click = () => OpenUrl(Palette.SponsorUrl),
+        };
+        var captionSignature = new CaptionItem
+        {
+            Text = "Teknesyum",
+            Style = CaptionItemStyle.Link,
+            Font = Palette.Body,
+            Color = Palette.NeonBlue,
+            Accent = Palette.NeonPink,
+            Click = () => OpenUrl(Palette.GitHubUrl),
+        };
+        SetCaptionItems(captionSignature, _captionSponsor, _captionLanguage, _captionVersion, _captionStatus);
 
         FormClosing += OnFormClosing;
         Activated += (_, _) => RefreshStatusOnly(force: false);
@@ -538,7 +554,7 @@ internal sealed class MainForm : NeonForm
 
     private (RadioButton alwaysAsk, RadioButton trustOnFirstUse, RadioButton neverAsk, ListBox folders, Label filesLabel, Panel group) BuildSecurityPanel()
     {
-        var group = new NeonGroupPanel(Strings.Get("security")) { Dock = DockStyle.Fill, Margin = new Padding(0, 0, Metrics.Px(6), 0) };
+        var group = new NeonGroupPanel(Strings.Get("security")) { Dock = DockStyle.Fill, Margin = new Padding(0, 0, Metrics.Px(12), 0) };
         var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 4, BackColor = Color.Transparent };
         // Row0 is an Absolute height, not AutoSize: three stacked NeonRadioButtons inside a nested
         // AutoSize FlowLayoutPanel is exactly the "AutoSize row + Dock=Fill child" trap R5 already hit once
@@ -595,7 +611,7 @@ internal sealed class MainForm : NeonForm
 
     private (RadioButton always, RadioButton onError, RadioButton never, TextBox editor, CheckBox logEnabled, Panel group) BuildBehaviorPanel()
     {
-        var group = new NeonGroupPanel(Strings.Get("behavior")) { Dock = DockStyle.Fill, Margin = new Padding(Metrics.Px(6), 0, 0, 0) };
+        var group = new NeonGroupPanel(Strings.Get("behavior")) { Dock = DockStyle.Fill, Margin = new Padding(Metrics.Px(12), 0, 0, 0) };
         var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 4, BackColor = Color.Transparent };
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         // Absolute, not AutoSize — same fix as BuildSecurityPanel's radios row (see comment there), and the
@@ -2047,7 +2063,8 @@ internal sealed class MainForm : NeonForm
         _grid.Columns[ColArgs].HeaderText = Strings.Get("arguments");
         _grid.Columns[ColStatus].HeaderText = Strings.Get("status");
         _searchBox.PlaceholderText = Strings.Get("catalog.searchPlaceholder");
-        _languageToggle.Text = Strings.Language == "tr" ? "TR | en" : "tr | EN";
+        _captionLanguage.Text = Strings.Language == "tr" ? "TR | en" : "tr | EN";
+        _captionSponsor.Text = Strings.Get("caption.sponsor");
         RefreshExtensionGrid();
         RefreshTrustedFilesLabel();
         RefreshStatusStrip();
@@ -2143,18 +2160,20 @@ internal sealed class MainForm : NeonForm
             _statusLabel.ForeColor = NeedsChoiceFore;
         }
 
-        _footerDot.ForeColor = bound + pending == 0 ? Palette.TextHint : Palette.Success;
-        _footerStatusLabel.Text = bound + pending == 0 ? Strings.Get("notInstalled") : Strings.Get("installed");
+        _captionStatus.Dot = bound + pending == 0 ? Palette.TextHint : Palette.Success;
+        _captionStatus.Text = bound + pending == 0 ? Strings.Get("notInstalled") : Strings.Get("installed");
 
         var exeFullText = missingLauncher is null ? exePath : $"{missingLauncher} (bulunamadı)";
         _exePathLabel.Text = ShortenPathMiddle(exeFullText, 42);
         _statusTip.SetToolTip(_exePathLabel, exeFullText);
 
-        _versionLabel.Text = Strings.Get("version") + ": v" + GetVersionText(exePath).TrimStart('v');
+        _captionVersion.Text = Strings.Get("version") + ": v" + GetVersionText(exePath).TrimStart('v');
 
         var configFullText = "config: " + _configStore.ConfigPath;
         _configPathLink.Text = ShortenPathMiddle(configFullText, 42);
         _statusTip.SetToolTip(_configPathLink, configFullText);
+
+        RefreshCaptionItems();
     }
 
     // D3 fix (R5 yönetici incelemesi): tam yol, durum şeridinin dar Fill alanına sığmayınca pencere
@@ -2197,6 +2216,9 @@ internal sealed class MainForm : NeonForm
 
         return typeof(MainForm).Assembly.GetName().Version?.ToString() ?? "bilinmiyor";
     }
+
+    private static void OpenUrl(string url) =>
+        Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true })?.Dispose();
 
     private static void OpenFolder(string path)
     {
