@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- K29: GUI subsystem. Windows creates no console for this binary at all, which is the only way to
+         hand a file to Notepad++ without a console window flashing first. -->
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Runly.Launcher</RootNamespace>
+    <!-- SPEC 3: the shipped binary is Runly.exe. -->
+    <AssemblyName>Runly</AssemblyName>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- SPEC 3 size budget: no stack traces, no localised framework resource strings. -->
+    <StackTraceSupport>false</StackTraceSupport>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <!-- SPEC 6: comctl32 v6 + PerMonitorV2 + longPathAware. Shared with the console binary so the two
+         can never end up with different DPI or long-path behaviour. -->
+    <ApplicationManifest>..\Runly.Launcher\app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\..\assets\runly.ico</ApplicationIcon>
+    <!-- Enforces the "one XML doc line per type" rule from SPEC 11 via CS1591. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Runly.Launcher\Runly.Launcher.csproj" />
+  </ItemGroup>
+
+</Project>

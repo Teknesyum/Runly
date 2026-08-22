@@ -1,22 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <!-- K29: the launcher logic is a library so the console and GUI binaries can be two thin entry
+         points over one implementation instead of two copies that drift apart. -->
+    <OutputType>Library</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Runly.Launcher</RootNamespace>
-    <!-- SPEC 3: the shipped binary is Runly.exe. -->
-    <AssemblyName>Runly</AssemblyName>
+    <AssemblyName>Runly.Launcher</AssemblyName>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-    <PublishAot>true</PublishAot>
+    <IsAotCompatible>true</IsAotCompatible>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <!-- SPEC 3 size budget: no stack traces, no localised framework resource strings. -->
-    <StackTraceSupport>false</StackTraceSupport>
-    <UseSystemResourceKeys>true</UseSystemResourceKeys>
     <!-- Required for the [UnmanagedCallersOnly] TaskDialog / window procedure callbacks. -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <!-- SPEC 6: comctl32 v6 + PerMonitorV2 + longPathAware. -->
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>..\..\assets\runly.ico</ApplicationIcon>
     <!-- Enforces the "one XML doc line per type" rule from SPEC 11 via CS1591. -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>

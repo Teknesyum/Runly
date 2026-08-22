@@ -15,8 +15,11 @@ public static class RunlyRegistryLayout
     /// <summary>Prefix shared by every Runly ProgID, for example <c>Runly.Script.js</c>.</summary>
     public const string ProgIdPrefix = "Runly.Script.";
 
-    /// <summary>File name of the launcher, used as the key name under <c>Classes\Applications</c>.</summary>
+    /// <summary>File name of the GUI launcher, used as the key name under <c>Classes\Applications</c>.</summary>
     public const string LauncherFileName = "Runly.exe";
+
+    /// <summary>File name of the console launcher that runs scripts (K29).</summary>
+    public const string ConsoleLauncherFileName = "RunlyConsole.exe";
 
     /// <summary>Value name Runly registers under <c>RegisteredApplications</c>.</summary>
     public const string RegisteredApplicationName = "Runly";
@@ -24,8 +27,11 @@ public static class RunlyRegistryLayout
     /// <summary><c>Software\Classes</c>.</summary>
     public const string ClassesKey = @"Software\Classes";
 
-    /// <summary><c>Software\Classes\Applications\Runly.exe</c>.</summary>
+    /// <summary><c>Software\Classes\Applications\Runly.exe</c> — the identity the user sees in "Open with".</summary>
     public const string ApplicationKey = @"Software\Classes\Applications\" + LauncherFileName;
+
+    /// <summary><c>Software\Classes\Applications\RunlyConsole.exe</c>, so uninstall can clear it even though install never writes it (K29).</summary>
+    public const string ConsoleApplicationKey = @"Software\Classes\Applications\" + ConsoleLauncherFileName;
 
     /// <summary><c>Software\Runly</c> — the root of Runly's capability registration.</summary>
     public const string VendorKey = @"Software\Runly";
@@ -67,6 +73,11 @@ public static class RunlyRegistryLayout
 
     /// <summary>Whether Runly must refuse to register this Windows executable or system type.</summary>
     public static bool IsBlockedExtension(string extension) => BlockedExtensions.Contains(NormalizeExtension(extension));
+
+    /// <summary>Whether a file name is one of Runly's two launcher binaries (K29).</summary>
+    public static bool IsLauncherFileName(string? fileName) =>
+        string.Equals(fileName, LauncherFileName, StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(fileName, ConsoleLauncherFileName, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Whether a ProgID belongs to Runly.</summary>
     public static bool IsRunlyProgId(string? progId) =>

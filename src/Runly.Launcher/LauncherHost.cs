@@ -13,14 +13,20 @@ using Runly.Launcher.Ui;
 
 namespace Runly.Launcher;
 
-/// <summary>Entry point of <c>Runly.exe</c>: parses the command line, runs the security gate, launches the script (SPEC 6, SPEC 7).</summary>
-internal static class Program
+/// <summary>
+/// The whole launcher: parses the command line, runs the security gate, launches the script (SPEC 6, SPEC 7).
+/// Both shipped binaries call <see cref="Main"/>; the only thing they disagree on is <see cref="LauncherSurface"/> (K29).
+/// </summary>
+internal static class LauncherHost
 {
     private static ILogger s_logger = new FileLogger(enabled: true);
     private static TaskDialogInterop? s_dialogs;
+    private static LauncherSurface s_surface = LauncherSurface.Console;
 
-    private static int Main(string[] args)
+    /// <summary>Runs the launcher on behalf of one of the two entry-point assemblies.</summary>
+    internal static int Main(string[] args, LauncherSurface surface)
     {
+        s_surface = surface;
         UseUtf8Console();
 
         try
@@ -259,24 +265,29 @@ internal static class Program
     private static int LaunchScript(LaunchRequest request, RunlyConfig config, ScriptInfo script, ResolvedInterpreter interpreter)
     {
         var workingDirectory = script.DirectoryPath is { Length: > 0 } directory ? directory : Environment.CurrentDirectory;
-        var launcher = new ProcessLauncher();
+        var keepMode = request.NoWait ? KeepWindowMode.Never : config.KeepWindowOpen;
 
         s_logger.Info($"Çalıştırılıyor: {interpreter.CommandLine}");
 
-        var stopwatch = Stopwatch.StartNew();
-        var exitCode = launcher.Launch(interpreter, workingDirectory, elevated: request.Verb == LaunchVerb.RunAs);
-        stopwatch.Stop();
-
-        s_logger.Info($"Bitti: çıkış kodu {exitCode}, süre {stopwatch.Elapsed.TotalSeconds:F1} sn");
-
-        var keepMode = request.NoWait ? KeepWindowMode.Never : config.KeepWindowOpen;
-        ConsoleWaiter.WaitIfNeeded(exitCode, stopwatch.Elapsed, keepMode);
-
-        return exitCode;
+        return ScriptRunner.RunAndWait(
+            new ProcessLauncher(),
+            interpreter,
+            workingDirectory,
+            elevated: request.Verb == LaunchVerb.RunAs,
+            (exitCode, elapsed) => ConsoleWaiter.WaitIfNeeded(exitCode, elapsed, keepMode, s_surface),
+            s_logger);
     }
 
     private static int ShowUsage(string? error)
     {
+        // The GUI binary has no console to print to, so the same text has to arrive as a dialog or not at all.
+        if (s_surface == LauncherSurface.Gui)
+        {
+            var body = error is null ? CommandLineParser.UsageText : error + "\n\n" + CommandLineParser.UsageText;
+            Dialogs().ShowError("Runly nasıl kullanılır", body);
+            return ExitCode.UsageError;
+        }
+
         if (error is not null)
         {
             Console.Error.WriteLine(error);
@@ -302,6 +313,8 @@ internal static class Program
 
         return ExitCode.UsageError;
     }
+
+    private static TaskDialogInterop Dialogs() => s_dialogs ??= new TaskDialogInterop(s_logger);
 
     private static void TryStartSettings()
     {
@@ -341,9 +354,9 @@ internal static class Program
         }
 
         var body = $"{ex.Message}\n\nAyrıntılar günlüğe yazıldı:\n{RunlyPaths.LogPath}";
-        if (s_dialogs is not null)
+        if (s_dialogs is not null || s_surface == LauncherSurface.Gui)
         {
-            s_dialogs.ShowError("Runly beklenmedik bir hatayla karşılaştı", body);
+            Dialogs().ShowError("Runly beklenmedik bir hatayla karşılaştı", body);
         }
         else
         {
@@ -367,6 +380,11 @@ internal static class Program
 
     private static void UseUtf8Console()
     {
+        if (s_surface == LauncherSurface.Gui)
+        {
+            return;
+        }
+
         try
         {
             Console.OutputEncoding = Encoding.UTF8;

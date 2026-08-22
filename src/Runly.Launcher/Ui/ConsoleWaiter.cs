@@ -7,9 +7,11 @@ namespace Runly.Launcher.Ui;
 internal static class ConsoleWaiter
 {
     /// <summary>Prints the exit line and waits for a key press when the mode calls for it.</summary>
-    internal static void WaitIfNeeded(int exitCode, TimeSpan elapsed, KeepWindowMode mode)
+    internal static void WaitIfNeeded(int exitCode, TimeSpan elapsed, KeepWindowMode mode, LauncherSurface surface)
     {
-        if (!ShouldWait(exitCode, mode))
+        // K29: the GUI binary has no console window, so there is nothing to keep open — and holding the
+        // process alive for a key press nobody can send would leave an invisible process running forever.
+        if (surface == LauncherSurface.Gui || !ShouldWait(exitCode, mode))
         {
             return;
         }

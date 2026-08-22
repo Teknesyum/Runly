@@ -71,11 +71,12 @@ try {
         Expand-Archive -LiteralPath $archivePath -DestinationPath $packagePath -Force
     }
 
-    if (-not (Test-Path (Join-Path $packagePath "Runly.exe"))) {
-        throw "Runly.exe was not found in the installation package."
-    }
-    if (-not (Test-Path (Join-Path $packagePath "RunlySettings.exe"))) {
-        throw "RunlySettings.exe was not found in the installation package."
+    # Runly ships two launchers: Runly.exe opens files in an application, RunlyConsole.exe runs them.
+    # A package missing either one installs associations that point at a file that is not there.
+    foreach ($required in @("Runly.exe", "RunlyConsole.exe", "RunlySettings.exe")) {
+        if (-not (Test-Path (Join-Path $packagePath $required))) {
+            throw "$required was not found in the installation package."
+        }
     }
 
     Write-Host "Installing to $installPath..." -ForegroundColor Cyan

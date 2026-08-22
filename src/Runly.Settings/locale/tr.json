@@ -102,5 +102,5 @@
   "bind.needsInstall": "{extension} uzantısı Windows'a henüz tanıtılmadı. Bu yüzden Windows'un varsayılan uygulamalar sayfasında görünmüyor.\n\nUygulama seçmek dosyayı yalnız Runly'nin ayarına yazar; Windows'un o uzantıyı bilmesi için kurulum gerekir.\n\nŞimdi kurulup Windows ayarları açılsın mı?",
   "bind.notRegistered": "{extension} kurulumdan sonra da Windows'a tanıtılamadı.\n\nEn sık sebebi: satırdaki uygulama bulunamıyor ya da satır etkin değil. Uzantıyı etkinleştirip uygulamayı yeniden seçin.",
   "bind.openFileTypePage": "{extension} için varsayılan uygulamayı seç",
-  "install.launcherMissing": "Kurulum yapılamaz: başlatıcı bulunamadı.\n\n{path}\n\nRunly.exe bu klasörde olmadan uzantılar çalışmayan bir yola bağlanır. Yayınlanmış klasörden (dist) çalıştırın."
+  "install.launcherMissing": "Kurulum yapılamaz: başlatıcı bulunamadı.\n\n{path}\n\nRunly iki başlatıcı kullanır: uygulamada açmak için Runly.exe, çalıştırmak için RunlyConsole.exe. İkisi de bu klasörde olmadan uzantılar çalışmayan bir yola bağlanır. Yayınlanmış klasörden (dist) çalıştırın."
 }

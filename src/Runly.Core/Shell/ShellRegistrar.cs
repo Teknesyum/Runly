@@ -51,10 +51,11 @@ public sealed class ShellRegistrar : IShellRegistrar
     }
 
     /// <inheritdoc />
-    public InstallResult Install(RunlyConfig config, string exePath)
+    public InstallResult Install(RunlyConfig config, string exePath, string consoleExePath)
     {
         ArgumentNullException.ThrowIfNull(config);
         ArgumentException.ThrowIfNullOrWhiteSpace(exePath);
+        ArgumentException.ThrowIfNullOrWhiteSpace(consoleExePath);
 
         var actions = new List<string>();
         var skipped = new List<SkippedExtension>();
@@ -105,8 +106,15 @@ public sealed class ShellRegistrar : IShellRegistrar
                 candidates.Add((extension, mapping, interpreterPath));
             }
 
-            // 2. Back up every key we are about to touch, before the first write.
-            var backupKeys = new List<string> { RunlyRegistryLayout.ApplicationKey, RunlyRegistryLayout.VendorKey, RunlyRegistryLayout.RegisteredApplicationsKey };
+            // 2. Back up every key we are about to touch, before the first write. Both Applications keys go in
+            // even though only the GUI one is written, so a restore also undoes anything the console binary left.
+            var backupKeys = new List<string>
+            {
+                RunlyRegistryLayout.ApplicationKey,
+                RunlyRegistryLayout.ConsoleApplicationKey,
+                RunlyRegistryLayout.VendorKey,
+                RunlyRegistryLayout.RegisteredApplicationsKey,
+            };
             foreach (var (extension, _, _) in candidates)
             {
                 backupKeys.Add(RunlyRegistryLayout.ProgIdKey(extension));
@@ -117,21 +125,24 @@ public sealed class ShellRegistrar : IShellRegistrar
             actions.Add($"Kayıt defteri yedeği alındı: {backupPath}");
 
             var command = $"\"{Path.GetFullPath(exePath)}\"";
+            var consoleCommand = $"\"{Path.GetFullPath(consoleExePath)}\"";
 
-            // 3-4. Application registration, so Runly shows up in the "Open with" list.
+            // 3-4. Application registration, so Runly shows up in the "Open with" list. This is the GUI binary
+            // on purpose: it is Runly's user-visible identity, and the console binary must never appear there.
             WriteApplicationRegistration(command, candidates.Select(c => c.Extension).ToList());
 
             // The path goes into the action text, not just the registry: when associations later point at an
             // executable that no longer exists, the only question worth answering is which install wrote it,
             // and "Uygulama kaydı yazıldı" alone could not answer it.
             actions.Add($"Uygulama kaydı yazıldı (Birlikte aç listesi, Varsayılan uygulamalar). Başlatıcı: {Path.GetFullPath(exePath)}");
+            actions.Add($"Çalıştırma başlatıcısı: {Path.GetFullPath(consoleExePath)}");
 
             foreach (var (extension, mapping, interpreterPath) in candidates)
             {
                 var progId = RunlyRegistryLayout.ProgIdFor(extension);
 
                 // 3. The ProgID tree with all four verbs.
-                WriteProgId(extension, mapping, installDir, command);
+                WriteProgId(extension, mapping, installDir, command, consoleCommand);
 
                 // 5. OpenWithProgids is always written: it is what puts Runly in the "Open with" list.
                 _registry.SetValue(
@@ -271,7 +282,15 @@ public sealed class ShellRegistrar : IShellRegistrar
                 actions.Add($"{progId} anahtarı silindi.");
             }
 
-            foreach (var key in new[] { RunlyRegistryLayout.ApplicationKey, RunlyRegistryLayout.VendorKey })
+            // K29: both launcher binaries are cleared. Install only writes the GUI Applications key, but
+            // Windows creates the console one as soon as the user picks RunlyConsole.exe from "Open with",
+            // and a half-cleaned uninstall that leaves a key pointing at a deleted exe is exactly B2/K24.
+            foreach (var key in new[]
+                     {
+                         RunlyRegistryLayout.ApplicationKey,
+                         RunlyRegistryLayout.ConsoleApplicationKey,
+                         RunlyRegistryLayout.VendorKey,
+                     })
             {
                 if (_registry.KeyExists(RegistryRoot.CurrentUser, key))
                 {
@@ -459,11 +478,12 @@ public sealed class ShellRegistrar : IShellRegistrar
             }
         }
 
-        return string.Equals(
-            Path.GetFileName(handlerPath), RunlyRegistryLayout.LauncherFileName, StringComparison.OrdinalIgnoreCase);
+        // K29: a Run mapping's effective handler is RunlyConsole.exe, not the Runly.exe that was installed.
+        // Comparing against the GUI name alone would report every bound script extension as unbound.
+        return RunlyRegistryLayout.IsLauncherFileName(Path.GetFileName(handlerPath));
     }
 
-    private void WriteProgId(string extension, ExtensionMapping mapping, string installDir, string command)
+    private void WriteProgId(string extension, ExtensionMapping mapping, string installDir, string command, string consoleCommand)
     {
         var key = RunlyRegistryLayout.ProgIdKey(extension);
 
@@ -473,16 +493,20 @@ public sealed class ShellRegistrar : IShellRegistrar
         _registry.SetValue(RegistryRoot.CurrentUser, key + @"\DefaultIcon",
             RegistryValueEntry.FromString(RegistryValueEntry.DefaultValueName, RunlyRegistryLayout.IconValue(installDir, mapping.Icon, mapping.Category)));
 
+        // K29: the double-click command is chosen by Kind, and it is the only reason two binaries exist.
+        // An Open mapping hands the file to a desktop application, so a console-subsystem launcher would
+        // flash a black window before the application appears; a Run mapping needs the opposite — a real
+        // console the script can write to and the caller can wait on.
         if (mapping.Kind == HandlerKind.Open)
         {
             WriteVerb(key, "open", "Runly ile aç", command + " \"%1\" %*");
             return;
         }
 
-        WriteVerb(key, "open", "Runly ile çalıştır", command + " \"%1\" %*");
-        WriteVerb(key, "runas", "Yönetici olarak çalıştır (Runly)", command + " --verb runas \"%1\" %*");
-        WriteVerb(key, "edit", "Düzenle", command + " --verb edit \"%1\"");
-        WriteVerb(key, "runlyargs", "Runly ile argümanlarla çalıştır…", command + " --verb prompt-args \"%1\"");
+        WriteVerb(key, "open", "Runly ile çalıştır", consoleCommand + " \"%1\" %*");
+        WriteVerb(key, "runas", "Yönetici olarak çalıştır (Runly)", consoleCommand + " --verb runas \"%1\" %*");
+        WriteVerb(key, "edit", "Düzenle", consoleCommand + " --verb edit \"%1\"");
+        WriteVerb(key, "runlyargs", "Runly ile argümanlarla çalıştır…", consoleCommand + " --verb prompt-args \"%1\"");
     }
 
     private void WriteVerb(string progIdKey, string verb, string muiVerb, string commandLine)
