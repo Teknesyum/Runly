@@ -100,6 +100,9 @@ public sealed class ShellRegistrarTests : IDisposable
     {
         // K29: this is the whole reason two binaries exist. A Kind=Open mapping hands the file to a desktop
         // application, so its double-click command must never go through the console-subsystem binary.
+        // The handler is named, not rooted, on purpose: FindInterpreter only calls File.Exists for a
+        // rooted path, so a real "C:\Program Files\..." here silently binds the test to whatever the
+        // developer happens to have installed. It passed on a machine with Notepad++ and failed on CI.
         _paths.Add("notepad++", @"C:\Program Files\Notepad++\notepad++.exe");
         var config = TargetMachineConfig() with
         {
@@ -108,7 +111,7 @@ public sealed class ShellRegistrarTests : IDisposable
                 [".md"] = new()
                 {
                     Kind = HandlerKind.Open,
-                    OpenWith = @"C:\Program Files\Notepad++\notepad++.exe",
+                    OpenWith = "notepad++",
                     Args = "\"{script}\"",
                     Enabled = true,
                 },

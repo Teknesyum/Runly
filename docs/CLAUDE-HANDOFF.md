@@ -122,6 +122,10 @@ The new cyan/pink icon was visually verified in the live Release Settings title 
   capabilities, in `SupportedTypes`, in `OpenWithProgids` and had a valid ProgID `shell\open\command`.
   An extension shows up there only after it is bound, which is exactly too late. Per-extension
   binding uses `ms-settings:defaultapps?ftfilter=<ext>`.
+- Do not put a rooted path in a test mapping's `OpenWith` or `Interpreter`. `ShellRegistrar`'s
+  `FindInterpreter` calls `File.Exists` for a rooted path and only consults the fake path searcher
+  for a bare name, so a real `C:\Program Files\...` binds the test to whatever the developer has
+  installed. One such test passed locally and failed on the first CI run.
 - Do not assume "Save" registers anything. `SaveAll` writes the config file and the trust store and
   touches no registry key; only `ShellRegistrar.Install`, reached through "Install / Update", writes
   `Capabilities\FileAssociations`. `AskWindows` checks that key first and offers to install.
