@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- K29: console subsystem. Running a script means the user wants to see its output, and only a
+         console binary inherits the caller's console and lets cmd wait for the exit code. -->
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Runly.Launcher</RootNamespace>
+    <AssemblyName>RunlyConsole</AssemblyName>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- SPEC 3 size budget: no stack traces, no localised framework resource strings. -->
+    <StackTraceSupport>false</StackTraceSupport>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <!-- SPEC 6: comctl32 v6 + PerMonitorV2 + longPathAware. Shared with the GUI binary so the two
+         can never end up with different DPI or long-path behaviour. -->
+    <ApplicationManifest>..\Runly.Launcher\app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\..\assets\runly.ico</ApplicationIcon>
+    <!-- Enforces the "one XML doc line per type" rule from SPEC 11 via CS1591. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Runly.Launcher\Runly.Launcher.csproj" />
+  </ItemGroup>
+
+</Project>

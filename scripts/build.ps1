@@ -39,32 +39,41 @@ try {
 Write-Host ""
 
 # 2. Launcher publish (K8: Defender retry)
-Write-Host "> Runly.Launcher AOT publish yapılıyor (3 deneme, 500ms bekleme)..." -ForegroundColor Cyan
-$launcherPublished = $false
-for ($i = 1; $i -le 3; $i++) {
-    try {
-        Write-Host "  Deneme $i/3..."
-        dotnet publish "src/Runly.Launcher" -c $Configuration -r win-x64 /p:PublishAot=true 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            $launcherPublished = $true
-            Write-Host "  * Başarılı" -ForegroundColor Green
-            break
+# K29: iki ikili, tek mantık derlemesi. Runly.exe GUI altsisteminde (Kind=Open), RunlyConsole.exe
+# konsol altsisteminde (Kind=Run). Biri eksik paketlenirse kurulum uzantıların yarısını kırar.
+$launcherProjects = @(
+    @{ Name = "Runly.Launcher.Gui";     Path = "src/Runly.Launcher.Gui";     Exe = "Runly.exe" },
+    @{ Name = "Runly.Launcher.Console"; Path = "src/Runly.Launcher.Console"; Exe = "RunlyConsole.exe" }
+)
+
+foreach ($launcher in $launcherProjects) {
+    Write-Host "> $($launcher.Name) AOT publish yapılıyor (3 deneme, 500ms bekleme)..." -ForegroundColor Cyan
+    $launcherPublished = $false
+    for ($i = 1; $i -le 3; $i++) {
+        try {
+            Write-Host "  Deneme $i/3..."
+            dotnet publish $launcher.Path -c $Configuration -r win-x64 /p:PublishAot=true 2>&1
+            if ($LASTEXITCODE -eq 0) {
+                $launcherPublished = $true
+                Write-Host "  * Başarılı" -ForegroundColor Green
+                break
+            }
+        } catch {
+            Write-Host "  ✗ Hata: $_"
         }
-    } catch {
-        Write-Host "  ✗ Hata: $_"
+        if ($i -lt 3) {
+            Write-Host "  500ms bekleniyor..."
+            Start-Sleep -Milliseconds 500
+        }
     }
-    if ($i -lt 3) {
-        Write-Host "  500ms bekleniyor..."
-        Start-Sleep -Milliseconds 500
+
+    if (-not $launcherPublished) {
+        Write-Host "HATA: $($launcher.Name) publish 3 deneme sonunda başarısız oldu." -ForegroundColor Red
+        exit 1
     }
-}
 
-if (-not $launcherPublished) {
-    Write-Host "HATA: Runly.Launcher publish 3 deneme sonunda başarısız oldu." -ForegroundColor Red
-    exit 1
+    Write-Host ""
 }
-
-Write-Host ""
 
 # 3. Settings publish
 Write-Host "> Runly.Settings publish yapılıyor..." -ForegroundColor Cyan
@@ -90,13 +99,22 @@ if (Test-Path $Output) {
 New-Item -ItemType Directory $Output | Out-Null
 
 # Launcher çıktıları
-$launcherBin = "src/Runly.Launcher/bin/$Configuration/net8.0/win-x64/publish"
-if (Test-Path $launcherBin) {
-    Get-ChildItem $launcherBin -File | Where-Object { $_.Extension -ne ".pdb" } | Copy-Item -Destination "$Output/" -Force
-    Write-Host "  * Launcher dosyaları kopyalandı"
-} else {
-    Write-Host "HATA: Launcher publish klasörü bulunamadı: $launcherBin" -ForegroundColor Red
-    exit 1
+foreach ($launcher in $launcherProjects) {
+    $launcherBin = "$($launcher.Path)/bin/$Configuration/net8.0/win-x64/publish"
+    if (Test-Path $launcherBin) {
+        Get-ChildItem $launcherBin -File | Where-Object { $_.Extension -ne ".pdb" } | Copy-Item -Destination "$Output/" -Force
+        Write-Host "  * $($launcher.Exe) dosyaları kopyalandı"
+    } else {
+        Write-Host "HATA: Launcher publish klasörü bulunamadı: $launcherBin" -ForegroundColor Red
+        exit 1
+    }
+}
+
+foreach ($launcher in $launcherProjects) {
+    if (-not (Test-Path (Join-Path $Output $launcher.Exe))) {
+        Write-Host "HATA: $($launcher.Exe) $Output/ altında oluşmadı." -ForegroundColor Red
+        exit 1
+    }
 }
 
 # Settings çıktıları
@@ -104,8 +122,13 @@ $settingsBin = "src/Runly.Settings/bin/$Configuration/net8.0-windows/win-x64/pub
 if (Test-Path $settingsBin) {
     # Self-contained WinForms output: every file is needed except the framework-dependent Runly.exe
     # apphost that lands here through the Runly.Core reference (the AOT launcher is copied above).
+    # Both launcher names are excluded: this copy runs after the launchers, so a stray apphost of
+    # either name would silently overwrite a 3 MB AOT binary with one that needs a runtime.
     Get-ChildItem $settingsBin -File |
-        Where-Object { $_.Extension -ne ".pdb" -and $_.Name -notin @("Runly.exe", "Runly.xml") } |
+        Where-Object {
+            $_.Extension -ne ".pdb" -and
+            $_.Name -notin @("Runly.exe", "Runly.xml", "RunlyConsole.exe", "RunlyConsole.xml")
+        } |
         Copy-Item -Destination "$Output/" -Force
     Write-Host "  * Settings dosyaları kopyalandı"
 } else {
@@ -151,10 +174,12 @@ Get-ChildItem $Output -Recurse -File | Select-Object @{
     Expression = { [math]::Round($_.Length / 1KB, 2) }
 } | Format-Table -AutoSize
 
-$runlyExe = "$Output/Runly.exe"
-if (Test-Path $runlyExe) {
-    $size = (Get-Item $runlyExe).Length
-    Write-Host "Runly.exe boyutu: $([math]::Round($size / 1MB, 2)) MB" -ForegroundColor Cyan
+foreach ($launcher in $launcherProjects) {
+    $launcherExe = Join-Path $Output $launcher.Exe
+    if (Test-Path $launcherExe) {
+        $size = (Get-Item $launcherExe).Length
+        Write-Host "$($launcher.Exe) boyutu: $([math]::Round($size / 1MB, 2)) MB" -ForegroundColor Cyan
+    }
 }
 
 Write-Host ""

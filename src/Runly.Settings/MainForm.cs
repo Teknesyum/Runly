@@ -1623,7 +1623,9 @@ internal sealed class MainForm : NeonForm
 
     // ---- Bottom bar: install / uninstall / restore / save ----------------------------------
 
-    private static string ExePath => Path.Combine(AppContext.BaseDirectory, "Runly.exe");
+    private static string ExePath => Path.Combine(AppContext.BaseDirectory, RunlyRegistryLayout.LauncherFileName);
+
+    private static string ConsoleExePath => Path.Combine(AppContext.BaseDirectory, RunlyRegistryLayout.ConsoleLauncherFileName);
 
     private async void OnInstallClicked(object? sender, EventArgs e)
     {
@@ -1649,24 +1651,27 @@ internal sealed class MainForm : NeonForm
     private async Task<(bool Success, IReadOnlyList<string> Pending)> RunInstallAsync()
     {
         var exePath = ExePath;
+        var consoleExePath = ConsoleExePath;
 
-        // Registration writes this path into every ProgID's shell\open\command. Running the settings
-        // window straight out of its build output has no Runly.exe beside it — the launcher is a
-        // separate project — so installing from there used to silently register a path that does not
-        // exist and break every association it touched.
-        if (!File.Exists(exePath))
+        // Registration writes these paths into every ProgID's shell\open\command. Running the settings
+        // window straight out of its build output has neither launcher beside it — they are separate
+        // projects — so installing from there used to silently register a path that does not exist and
+        // break every association it touched. K29: one missing binary is enough to break half the
+        // mappings, so both are required before a single key is written.
+        var missing = new[] { exePath, consoleExePath }.Where(path => !File.Exists(path)).ToArray();
+        if (missing.Length > 0)
         {
             NeonMessageBox.Show(this,
-                Strings.Get("install.launcherMissing").Replace("{path}", exePath, StringComparison.Ordinal),
+                Strings.Get("install.launcherMissing").Replace("{path}", string.Join("\n", missing), StringComparison.Ordinal),
                 Strings.Get("app.title"), MessageBoxButtons.OK, MessageBoxIcon.Error);
-            _logger.Error($"Kurulum reddedildi, başlatıcı yok: {exePath}", new FileNotFoundException(exePath));
+            _logger.Error($"Kurulum reddedildi, başlatıcı yok: {string.Join(", ", missing)}", new FileNotFoundException(missing[0]));
             return (false, []);
         }
 
         SetBusy(true, "Kuruluyor…");
         try
         {
-            var result = await Task.Run(() => _shellRegistrar.Install(_config, exePath));
+            var result = await Task.Run(() => _shellRegistrar.Install(_config, exePath, consoleExePath));
 
             if (!result.Success)
             {
@@ -2052,7 +2057,9 @@ internal sealed class MainForm : NeonForm
     private void RefreshStatusStrip()
     {
         var exePath = ExePath;
-        var exeExists = File.Exists(exePath);
+        // K29: the strip has room for one path, so it shows the missing binary when there is one —
+        // naming the launcher that is present would hide exactly the fault the user needs to see.
+        var missingLauncher = new[] { exePath, ConsoleExePath }.FirstOrDefault(path => !File.Exists(path));
         var statuses = _shellRegistrar.GetStatus(_config);
         var bound = statuses.Count(s => s.Bound == BindingState.Bound);
         var pending = statuses.Count(s => s.Bound == BindingState.NeedsUserChoice);
@@ -2082,7 +2089,7 @@ internal sealed class MainForm : NeonForm
         _footerDot.ForeColor = bound + pending == 0 ? Palette.TextHint : Palette.Success;
         _footerStatusLabel.Text = bound + pending == 0 ? Strings.Get("notInstalled") : Strings.Get("installed");
 
-        var exeFullText = exeExists ? exePath : $"{exePath} (bulunamadı)";
+        var exeFullText = missingLauncher is null ? exePath : $"{missingLauncher} (bulunamadı)";
         _exePathLabel.Text = ShortenPathMiddle(exeFullText, 42);
         _statusTip.SetToolTip(_exePathLabel, exeFullText);
 

@@ -13,6 +13,7 @@ public sealed class ShellRegistrarTests : IDisposable
 {
     private const string StoreNotepadProgId = "AppXxf01pj590w7z9mxmyv3nx0a9ewj3e51g";
     private const string ExePath = @"C:\Program Files\Runly\Runly.exe";
+    private const string ConsoleExePath = @"C:\Program Files\Runly\RunlyConsole.exe";
 
     private readonly FakeRegistryAccessor _registry = new();
     private readonly FakePathSearcher _paths = new();
@@ -56,7 +57,7 @@ public sealed class ShellRegistrarTests : IDisposable
     {
         SeedTargetMachineInterpreters();
 
-        var result = NewRegistrar().Install(TargetMachineConfig(), ExePath);
+        var result = NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
 
         Assert.True(result.Success, result.ErrorMessage);
         Assert.NotNull(result.BackupPath);
@@ -71,7 +72,7 @@ public sealed class ShellRegistrarTests : IDisposable
     public void Install_writes_the_whole_ProgID_tree_with_all_four_verbs()
     {
         SeedTargetMachineInterpreters();
-        NewRegistrar().Install(TargetMachineConfig(), ExePath);
+        NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
 
         const string progId = @"Software\Classes\Runly.Script.js";
 
@@ -80,23 +81,65 @@ public sealed class ShellRegistrarTests : IDisposable
         Assert.Equal(@"C:\Program Files\Runly\assets\js.ico,0",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\DefaultIcon", "")!.AsString());
 
-        Assert.Equal("\"C:\\Program Files\\Runly\\Runly.exe\" \"%1\" %*",
+        Assert.Equal("\"C:\\Program Files\\Runly\\RunlyConsole.exe\" \"%1\" %*",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\open\command", "")!.AsString());
-        Assert.Equal("\"C:\\Program Files\\Runly\\Runly.exe\" --verb runas \"%1\" %*",
+        Assert.Equal("\"C:\\Program Files\\Runly\\RunlyConsole.exe\" --verb runas \"%1\" %*",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\runas\command", "")!.AsString());
-        Assert.Equal("\"C:\\Program Files\\Runly\\Runly.exe\" --verb edit \"%1\"",
+        Assert.Equal("\"C:\\Program Files\\Runly\\RunlyConsole.exe\" --verb edit \"%1\"",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\edit\command", "")!.AsString());
-        Assert.Equal("\"C:\\Program Files\\Runly\\Runly.exe\" --verb prompt-args \"%1\"",
+        Assert.Equal("\"C:\\Program Files\\Runly\\RunlyConsole.exe\" --verb prompt-args \"%1\"",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\runlyargs\command", "")!.AsString());
         Assert.Equal("Runly ile argümanlarla çalıştır…",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\runlyargs", "MUIVerb")!.AsString());
     }
 
     [Fact]
+    public void An_Open_mapping_gets_the_GUI_launcher_so_no_console_window_flashes()
+    {
+        // K29: this is the whole reason two binaries exist. A Kind=Open mapping hands the file to a desktop
+        // application, so its double-click command must never go through the console-subsystem binary.
+        _paths.Add("notepad++", @"C:\Program Files\Notepad++\notepad++.exe");
+        var config = TargetMachineConfig() with
+        {
+            Extensions = new Dictionary<string, ExtensionMapping>(StringComparer.OrdinalIgnoreCase)
+            {
+                [".md"] = new()
+                {
+                    Kind = HandlerKind.Open,
+                    OpenWith = @"C:\Program Files\Notepad++\notepad++.exe",
+                    Args = "\"{script}\"",
+                    Enabled = true,
+                },
+            },
+        };
+
+        NewRegistrar().Install(config, ExePath, ConsoleExePath);
+
+        Assert.Equal("\"C:\\Program Files\\Runly\\Runly.exe\" \"%1\" %*", _registry
+            .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Runly.Script.md\shell\open\command", "")!.AsString());
+        Assert.Null(_registry
+            .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Runly.Script.md\shell\runas\command", ""));
+    }
+
+    [Fact]
+    public void A_binding_that_resolves_to_the_console_launcher_still_counts_as_bound()
+    {
+        // K29: a Run mapping's effective handler is RunlyConsole.exe, not the Runly.exe that was installed.
+        SeedTargetMachineInterpreters();
+        _registry.Seed(RegistryRoot.CurrentUser, UserChoiceInspector.UserChoiceKey(".js"), "ProgId", "Runly.Script.js");
+        _handlers.Set(".js", ConsoleExePath);
+
+        var status = NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath).Extensions
+            .Single(e => e.Extension == ".js");
+
+        Assert.Equal(BindingState.Bound, status.Bound);
+    }
+
+    [Fact]
     public void Install_registers_the_application_so_it_appears_in_the_Open_with_list()
     {
         SeedTargetMachineInterpreters();
-        NewRegistrar().Install(TargetMachineConfig(), ExePath);
+        NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
 
         Assert.Equal("Runly", _registry
             .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Applications\Runly.exe", "FriendlyAppName")!.AsString());
@@ -114,7 +157,7 @@ public sealed class ShellRegistrarTests : IDisposable
         SeedTargetMachineInterpreters();
         _registry.Seed(RegistryRoot.CurrentUser, UserChoiceInspector.UserChoiceKey(".ps1"), "ProgId", StoreNotepadProgId);
 
-        NewRegistrar().Install(TargetMachineConfig(), ExePath);
+        NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
 
         Assert.NotNull(_registry.GetValue(
             RegistryRoot.CurrentUser, @"Software\Classes\.ps1\OpenWithProgids", "Runly.Script.ps1"));
@@ -128,7 +171,7 @@ public sealed class ShellRegistrarTests : IDisposable
         SeedTargetMachineInterpreters();
         _registry.Seed(RegistryRoot.CurrentUser, UserChoiceInspector.UserChoiceKey(".ps1"), "ProgId", StoreNotepadProgId);
 
-        var result = NewRegistrar().Install(TargetMachineConfig(), ExePath);
+        var result = NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
         var byExtension = result.Extensions.ToDictionary(e => e.Extension, StringComparer.OrdinalIgnoreCase);
 
         Assert.Equal(BindingState.NeedsUserChoice, byExtension[".js"].Bound);
@@ -146,7 +189,7 @@ public sealed class ShellRegistrarTests : IDisposable
         SeedTargetMachineInterpreters();
         SeedApprovedByUser(".js");
 
-        var result = NewRegistrar().Install(TargetMachineConfig(), ExePath);
+        var result = NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
         var byExtension = result.Extensions.ToDictionary(e => e.Extension, StringComparer.OrdinalIgnoreCase);
 
         Assert.Equal(BindingState.Bound, byExtension[".js"].Bound);
@@ -161,7 +204,7 @@ public sealed class ShellRegistrarTests : IDisposable
         _registry.Seed(RegistryRoot.CurrentUser, UserChoiceInspector.UserChoiceKey(".js"), "ProgId", "Runly.Script.js");
         _handlers.Set(".js", @"C:\Program Files\Antigravity\AntigravityIDE.exe");
 
-        var status = NewRegistrar().Install(TargetMachineConfig(), ExePath).Extensions
+        var status = NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath).Extensions
             .Single(e => e.Extension == ".js");
 
         Assert.Equal(BindingState.NeedsUserChoice, status.Bound);
@@ -173,7 +216,7 @@ public sealed class ShellRegistrarTests : IDisposable
     {
         SeedTargetMachineInterpreters();
 
-        var result = NewRegistrar().Install(TargetMachineConfig(), ExePath);
+        var result = NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
 
         var jsLine = result.Actions.Single(a => a.StartsWith(".js →", StringComparison.Ordinal));
         Assert.Contains("Windows onayı bekliyor", jsLine, StringComparison.Ordinal);
@@ -187,7 +230,7 @@ public sealed class ShellRegistrarTests : IDisposable
         _registry.Seed(RegistryRoot.CurrentUser, UserChoiceInspector.UserChoiceKey(".ps1"), "ProgId", StoreNotepadProgId);
         _registry.Seed(RegistryRoot.CurrentUser, @"Software\Classes\.ps1", "", "Microsoft.PowerShellScript.1");
 
-        NewRegistrar().Install(TargetMachineConfig(), ExePath);
+        NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
 
         Assert.Equal("Microsoft.PowerShellScript.1",
             _registry.GetValue(RegistryRoot.CurrentUser, @"Software\Classes\.ps1", "")!.AsString());
@@ -200,7 +243,7 @@ public sealed class ShellRegistrarTests : IDisposable
         var key = UserChoiceInspector.UserChoiceKey(".ps1");
         _registry.Seed(RegistryRoot.CurrentUser, key, "ProgId", StoreNotepadProgId);
 
-        NewRegistrar().Install(TargetMachineConfig(), ExePath);
+        NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
 
         Assert.Equal(StoreNotepadProgId, _registry.GetValue(RegistryRoot.CurrentUser, key, "ProgId")!.AsString());
         Assert.Null(_registry.GetValue(RegistryRoot.CurrentUser, key, "Hash"));
@@ -212,7 +255,7 @@ public sealed class ShellRegistrarTests : IDisposable
     {
         SeedTargetMachineInterpreters();
 
-        NewRegistrar().Install(TargetMachineConfig(), ExePath);
+        NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
 
         Assert.Empty(_registry.RejectedWrites);
         Assert.Empty(_registry.AllKeys(RegistryRoot.ClassesRoot));
@@ -232,7 +275,7 @@ public sealed class ShellRegistrarTests : IDisposable
             },
         };
 
-        var result = NewRegistrar().Install(config, ExePath);
+        var result = NewRegistrar().Install(config, ExePath, ConsoleExePath);
 
         Assert.Single(result.Extensions);
         Assert.Equal(".js", result.Extensions[0].Extension);
@@ -254,7 +297,7 @@ public sealed class ShellRegistrarTests : IDisposable
             },
         };
 
-        var result = NewRegistrar().Install(config, ExePath);
+        var result = NewRegistrar().Install(config, ExePath, ConsoleExePath);
 
         Assert.Empty(result.Extensions);
         Assert.Single(result.Skipped);
@@ -264,7 +307,7 @@ public sealed class ShellRegistrarTests : IDisposable
     public void Install_notifies_Explorer_once()
     {
         SeedTargetMachineInterpreters();
-        NewRegistrar().Install(TargetMachineConfig(), ExePath);
+        NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
 
         Assert.Equal(1, _notifier.Count);
     }
@@ -274,7 +317,7 @@ public sealed class ShellRegistrarTests : IDisposable
     {
         SeedTargetMachineInterpreters();
         var registrar = NewRegistrar();
-        registrar.Install(TargetMachineConfig(), ExePath);
+        registrar.Install(TargetMachineConfig(), ExePath, ConsoleExePath);
 
         var result = registrar.Uninstall();
 
@@ -287,6 +330,25 @@ public sealed class ShellRegistrarTests : IDisposable
     }
 
     [Fact]
+    public void Uninstall_also_clears_the_Applications_key_Windows_wrote_for_the_console_launcher()
+    {
+        // K29: install only ever writes Applications\Runly.exe, but Windows creates the RunlyConsole.exe
+        // key the moment the user picks that binary from "Open with". Leaving it behind points a live
+        // registry key at a deleted executable, which is the B2/K24 failure this uninstall must not repeat.
+        SeedTargetMachineInterpreters();
+        var registrar = NewRegistrar();
+        registrar.Install(TargetMachineConfig(), ExePath, ConsoleExePath);
+        _registry.Seed(RegistryRoot.CurrentUser,
+            @"Software\Classes\Applications\RunlyConsole.exe\shell\open\command", "", $"\"{ConsoleExePath}\" \"%1\"");
+
+        var result = registrar.Uninstall();
+
+        Assert.True(result.Success, result.ErrorMessage);
+        Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, @"Software\Classes\Applications\RunlyConsole.exe"));
+        Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, @"Software\Classes\Applications\Runly.exe"));
+    }
+
+    [Fact]
     public void Uninstall_leaves_other_applications_alone()
     {
         SeedTargetMachineInterpreters();
@@ -294,7 +356,7 @@ public sealed class ShellRegistrarTests : IDisposable
         _registry.Seed(RegistryRoot.CurrentUser, @"Software\RegisteredApplications", "Notepad++", @"Software\Notepad++\Capabilities");
 
         var registrar = NewRegistrar();
-        registrar.Install(TargetMachineConfig(), ExePath);
+        registrar.Install(TargetMachineConfig(), ExePath, ConsoleExePath);
         registrar.Uninstall();
 
         Assert.NotNull(_registry.GetValue(RegistryRoot.CurrentUser, @"Software\Classes\.js\OpenWithProgids", "VSCode.js"));
@@ -317,7 +379,7 @@ public sealed class ShellRegistrarTests : IDisposable
         };
 
         var registrar = NewRegistrar();
-        registrar.Install(config, ExePath);
+        registrar.Install(config, ExePath, ConsoleExePath);
 
         var result = registrar.Uninstall();
 
@@ -340,7 +402,7 @@ public sealed class ShellRegistrarTests : IDisposable
         };
 
         var registrar = NewRegistrar();
-        registrar.Install(config, ExePath);
+        registrar.Install(config, ExePath, ConsoleExePath);
 
         var result = registrar.Uninstall(new UninstallOptions { RestoreBackup = true });
 
@@ -385,7 +447,7 @@ public sealed class ShellRegistrarTests : IDisposable
 
         var registrar = NewRegistrar();
         var config = TargetMachineConfig();
-        registrar.Install(config, ExePath);
+        registrar.Install(config, ExePath, ConsoleExePath);
 
         var byExtension = registrar.GetStatus(config)
             .ToDictionary(s => s.Extension, StringComparer.OrdinalIgnoreCase);
@@ -407,7 +469,7 @@ public sealed class ShellRegistrarTests : IDisposable
         SeedTargetMachineInterpreters();
         var registrar = NewRegistrar();
         var config = TargetMachineConfig();
-        registrar.Install(config, ExePath);
+        registrar.Install(config, ExePath, ConsoleExePath);
 
         _registry.Seed(RegistryRoot.CurrentUser, UserChoiceInspector.UserChoiceKey(".ps1"), "ProgId", "Runly.Script.ps1");
 
@@ -435,10 +497,10 @@ public sealed class ShellRegistrarTests : IDisposable
         var registrar = NewRegistrar();
         var config = TargetMachineConfig();
 
-        var first = registrar.Install(config, ExePath);
+        var first = registrar.Install(config, ExePath, ConsoleExePath);
         var keysAfterFirst = _registry.AllKeys(RegistryRoot.CurrentUser);
 
-        var second = registrar.Install(config, ExePath);
+        var second = registrar.Install(config, ExePath, ConsoleExePath);
 
         Assert.True(second.Success, second.ErrorMessage);
         Assert.Equal(keysAfterFirst, _registry.AllKeys(RegistryRoot.CurrentUser));
@@ -453,7 +515,7 @@ public sealed class ShellRegistrarTests : IDisposable
         // Decision K20: the ACL protected key survives, so the extension is left pointing at a deleted ProgID.
         SeedTargetMachineInterpreters();
         var registrar = NewRegistrar();
-        registrar.Install(TargetMachineConfig(), ExePath);
+        registrar.Install(TargetMachineConfig(), ExePath, ConsoleExePath);
         SeedApprovedByUser(".js");
         _registry.UndeletableKeys.Add(UserChoiceInspector.UserChoiceKey(".js"));
 
@@ -475,7 +537,7 @@ public sealed class ShellRegistrarTests : IDisposable
     {
         SeedTargetMachineInterpreters();
         var registrar = NewRegistrar();
-        registrar.Install(TargetMachineConfig(), ExePath);
+        registrar.Install(TargetMachineConfig(), ExePath, ConsoleExePath);
         SeedApprovedByUser(".js");
 
         var result = registrar.Uninstall();
@@ -494,7 +556,7 @@ public sealed class ShellRegistrarTests : IDisposable
         _registry.Seed(RegistryRoot.CurrentUser, key, "ProgId", StoreNotepadProgId);
 
         var registrar = NewRegistrar();
-        registrar.Install(TargetMachineConfig(), ExePath);
+        registrar.Install(TargetMachineConfig(), ExePath, ConsoleExePath);
 
         var result = registrar.Uninstall();
 
@@ -513,7 +575,7 @@ public sealed class ShellRegistrarTests : IDisposable
             },
         };
 
-        var result = NewRegistrar().Install(config, ExePath);
+        var result = NewRegistrar().Install(config, ExePath, ConsoleExePath);
 
         Assert.Empty(result.Extensions);
         Assert.Contains(result.Skipped, item => item.Extension == ".exe" && item.Reason.Contains("güvenliği", StringComparison.Ordinal));
@@ -532,7 +594,7 @@ public sealed class ShellRegistrarTests : IDisposable
             },
         };
 
-        var result = NewRegistrar().Install(config, ExePath);
+        var result = NewRegistrar().Install(config, ExePath, ConsoleExePath);
 
         Assert.True(result.Success, result.ErrorMessage);
         var shell = RunlyRegistryLayout.ProgIdKey(".md") + @"\shell";

@@ -42,8 +42,13 @@ tespit edip kullanıcıyı bu diyaloğa yönlendirmek zorundadır. UserChoice ha
 ## 3. Teknoloji kararları (tartışmaya kapalı)
 
 - **Dil/platform:** C# / .NET 8.
-- **`Runly.exe` (launcher):** Console subsystem, `PublishAot=true`, `InvariantGlobalization=true`,
-  tek dosya, ~2-4 MB, runtime bağımlılığı yok. Açılış gecikmesi hedefi **< 50 ms**.
+- **Başlatıcı — iki ikili (K29):** `Runly.exe` **GUI subsystem**, `RunlyConsole.exe` **console
+  subsystem**. İkisi de `PublishAot=true`, `InvariantGlobalization=true`, tek dosya, ~3 MB, runtime
+  bağımlılığı yok. Açılış gecikmesi hedefi **< 50 ms**. Ortak mantık `Runly.Launcher` sınıf
+  kitaplığındadır; iki proje yalnızca `LauncherSurface` değerini veren birer giriş noktasıdır.
+  ProgID'nin `shell\open\command` değeri eşlemenin `Kind` değerine göre seçilir: `Run` → konsol
+  ikilisi, `Open` → GUI ikilisi. `Applications\<exe>` ve `RegisteredApplications` kayıtları GUI
+  ikilisine bağlanır, kullanıcıya görünen kimlik odur.
   AOT olduğu için: WinForms/WPF kullanılamaz, `System.Text.Json` **source-generated context**
   ile kullanılır (reflection tabanlı serileştirme AOT'de kırılır), `Assembly.Load`/reflection yok.
 - **`RunlySettings.exe` (GUI):** WinForms, `win-x64`, self-contained, **trim kapalı**
@@ -60,7 +65,9 @@ C:\Users\Administrator\Desktop\Projeler\Runly\
 ├─ Runly.sln
 ├─ src\
 │  ├─ Runly.Core\            # sözleşmeler + mantık (AOT-safe)
-│  ├─ Runly.Launcher\        # Runly.exe  (AOT console)
+│  ├─ Runly.Launcher\        # başlatıcı mantığı (sınıf kitaplığı, AOT-safe)
+│  ├─ Runly.Launcher.Gui\    # Runly.exe        (AOT, GUI subsystem)
+│  ├─ Runly.Launcher.Console\# RunlyConsole.exe (AOT, console subsystem)
 │  └─ Runly.Settings\        # RunlySettings.exe (WinForms)
 ├─ tests\
 │  └─ Runly.Core.Tests\      # xUnit
@@ -212,11 +219,17 @@ Hepsi **HKCU** altında — yönetici hakkı gerekmez.
 HKCU\Software\Classes\Runly.Script.js\
    (default)                  = "JavaScript Script (Runly)"
    DefaultIcon                = "<kurulum>\assets\js.ico,0"
-   shell\open\command         = "<kurulum>\Runly.exe" "%1" %*
-   shell\runas\command        = "<kurulum>\Runly.exe" --verb runas "%1" %*
-   shell\edit\command         = "<kurulum>\Runly.exe" --verb edit "%1"
+   shell\open\command         = "<kurulum>\RunlyConsole.exe" "%1" %*
+   shell\runas\command        = "<kurulum>\RunlyConsole.exe" --verb runas "%1" %*
+   shell\edit\command         = "<kurulum>\RunlyConsole.exe" --verb edit "%1"
    shell\runlyargs\           = MUIVerb "Runly ile argümanlarla çalıştır…"
-   shell\runlyargs\command    = "<kurulum>\Runly.exe" --verb prompt-args "%1"
+   shell\runlyargs\command    = "<kurulum>\RunlyConsole.exe" --verb prompt-args "%1"
+```
+
+`Kind=Open` eşlemesinde tek fiil yazılır ve GUI ikilisine bağlanır (K29):
+```
+HKCU\Software\Classes\Runly.Script.md\
+   shell\open\command         = "<kurulum>\Runly.exe" "%1" %*
 ```
 
 **Uzantı bağlama:**
@@ -226,6 +239,9 @@ HKCU\Software\Classes\.js\OpenWithProgids\Runly.Script.js = ""   (REG_SZ, boş)
 ```
 
 **Uygulama kaydı (Birlikte aç listesinde görünmek için — .ps1 akışı buna bağlı):**
+Yalnız GUI ikilisi yazılır; kullanıcıya görünen kimlik odur (K29). Kaldırma buna ek olarak
+`Applications\RunlyConsole.exe` anahtarını da siler — kurulum onu yazmasa da Windows, kullanıcı
+"Birlikte aç"tan konsol ikilisini seçtiğinde bu anahtarı kendisi oluşturur.
 ```
 HKCU\Software\Classes\Applications\Runly.exe\
    FriendlyAppName            = "Runly"
@@ -300,6 +316,7 @@ Paketler arası çelişkiler burada çözülür. Bir paket dosyası bu bölümle
 | K6 | `ExtensionStatus.UserChoiceOwnerName` | **Eklenmesi onaylandı** — `string? UserChoiceOwnerName { get; init; }`. Bu, T1 modeline yapılan tek yetkili eklemedir; T4 ekleyecek. Gerekçe: §10.2'deki turuncu satır "Windows bu uzantıyı *Not Defteri*'ne bağlamış" diyebilmeli; isim olmadan mesaj soyut kalıyor. | 2026-08-09 |
 | K7 | `editorCommand` boşsa | `notepad.exe`'ye düş. Sabit T3'te (`Ui/EditorLauncher.cs`), Core'a konmayacak. | 2026-08-09 |
 | K9 | 0-byte aday (Store alias) | **Kural değişti.** §8'in "0 bayt adayı atla" kuralı mutlak değil: gerçek bir exe her zaman tercih edilir, **ama hiç bulunamazsa 0 baytlık aday son çare olarak kabul edilir.** Gerekçe: bu makinede `py.exe` **tek** aday ve 0 bayt; kural harfiyen uygulanınca `.py` hiç bağlanamıyordu. Store install stub'ı ile çalışan app-execution alias'ı bayt boyutuyla ayırt edilemiyor. Yönetici tarafından `PathSearcher.cs`'te düzeltildi + 2 test. | 2026-08-09 |
+| K29 | **Başlatıcı konsol ve GUI olarak ikiye ayrıldı** | Tek `Exe` (konsol altsistemi) başlatıcı, `Kind=Open` eşlemelerinde dosyayı Notepad++ gibi bir GUI uygulamasına devrederken **siyah pencere yanıp söndürüyordu**. Karar: `uv` deseni — iki ayrı ikili. `Runly.exe` **WinExe** (GUI altsistemi, `Kind=Open`), `RunlyConsole.exe` **Exe** (konsol altsistemi, `Kind=Run`); ikisi de NativeAOT, ~3 MB. Ortak mantık `Runly.Launcher` sınıf kitaplığındadır, iki proje yalnızca `LauncherSurface` veren birer giriş noktasıdır — kopyala-yapıştır iki kod yolu yok. ProgID'nin `shell\open\command` değeri `Kind`'a göre seçilir; `Applications\<exe>` ve `RegisteredApplications` GUI ikilisine bağlıdır. `PointsAtRunly` artık iki adı da kabul eder (yoksa bağlı her script uzantısı "onay bekliyor" görünürdü) ve kaldırma `Applications\RunlyConsole.exe`'yi de siler. **Elenen alternatifler:** (1) `ShowWindow(GetConsoleWindow(), SW_HIDE)` — pencere önce oluşuyor, gizleme sonra geliyor, flash tam o aralıkta yaşanıyor; (2) GUI altsistemi + `AllocConsole()` — üst sürecin konsolunu devralmıyor, terminalden çalıştıranın stdout/stderr yönlendirmesini bozuyor, cmd'de "fire-and-forget" olup çağıranın çıkış kodunu beklemesini engelliyor. Ayrıca gsudo#421 tuzağı: alt sürecin çıkış kodu "pencereyi açık tut" adımından **önce** saklanıp adım bittikten sonra döndürülüyor, bekleme başarısız olsa bile değişmiyor (`ScriptRunner` + 4 test). | 2026-08-22 |
 | K28 | Store takozunu boyutla ayırt etme | **K9 kapandı.** 0 bayt sezgisi yerine reparse point okunuyor: `FSCTL_GET_REPARSE_POINT` + `IO_REPARSE_TAG_APPEXECLINK`, hedef `*Redirector.exe` ise ölü takoz sayılıp atlanıyor, değilse alias doğrudan kabul ediliyor. Reparse okunamazsa K9'un son-çare davranışına düşülüyor. `uv` ve CPython `launcher2.c` aynı yolu kullanıyor. Yönlendirici kararı yalnız hedef adına bağlı — paket ailesine bağlamak `winget.exe`'yi yanlışlıkla eliyordu. | 2026-08-22 |
 | K10 | Shebang + config eşlemesi çakışması | **Shebang config'i tamamen bypass eder**, argüman şablonu `"{script}" {args}` olur. T2'nin seçimi onaylandı. Gerekçe: shebang dosyanın kendi beyanıdır ve `.ts` gibi bir uzantının bayrakları başka bir yorumlayıcıya taşınırsa anlamsız/tehlikeli olur. | 2026-08-09 |
 | K11 | `TrustFile`/`TrustFolder` diske yazmaz | Onaylandı — bellekte mutasyon, çağıran `Save()` eder. T3 kullanıcı onayından **sonra** açıkça `trustStore.Save()` çağırmalı; unutulursa güven kalıcı olmaz. | 2026-08-09 |
