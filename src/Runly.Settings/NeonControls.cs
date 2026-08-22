@@ -119,9 +119,9 @@ internal sealed class NeonButton : Button
         ForeColor = Palette.TextBody;
         Font = Palette.Body;
         Cursor = Cursors.Hand;
-        Height = 32;
-        MinimumSize = new Size(0, 30);
-        Padding = new Padding(14, 4, 14, 4);
+        Height = Metrics.ButtonHeight;
+        MinimumSize = new Size(0, Metrics.ButtonMinHeight);
+        Padding = new Padding(Metrics.Px(14), Metrics.Px(4), Metrics.Px(14), Metrics.Px(4));
         MouseEnter += (_, _) => { _hover = true; Invalidate(); };
         MouseLeave += (_, _) => { _hover = false; Invalidate(); };
     }
@@ -129,7 +129,9 @@ internal sealed class NeonButton : Button
     public override Size GetPreferredSize(Size proposedSize)
     {
         var text = TextRenderer.MeasureText(Text, Font, Size.Empty, TextFormatFlags.NoPadding);
-        return new Size(text.Width + Padding.Horizontal + 6, Math.Max(32, text.Height + Padding.Vertical + 4));
+        return new Size(
+            text.Width + Padding.Horizontal + Metrics.Px(6),
+            Math.Max(Metrics.ButtonHeight, text.Height + Padding.Vertical + Metrics.Px(4)));
     }
 
     protected override void OnPaint(PaintEventArgs pevent)
@@ -140,7 +142,7 @@ internal sealed class NeonButton : Button
         var accent = Primary ? Palette.NeonBlue : Palette.NeonPurple;
         var bounds = new Rectangle(1, 1, Math.Max(1, Width - 2), Math.Max(1, Height - 2));
 
-        using var path = NeonTheme.RoundedRect(bounds, 12);
+        using var path = NeonTheme.RoundedRect(bounds, Metrics.Px(12));
 
         if (Primary)
         {
@@ -154,7 +156,7 @@ internal sealed class NeonButton : Button
             g.FillPath(fill, path);
         }
 
-        using (var glow = new Pen(Color.FromArgb(_hover ? 200 : 130, accent), _hover ? 2f : 1.5f))
+        using (var glow = new Pen(Color.FromArgb(_hover ? 200 : 130, accent), (_hover ? 2f : 1.5f) * Metrics.Scale))
         {
             g.DrawPath(glow, path);
         }
@@ -177,7 +179,7 @@ internal sealed class NeonGroupPanel : Panel
         DoubleBuffered = true;
         BackColor = Palette.Surface;
         ForeColor = Palette.TextBody;
-        Padding = new Padding(16, 34, 16, 16);
+        Padding = new Padding(Metrics.Px(16), Metrics.GroupTitleBand, Metrics.Px(16), Metrics.Px(16));
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -187,18 +189,20 @@ internal sealed class NeonGroupPanel : Panel
         g.SmoothingMode = SmoothingMode.AntiAlias;
         var bounds = new Rectangle(0, 0, Width - 1, Height - 1);
 
-        using var path = NeonTheme.RoundedRect(bounds, 16);
+        using var path = NeonTheme.RoundedRect(bounds, Metrics.Px(16));
         using (var fill = new SolidBrush(Palette.Surface))
         {
             g.FillPath(fill, path);
         }
 
-        using (var border = new Pen(Color.FromArgb(80, Palette.NeonBlue), 1f))
+        using (var border = new Pen(Color.FromArgb(80, Palette.NeonBlue), Metrics.Scale))
         {
             g.DrawPath(border, path);
         }
 
-        TextRenderer.DrawText(g, Title, Palette.H3, new Rectangle(16, 10, Width - 32, 20),
+        var inset = Metrics.Px(16);
+        TextRenderer.DrawText(g, Title, Palette.H3,
+            new Rectangle(inset, Metrics.Px(10), Width - (inset * 2), Metrics.Line(Palette.H3)),
             Palette.NeonBlue, TextFormatFlags.Left | TextFormatFlags.NoPadding);
     }
 }
@@ -206,6 +210,10 @@ internal sealed class NeonGroupPanel : Panel
 /// <summary>Owner-drawn radio button: system glyphs cannot be recoloured without full custom paint.</summary>
 internal sealed class NeonRadioButton : RadioButton
 {
+    /// The ring and the tick are drawn on this grid; every offset below is a fraction of it, so one
+    /// change to <see cref="GlyphGrid"/> moves the whole glyph instead of leaving half of it behind.
+    internal const int GlyphGrid = 14;
+
     public NeonRadioButton()
     {
         // See NeonButton: BackColor is the real parent colour, cleared every frame — no true transparency.
@@ -220,7 +228,8 @@ internal sealed class NeonRadioButton : RadioButton
     public override Size GetPreferredSize(Size proposedSize)
     {
         var textSize = TextRenderer.MeasureText(Text, Font);
-        return new Size(14 + 8 + textSize.Width + 2, Math.Max(18, textSize.Height));
+        var glyph = Metrics.Px(GlyphGrid) + Metrics.Px(8);
+        return new Size(glyph + textSize.Width + Metrics.Px(2), Math.Max(Metrics.Line(Font), textSize.Height));
     }
 
     protected override void OnPaint(PaintEventArgs pevent)
@@ -228,21 +237,23 @@ internal sealed class NeonRadioButton : RadioButton
         var g = pevent.Graphics;
         g.Clear(BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
-        const int d = 14;
+        var d = Metrics.Px(GlyphGrid);
         var circle = new Rectangle(0, (Height - d) / 2, d, d);
 
-        using (var ring = new Pen(Checked ? Palette.NeonBlue : Palette.TextLabel, 1.5f))
+        using (var ring = new Pen(Checked ? Palette.NeonBlue : Palette.TextLabel, 1.5f * Metrics.Scale))
         {
             g.DrawEllipse(ring, circle);
         }
 
         if (Checked)
         {
+            var inset = d * 3 / GlyphGrid;
             using var dot = new SolidBrush(Palette.NeonBlue);
-            g.FillEllipse(dot, circle.X + 3, circle.Y + 3, d - 6, d - 6);
+            g.FillEllipse(dot, circle.X + inset, circle.Y + inset, d - (inset * 2), d - (inset * 2));
         }
 
-        var textBounds = new Rectangle(d + 8, 0, Width - d - 8, Height);
+        var gap = Metrics.Px(8);
+        var textBounds = new Rectangle(d + gap, 0, Width - d - gap, Height);
         TextRenderer.DrawText(g, Text, Font, textBounds, ForeColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
     }
 }
@@ -264,7 +275,8 @@ internal sealed class NeonCheckBox : CheckBox
     public override Size GetPreferredSize(Size proposedSize)
     {
         var textSize = TextRenderer.MeasureText(Text, Font);
-        return new Size(14 + 8 + textSize.Width + 2, Math.Max(18, textSize.Height));
+        var glyph = Metrics.Px(NeonRadioButton.GlyphGrid) + Metrics.Px(8);
+        return new Size(glyph + textSize.Width + Metrics.Px(2), Math.Max(Metrics.Line(Font), textSize.Height));
     }
 
     protected override void OnPaint(PaintEventArgs pevent)
@@ -272,9 +284,10 @@ internal sealed class NeonCheckBox : CheckBox
         var g = pevent.Graphics;
         g.Clear(BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
-        const int d = 14;
+        const int grid = NeonRadioButton.GlyphGrid;
+        var d = Metrics.Px(grid);
         var box = new Rectangle(0, (Height - d) / 2, d, d);
-        using var path = NeonTheme.RoundedRect(box, 3);
+        using var path = NeonTheme.RoundedRect(box, Metrics.Px(3));
 
         if (Checked)
         {
@@ -282,24 +295,25 @@ internal sealed class NeonCheckBox : CheckBox
             g.FillPath(fill, path);
         }
 
-        using (var ring = new Pen(Checked ? Palette.NeonBlue : Palette.TextLabel, 1.5f))
+        using (var ring = new Pen(Checked ? Palette.NeonBlue : Palette.TextLabel, 1.5f * Metrics.Scale))
         {
             g.DrawPath(ring, path);
         }
 
         if (Checked)
         {
-            using var check = new Pen(Palette.Surface, 2f);
+            using var check = new Pen(Palette.Surface, 2f * Metrics.Scale);
             Point[] checkPoints =
             [
-                new Point(box.X + 3, box.Y + 7),
-                new Point(box.X + 6, box.Y + 10),
-                new Point(box.X + 11, box.Y + 4),
+                new Point(box.X + (d * 3 / grid), box.Y + (d * 7 / grid)),
+                new Point(box.X + (d * 6 / grid), box.Y + (d * 10 / grid)),
+                new Point(box.X + (d * 11 / grid), box.Y + (d * 4 / grid)),
             ];
             g.DrawLines(check, checkPoints);
         }
 
-        var textBounds = new Rectangle(d + 8, 0, Width - d - 8, Height);
+        var gap = Metrics.Px(8);
+        var textBounds = new Rectangle(d + gap, 0, Width - d - gap, Height);
         TextRenderer.DrawText(g, Text, Font, textBounds, ForeColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
     }
 }
@@ -334,8 +348,18 @@ internal sealed class NeonComboBox : ComboBox
         FlatStyle = FlatStyle.Flat;
         BackColor = Palette.FieldBg;
         ForeColor = Palette.TextBody;
-        ItemHeight = 22;
+        ApplyItemHeight();
     }
+
+    /// <summary>The item height of an owner-drawn combo is never scaled by WinForms and never follows
+    /// the inherited font on its own, so it is re-derived whenever the font arrives or changes.</summary>
+    protected override void OnFontChanged(EventArgs e)
+    {
+        base.OnFontChanged(e);
+        ApplyItemHeight();
+    }
+
+    private void ApplyItemHeight() => ItemHeight = Metrics.Row(Font, 3);
 
     protected override void OnDrawItem(DrawItemEventArgs e)
     {
@@ -349,8 +373,9 @@ internal sealed class NeonComboBox : ComboBox
         using var background = new SolidBrush(selected ? ColorTranslator.FromHtml("#123238") : Palette.FieldBg);
         e.Graphics.FillRectangle(background, e.Bounds);
 
+        var inset = Metrics.Px(4);
         TextRenderer.DrawText(e.Graphics, GetItemText(Items[e.Index]), Font,
-            new Rectangle(e.Bounds.Left + 4, e.Bounds.Top, e.Bounds.Width - 8, e.Bounds.Height),
+            new Rectangle(e.Bounds.Left + inset, e.Bounds.Top, e.Bounds.Width - (inset * 2), e.Bounds.Height),
             selected ? Palette.NeonBlue : Palette.TextBody,
             TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
     }

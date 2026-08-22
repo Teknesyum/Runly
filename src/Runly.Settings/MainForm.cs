@@ -56,6 +56,34 @@ internal sealed class MainForm : NeonForm
         Margin = margin,
     };
 
+    // Absolute rows only exist where AutoSize has already misjudged the content once (see the comments at
+    // each use). They stay absolute, but the number is composed from what has to fit, so a taller font
+    // grows the slot instead of clipping inside it.
+    private static int FolderButtonHeight => Metrics.ButtonMinHeight;
+
+    private static int FolderButtonWidth => Metrics.Px(78);
+
+    /// Three stacked radios; 72 design pixels fitted only two and painted the folders label over the third.
+    private static int RadioStackHeight => Metrics.Stack(Palette.Body, 3, 13);
+
+    /// Two stacked folder buttons plus the margin between them; one button used to be cut in half here.
+    private static int FoldersAreaHeight => (FolderButtonHeight * 2) + Metrics.Px(18);
+
+    private static int TrustedFilesRowHeight => Metrics.ButtonHeight + Metrics.Px(4);
+
+    private static int EditorRowHeight => Metrics.ButtonHeight + Metrics.Px(12);
+
+    private static int SearchStripHeight => Metrics.ButtonHeight + Metrics.Px(14);
+
+    private static int ExtensionButtonsHeight => Metrics.ButtonHeight + Metrics.Px(8);
+
+    /// The security panel is the taller of the two, so it sets the row both of them share.
+    private static int PanelsRowHeight =>
+        Metrics.GroupTitleBand + Metrics.Px(16) + RadioStackHeight + Metrics.SectionLabelHeight +
+        FoldersAreaHeight + TrustedFilesRowHeight + Metrics.Px(24);
+
+    private static int BottomBarHeight => Metrics.ButtonHeight + Metrics.FooterLineHeight + Metrics.Px(26);
+
     private readonly IConfigStore _configStore;
     private readonly ITrustStore _trustStore;
     private readonly IShellRegistrar _shellRegistrar;
@@ -126,6 +154,10 @@ internal sealed class MainForm : NeonForm
         RegistryBackup registryBackup,
         ILogger logger)
     {
+        // Before any control exists: every size below is derived from this one reading, and re-reading it
+        // per control would let two halves of the window disagree.
+        Metrics.Initialize(this);
+
         _configStore = configStore;
         _trustStore = trustStore;
         _shellRegistrar = shellRegistrar;
@@ -140,10 +172,14 @@ internal sealed class MainForm : NeonForm
         Text = Strings.Get("app.title");
         AutoScaleMode = AutoScaleMode.Dpi;
         AutoScaleDimensions = new SizeF(96f, 96f);
-        var workArea = Screen.PrimaryScreen?.WorkingArea.Size ?? new Size(1280, 900);
-        Size = new Size(Math.Min(1280, (int)(workArea.Width * 0.85)), Math.Min(900, (int)(workArea.Height * 0.85)));
-        // Height dropped 74px with the status strip removed and the footer strip tightened.
-        MinimumSize = new Size(Math.Min(1180, workArea.Width), Math.Min(750, workArea.Height));
+        var workArea = Screen.PrimaryScreen?.WorkingArea.Size ?? new Size(Metrics.Px(1280), Metrics.Px(900));
+        Size = new Size(
+            Math.Min(Metrics.Px(1280), (int)(workArea.Width * 0.85)),
+            Math.Min(Metrics.Px(900), (int)(workArea.Height * 0.85)));
+        // Height dropped 74 design pixels with the status strip removed and the footer strip tightened.
+        MinimumSize = new Size(
+            Math.Min(Metrics.Px(1180), workArea.Width),
+            Math.Min(Metrics.Px(750), workArea.Height));
         StartPosition = FormStartPosition.CenterScreen;
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
@@ -154,15 +190,16 @@ internal sealed class MainForm : NeonForm
 
         var root = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, BackColor = Palette.AppBg };
         root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        // 270 could not hold the security panel once the third radio and the second folder button
-        // were given real room (96 + label + 78 + 36 + panel chrome).
-        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 306));
-        // Buttons (32) + signature (18) + padding; keeps the two rows visually joined.
-        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 76));
+        // A flat 270 could not hold the security panel once the third radio and the second folder button
+        // were given real room, which is why this is now the sum of those parts rather than a number.
+        root.RowStyles.Add(new RowStyle(SizeType.Absolute, PanelsRowHeight));
+        // One button row plus the signature line; keeps the two visually joined.
+        root.RowStyles.Add(new RowStyle(SizeType.Absolute, BottomBarHeight));
 
         // The status strip was removed: it repeated the footer indicator and its 13.5pt line clipped
         // descenders. These four stay unparented — code paths still set their Text without a UI slot.
-        _refreshButton = new NeonButton { Text = "Yenile", Primary = false, AutoSize = true, Margin = new Padding(8, 0, 0, 0) };
+        var buttonGap = new Padding(Metrics.Px(8), 0, 0, 0);
+        _refreshButton = new NeonButton { Text = "Yenile", Primary = false, AutoSize = true, Margin = buttonGap };
         _refreshButton.Click += (_, _) => RefreshStatusOnly(force: true);
         _statusLabel = new Label { Visible = false };
         _exePathLabel = new Label { Visible = false };
@@ -171,15 +208,15 @@ internal sealed class MainForm : NeonForm
         _configPathLink.LinkClicked += (_, _) => OpenContainingFolder(_configStore.ConfigPath);
 
         // ---- 2. Extension table + detail panel -------------------------------------------
-        var gridArea = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 3, BackColor = Palette.AppBg, Padding = new Padding(0, 8, 0, 0) };
-        gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 190));
+        var gridArea = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 3, BackColor = Palette.AppBg, Padding = new Padding(0, Metrics.Px(8), 0, 0) };
+        gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Metrics.Px(190)));
         gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 270));
+        gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Metrics.Px(270)));
         // The search strip sits above the table, not below it: buried at the bottom of a
         // WrapContents=false button flow it was pushed past the right edge and never found.
-        gridArea.RowStyles.Add(new RowStyle(SizeType.Absolute, 46));
+        gridArea.RowStyles.Add(new RowStyle(SizeType.Absolute, SearchStripHeight));
         gridArea.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        gridArea.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+        gridArea.RowStyles.Add(new RowStyle(SizeType.Absolute, ExtensionButtonsHeight));
 
         _grid = BuildExtensionGrid();
         _categoryList = new ListBox
@@ -189,9 +226,12 @@ internal sealed class MainForm : NeonForm
             ForeColor = Palette.TextBody,
             BorderStyle = BorderStyle.None,
             Font = Palette.Body,
-            Margin = new Padding(0, 0, 8, 0),
+            Margin = new Padding(0, 0, Metrics.Px(8), 0),
             DrawMode = DrawMode.OwnerDrawFixed,
-            ItemHeight = 34,
+            // Owner-drawn item heights are the one thing WinForms is documented never to scale
+            // (dotnet/winforms#6382): the row has to hold the icon and one line of the label at whatever
+            // size those currently are.
+            ItemHeight = Metrics.CategoryRowHeight,
         };
         LoadCategoryIcons();
         foreach (var category in ExtensionCatalog.Entries.Select(entry => entry.Category).Distinct(StringComparer.Ordinal))
@@ -203,7 +243,7 @@ internal sealed class MainForm : NeonForm
         gridArea.Controls.Add(_categoryList, 0, 1);
         gridArea.Controls.Add(_grid, 1, 1);
 
-        var detailPanel = new NeonGroupPanel(Strings.Get("details")) { Dock = DockStyle.Fill, Margin = new Padding(8, 0, 0, 0) };
+        var detailPanel = new NeonGroupPanel(Strings.Get("details")) { Dock = DockStyle.Fill, Margin = new Padding(Metrics.Px(8), 0, 0, 0) };
         _detailPlaceholder = new Label
         {
             Dock = DockStyle.Fill,
@@ -234,11 +274,12 @@ internal sealed class MainForm : NeonForm
         gridArea.Controls.Add(detailPanel, 2, 1);
 
         var extButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
-        var selectAllButton = new NeonButton { Text = "Tümünü seç", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
-        var addExtButton = new NeonButton { Text = "Uzantı ekle", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
-        var removeExtButton = new NeonButton { Text = "Seçili uzantıyı sil", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
-        var exportButton = new NeonButton { Text = Strings.Get("profile.export"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
-        var importButton = new NeonButton { Text = Strings.Get("profile.import"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
+        var extButtonMargin = new Padding(0, Metrics.Px(4), Metrics.Px(8), Metrics.Px(4));
+        var selectAllButton = new NeonButton { Text = "Tümünü seç", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
+        var addExtButton = new NeonButton { Text = "Uzantı ekle", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
+        var removeExtButton = new NeonButton { Text = "Seçili uzantıyı sil", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
+        var exportButton = new NeonButton { Text = Strings.Get("profile.export"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
+        var importButton = new NeonButton { Text = Strings.Get("profile.import"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
         selectAllButton.Click += (_, _) => SetAllExtensionsEnabled();
         addExtButton.Click += OnAddExtensionClicked;
         removeExtButton.Click += OnRemoveExtensionClicked;
@@ -249,19 +290,19 @@ internal sealed class MainForm : NeonForm
         extButtons.Controls.Add(removeExtButton);
         extButtons.Controls.Add(exportButton);
         extButtons.Controls.Add(importButton);
-        _chooseAppButton = new NeonButton { Text = Strings.Get("catalog.chooseApp"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 4, 8, 4) };
+        _chooseAppButton = new NeonButton { Text = Strings.Get("catalog.chooseApp"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
         _chooseAppButton.Click += (_, _) => ChooseApplicationForSelectedRow();
         extButtons.Controls.Add(_chooseAppButton);
 
         // Two columns, not one flow: the bulk-assign pair is AutoSize on the right and the search
         // group absorbs the slack, so neither can be pushed off the edge at MinimumSize.
-        var searchStrip = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent, Margin = new Padding(0, 0, 0, 6) };
+        var searchStrip = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent, Margin = new Padding(0, 0, 0, Metrics.Px(6)) };
         searchStrip.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         searchStrip.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
         var searchGroup = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
-        var searchLabel = new Label { Text = Strings.Get("catalog.searchLabel"), AutoSize = true, Font = Palette.H3, ForeColor = Palette.NeonBlue, Margin = new Padding(0, 11, 8, 4) };
-        _searchBox = new TextBox { Width = 280, PlaceholderText = Strings.Get("catalog.searchPlaceholder"), BackColor = Palette.FieldBg, ForeColor = Palette.NeonBlue, Font = Palette.MonoBody, BorderStyle = BorderStyle.FixedSingle, Margin = new Padding(0, 8, 8, 4) };
+        var searchLabel = new Label { Text = Strings.Get("catalog.searchLabel"), AutoSize = true, Font = Palette.H3, ForeColor = Palette.NeonBlue, Margin = new Padding(0, Metrics.Px(11), Metrics.Px(8), Metrics.Px(4)) };
+        _searchBox = new TextBox { Width = Metrics.Px(280), PlaceholderText = Strings.Get("catalog.searchPlaceholder"), BackColor = Palette.FieldBg, ForeColor = Palette.NeonBlue, Font = Palette.MonoBody, BorderStyle = BorderStyle.FixedSingle, Margin = new Padding(0, Metrics.Px(8), Metrics.Px(8), Metrics.Px(4)) };
 
         // The catalog carries 400+ rows and every refresh reprojects and refills the whole grid, so
         // rebuilding on each keystroke makes typing stutter. Only typing is delayed: ApplyLanguage and
@@ -278,19 +319,19 @@ internal sealed class MainForm : NeonForm
             _searchDebounce.Start();
         };
         _searchBox.KeyDown += OnSearchBoxKeyDown;
-        var clearSearchButton = new NeonButton { Text = Strings.Get("catalog.searchClear"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, 5, 12, 4) };
+        var clearSearchButton = new NeonButton { Text = Strings.Get("catalog.searchClear"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, Metrics.Px(5), Metrics.Px(12), Metrics.Px(4)) };
         clearSearchButton.Click += (_, _) => ClearSearch();
-        _searchResultLabel = new Label { AutoSize = true, Font = Palette.MonoBody, ForeColor = Palette.NeonPink, Margin = new Padding(0, 11, 0, 4) };
+        _searchResultLabel = new Label { AutoSize = true, Font = Palette.MonoBody, ForeColor = Palette.NeonPink, Margin = new Padding(0, Metrics.Px(11), 0, Metrics.Px(4)) };
         searchGroup.Controls.Add(searchLabel);
         searchGroup.Controls.Add(_searchBox);
         searchGroup.Controls.Add(clearSearchButton);
         searchGroup.Controls.Add(_searchResultLabel);
 
         var bulkGroup = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
-        _bulkAppBox = new NeonComboBox { Width = 220, Margin = new Padding(8, 8, 8, 4) };
+        _bulkAppBox = new NeonComboBox { Width = Metrics.Px(220), Margin = new Padding(Metrics.Px(8), Metrics.Px(8), Metrics.Px(8), Metrics.Px(4)) };
         foreach (var app in _installedApplications) _bulkAppBox.Items.Add(app);
         _bulkAppBox.DisplayMember = nameof(InstalledApplication.DisplayName);
-        var bulkButton = new NeonButton { Text = Strings.Get("catalog.bulkOpen"), Primary = true, AutoSize = true, Margin = new Padding(0, 5, 0, 4) };
+        var bulkButton = new NeonButton { Text = Strings.Get("catalog.bulkOpen"), Primary = true, AutoSize = true, Margin = new Padding(0, Metrics.Px(5), 0, Metrics.Px(4)) };
         bulkButton.Click += (_, _) => AssignCategoryToSelectedApplication();
         bulkGroup.Controls.Add(_bulkAppBox);
         bulkGroup.Controls.Add(bulkButton);
@@ -311,7 +352,7 @@ internal sealed class MainForm : NeonForm
         root.Controls.Add(gridArea, 0, 0);
 
         // ---- 3 & 4. Security + behavior panels --------------------------------------------
-        var panelsRow = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Palette.AppBg, Padding = new Padding(0, 8, 0, 0) };
+        var panelsRow = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Palette.AppBg, Padding = new Padding(0, Metrics.Px(8), 0, 0) };
         panelsRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
         panelsRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
 
@@ -323,10 +364,10 @@ internal sealed class MainForm : NeonForm
         root.Controls.Add(panelsRow, 0, 1);
 
         // ---- 5. Bottom bar (+ İmza bloğu, R5 zorunlu: ayarlar penceresinin en altında sağda) ----
-        var bottomBar = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 2, Padding = new Padding(12, 6, 12, 3), BackColor = Palette.Surface };
+        var bottomBar = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 2, Padding = new Padding(Metrics.Px(12), Metrics.Px(6), Metrics.Px(12), Metrics.Px(3)), BackColor = Palette.Surface };
         bottomBar.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        // 18 is the measured height of LabelFont plus its descender — smaller clips, larger opens a gap.
-        bottomBar.RowStyles.Add(new RowStyle(SizeType.Absolute, 18));
+        // The signature line is the label font plus its descender — smaller clips, larger opens a gap.
+        bottomBar.RowStyles.Add(new RowStyle(SizeType.Absolute, Metrics.FooterLineHeight));
 
         // Two columns instead of a Dock=Left label: a fixed 320px label starved the RightToLeft button
         // flow at MinimumSize and clipped the leftmost button ("Kur / Güncelle" rendered as "Güncelle").
@@ -337,11 +378,11 @@ internal sealed class MainForm : NeonForm
         _progressLabel = new Label { Dock = DockStyle.Fill, AutoEllipsis = true, TextAlign = ContentAlignment.MiddleLeft, Font = Palette.MonoBody, ForeColor = Palette.NeonBlue };
         var buttonsFlow = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.RightToLeft, WrapContents = false, BackColor = Color.Transparent };
 
-        var closeButton = new NeonButton { Text = "Kapat", Primary = false, AutoSize = true, Margin = new Padding(8, 0, 0, 0) };
-        _saveButton = new NeonButton { Text = "Kaydet", Primary = false, AutoSize = true, Margin = new Padding(8, 0, 0, 0) };
-        _restoreButton = new NeonButton { Text = "Yedekten geri yükle", Primary = false, AutoSize = true, Margin = new Padding(8, 0, 0, 0) };
-        _uninstallButton = new NeonButton { Text = "Kaldır", Primary = false, AutoSize = true, Margin = new Padding(8, 0, 0, 0) };
-        _installButton = new NeonButton { Text = "Kur / Güncelle", Primary = true, AutoSize = true, Margin = new Padding(8, 0, 0, 0) };
+        var closeButton = new NeonButton { Text = "Kapat", Primary = false, AutoSize = true, Margin = buttonGap };
+        _saveButton = new NeonButton { Text = "Kaydet", Primary = false, AutoSize = true, Margin = buttonGap };
+        _restoreButton = new NeonButton { Text = "Yedekten geri yükle", Primary = false, AutoSize = true, Margin = buttonGap };
+        _uninstallButton = new NeonButton { Text = "Kaldır", Primary = false, AutoSize = true, Margin = buttonGap };
+        _installButton = new NeonButton { Text = "Kur / Güncelle", Primary = true, AutoSize = true, Margin = buttonGap };
 
         closeButton.Click += (_, _) => Close();
         _saveButton.Click += (_, _) => SaveAll();
@@ -364,13 +405,14 @@ internal sealed class MainForm : NeonForm
         footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         footer.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         var footerLeft = new FlowLayoutPanel { Dock = DockStyle.Fill, WrapContents = false, BackColor = Color.Transparent, Margin = Padding.Empty };
-        _footerDot = new Label { Text = "●", AutoSize = true, Font = Palette.LabelFont, ForeColor = Palette.TextHint, Margin = new Padding(0, 1, 4, 0) };
-        _footerStatusLabel = new Label { AutoSize = true, Font = Palette.LabelFont, ForeColor = Palette.NeonBlue, Margin = new Padding(0, 1, 12, 0) };
+        var footerGap = new Padding(0, Metrics.Px(1), Metrics.Px(12), 0);
+        _footerDot = new Label { Text = "●", AutoSize = true, Font = Palette.LabelFont, ForeColor = Palette.TextHint, Margin = new Padding(0, Metrics.Px(1), Metrics.Px(4), 0) };
+        _footerStatusLabel = new Label { AutoSize = true, Font = Palette.LabelFont, ForeColor = Palette.NeonBlue, Margin = footerGap };
         var footerVersion = _versionLabel;
-        footerVersion.Margin = new Padding(0, 1, 12, 0);
+        footerVersion.Margin = footerGap;
         footerVersion.Font = Palette.LabelFont;
         footerVersion.Visible = true;
-        _languageToggle = new LinkLabel { Text = "TR | EN", AutoSize = true, Font = Palette.LabelFont, LinkColor = Palette.NeonBlue, ActiveLinkColor = Palette.NeonPink, BackColor = Color.Transparent, Margin = new Padding(0, 1, 12, 0) };
+        _languageToggle = new LinkLabel { Text = "TR | EN", AutoSize = true, Font = Palette.LabelFont, LinkColor = Palette.NeonBlue, ActiveLinkColor = Palette.NeonPink, BackColor = Color.Transparent, Margin = footerGap };
         _languageToggle.LinkClicked += (_, _) => ChangeLanguage(Strings.Language == "tr" ? "en" : "tr");
         footerLeft.Controls.Add(_footerDot);
         footerLeft.Controls.Add(_footerStatusLabel);
@@ -380,8 +422,8 @@ internal sealed class MainForm : NeonForm
 
         // Support link and signature stay together on the right, sponsor first.
         var footerRight = new FlowLayoutPanel { Anchor = AnchorStyles.Top | AnchorStyles.Right, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, WrapContents = false, BackColor = Color.Transparent, Margin = Padding.Empty };
-        footerRight.Controls.Add(new NeonLink("Buy me a coffee", Palette.SponsorUrl) { Margin = new Padding(0, 1, 12, 0) });
-        footerRight.Controls.Add(new SignatureBlock { AutoSize = true, Margin = new Padding(0, 1, 0, 0) });
+        footerRight.Controls.Add(new NeonLink("Buy me a coffee", Palette.SponsorUrl) { Margin = footerGap });
+        footerRight.Controls.Add(new SignatureBlock { AutoSize = true, Margin = new Padding(0, Metrics.Px(1), 0, 0) });
         footer.Controls.Add(footerRight, 1, 0);
         bottomBar.Controls.Add(footer, 0, 1);
 
@@ -435,7 +477,9 @@ internal sealed class MainForm : NeonForm
             // the "Durum" column — the one carrying the "Varsayılan yap" button — off screen behind a
             // horizontal scrollbar. Weights keep every column reachable at MinimumSize too.
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-            RowTemplate = { Height = 26 },
+            // Neither the row template nor the header below follows the DPI on its own, and both hold a
+            // line of text; a literal here is what clips the grid at 125% and 150%.
+            RowTemplate = { Height = Metrics.GridRowHeight },
             BackgroundColor = Palette.Surface,
             GridColor = ColorTranslator.FromHtml("#152229"), // opaque, dim blue-tinted line (GridColor rejects alpha)
             BorderStyle = BorderStyle.None,
@@ -453,7 +497,7 @@ internal sealed class MainForm : NeonForm
             SelectionForeColor = Palette.NeonBlue,
             Alignment = DataGridViewContentAlignment.MiddleCenter,
         };
-        grid.ColumnHeadersHeight = 30;
+        grid.ColumnHeadersHeight = Metrics.GridHeaderHeight;
         grid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
         grid.RowsDefaultCellStyle = new DataGridViewCellStyle
         {
@@ -469,13 +513,13 @@ internal sealed class MainForm : NeonForm
             SelectionBackColor = ColorTranslator.FromHtml("#123238"),
         };
 
-        grid.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Enabled", HeaderText = "ETKİN", FillWeight = 8, MinimumWidth = 60, Resizable = DataGridViewTriState.False });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Extension", HeaderText = "UZANTI", FillWeight = 10, MinimumWidth = 72, ReadOnly = true });
-        grid.Columns.Add(new DataGridViewComboBoxColumn { Name = "Kind", HeaderText = "TÜR", FillWeight = 13, MinimumWidth = 90, DataSource = new[] { Strings.Get("kind.run"), Strings.Get("kind.open") } });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Interpreter", HeaderText = "İŞLEYİCİ", FillWeight = 20, MinimumWidth = 130 });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Found", HeaderText = "BULUNDU", FillWeight = 18, MinimumWidth = 130, ReadOnly = true });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Args", HeaderText = "ARGÜMANLAR", FillWeight = 12, MinimumWidth = 90 });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "DURUM", FillWeight = 19, MinimumWidth = 110, ReadOnly = true });
+        grid.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Enabled", HeaderText = "ETKİN", FillWeight = 8, MinimumWidth = Metrics.Px(60), Resizable = DataGridViewTriState.False });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Extension", HeaderText = "UZANTI", FillWeight = 10, MinimumWidth = Metrics.Px(72), ReadOnly = true });
+        grid.Columns.Add(new DataGridViewComboBoxColumn { Name = "Kind", HeaderText = "TÜR", FillWeight = 13, MinimumWidth = Metrics.Px(90), DataSource = new[] { Strings.Get("kind.run"), Strings.Get("kind.open") } });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Interpreter", HeaderText = "İŞLEYİCİ", FillWeight = 20, MinimumWidth = Metrics.Px(130) });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Found", HeaderText = "BULUNDU", FillWeight = 18, MinimumWidth = Metrics.Px(130), ReadOnly = true });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Args", HeaderText = "ARGÜMANLAR", FillWeight = 12, MinimumWidth = Metrics.Px(90) });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "DURUM", FillWeight = 19, MinimumWidth = Metrics.Px(110), ReadOnly = true });
 
         grid.CurrentCellDirtyStateChanged += (_, _) =>
         {
@@ -494,19 +538,18 @@ internal sealed class MainForm : NeonForm
 
     private (RadioButton alwaysAsk, RadioButton trustOnFirstUse, RadioButton neverAsk, ListBox folders, Label filesLabel, Panel group) BuildSecurityPanel()
     {
-        var group = new NeonGroupPanel(Strings.Get("security")) { Dock = DockStyle.Fill, Margin = new Padding(0, 0, 6, 0) };
+        var group = new NeonGroupPanel(Strings.Get("security")) { Dock = DockStyle.Fill, Margin = new Padding(0, 0, Metrics.Px(6), 0) };
         var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 4, BackColor = Color.Transparent };
         // Row0 is an Absolute height, not AutoSize: three stacked NeonRadioButtons inside a nested
         // AutoSize FlowLayoutPanel is exactly the "AutoSize row + Dock=Fill child" trap R5 already hit once
         // (see docs/tasks/R5.md, UninstallConfirmDialog). AutoSize on this row mismeasured the true content
         // height and let the row3 (filesRow) content paint on top of row0/row1 — a fixed slot removes the guess.
-        // 72px fitted only two of the three radios; "Hiç sorma" was clipped and the folders label
-        // painted over it. 96px = 3 x 32 (NeonRadioButton at Palette.Body + margins).
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 96));
+        // Fixed, but not a constant: the slot is three radio rows, so it follows the body font.
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, RadioStackHeight));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        // 66px clipped the second stacked folder button ("Çıkar"): 30 + 4 margin + 30 needs 78.
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 78));
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36));
+        // Sized to two stacked folder buttons and the margin between them; a flat 66 cut "Çıkar" in half.
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, FoldersAreaHeight));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, TrustedFilesRowHeight));
 
         var radios = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.TopDown, WrapContents = false, BackColor = Color.Transparent };
         var alwaysAsk = new NeonRadioButton { Text = "Her seferinde sor", AutoSize = true };
@@ -517,15 +560,19 @@ internal sealed class MainForm : NeonForm
         radios.Controls.Add(neverAsk);
         layout.Controls.Add(radios, 0, 0);
 
-        layout.Controls.Add(SectionLabel("GÜVENİLEN KLASÖRLER", new Padding(0, 6, 0, 2)), 0, 1);
+        layout.Controls.Add(SectionLabel("GÜVENİLEN KLASÖRLER", new Padding(0, Metrics.Px(6), 0, Metrics.Px(2))), 0, 1);
 
         var foldersArea = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent };
         foldersArea.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        foldersArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 82));
+        foldersArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, FolderButtonWidth + Metrics.Px(4)));
         var foldersList = new ListBox { Dock = DockStyle.Fill, BackColor = Palette.FieldBg, ForeColor = Palette.TextBody, Font = Palette.MonoBody, BorderStyle = BorderStyle.FixedSingle };
-        var folderButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, BackColor = Color.Transparent };
-        var addFolderButton = new NeonButton { Text = "Ekle", Primary = false, AutoSize = false, Size = new Size(78, 30), Padding = new Padding(6, 2, 6, 2), Margin = new Padding(4, 0, 0, 4) };
-        var removeFolderButton = new NeonButton { Text = "Çıkar", Primary = false, AutoSize = false, Size = new Size(78, 30), Padding = new Padding(6, 2, 6, 2), Margin = new Padding(4, 0, 0, 0) };
+        // No margin of its own: the default 3px inset shrinks the cell below the fixed button width and
+        // GDI clips the right half of the outline away, which is invisible in a build log.
+        var folderButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, BackColor = Color.Transparent, Margin = Padding.Empty };
+        var folderButtonSize = new Size(FolderButtonWidth, FolderButtonHeight);
+        var folderButtonPadding = new Padding(Metrics.Px(6), Metrics.Px(2), Metrics.Px(6), Metrics.Px(2));
+        var addFolderButton = new NeonButton { Text = "Ekle", Primary = false, AutoSize = false, Size = folderButtonSize, Padding = folderButtonPadding, Margin = new Padding(Metrics.Px(4), 0, 0, Metrics.Px(4)) };
+        var removeFolderButton = new NeonButton { Text = "Çıkar", Primary = false, AutoSize = false, Size = folderButtonSize, Padding = folderButtonPadding, Margin = new Padding(Metrics.Px(4), 0, 0, 0) };
         addFolderButton.Click += (_, _) => OnAddTrustedFolder(foldersList);
         removeFolderButton.Click += (_, _) => OnRemoveTrustedFolder(foldersList);
         folderButtons.Controls.Add(addFolderButton);
@@ -534,8 +581,8 @@ internal sealed class MainForm : NeonForm
         foldersArea.Controls.Add(folderButtons, 1, 0);
         layout.Controls.Add(foldersArea, 0, 2);
 
-        var filesRow = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, Margin = new Padding(0, 6, 0, 0), BackColor = Color.Transparent };
-        var filesLabel = new Label { AutoSize = true, Font = Palette.MonoBody, ForeColor = Palette.TextDim, Margin = new Padding(0, 6, 12, 0) };
+        var filesRow = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, Margin = new Padding(0, Metrics.Px(6), 0, 0), BackColor = Color.Transparent };
+        var filesLabel = new Label { AutoSize = true, Font = Palette.MonoBody, ForeColor = Palette.TextDim, Margin = new Padding(0, Metrics.Px(6), Metrics.Px(12), 0) };
         var clearFilesButton = new NeonButton { Text = "Tümünü temizle", Primary = false, AutoSize = true };
         clearFilesButton.Click += OnClearTrustedFiles;
         filesRow.Controls.Add(filesLabel);
@@ -548,15 +595,16 @@ internal sealed class MainForm : NeonForm
 
     private (RadioButton always, RadioButton onError, RadioButton never, TextBox editor, CheckBox logEnabled, Panel group) BuildBehaviorPanel()
     {
-        var group = new NeonGroupPanel(Strings.Get("behavior")) { Dock = DockStyle.Fill, Margin = new Padding(6, 0, 0, 0) };
+        var group = new NeonGroupPanel(Strings.Get("behavior")) { Dock = DockStyle.Fill, Margin = new Padding(Metrics.Px(6), 0, 0, 0) };
         var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 4, BackColor = Color.Transparent };
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        // Absolute, not AutoSize — same fix as BuildSecurityPanel's radios row (see comment there).
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 84));
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 44));
+        // Absolute, not AutoSize — same fix as BuildSecurityPanel's radios row (see comment there), and the
+        // same three-radio slot, so the two panels cannot drift apart when the font changes.
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, RadioStackHeight));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, EditorRowHeight));
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
-        layout.Controls.Add(SectionLabel("PENCEREYİ AÇIK TUT", new Padding(0, 0, 0, 2)), 0, 0);
+        layout.Controls.Add(SectionLabel("PENCEREYİ AÇIK TUT", new Padding(0, 0, 0, Metrics.Px(2))), 0, 0);
         var keepRadios = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.TopDown, WrapContents = false, BackColor = Color.Transparent };
         var always = new NeonRadioButton { Text = "Her zaman", AutoSize = true };
         var onError = new NeonRadioButton { Text = "Sadece hata olursa", AutoSize = true };
@@ -566,22 +614,22 @@ internal sealed class MainForm : NeonForm
         keepRadios.Controls.Add(never);
         layout.Controls.Add(keepRadios, 0, 1);
 
-        var editorRow = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1, Margin = new Padding(0, 10, 0, 0), BackColor = Color.Transparent };
+        var editorRow = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1, Margin = new Padding(0, Metrics.Px(10), 0, 0), BackColor = Color.Transparent };
         editorRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         editorRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         editorRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        var editorLabel = SectionLabel("DÜZENLEYİCİ KOMUTU", new Padding(0, 8, 6, 0));
+        var editorLabel = SectionLabel("DÜZENLEYİCİ KOMUTU", new Padding(0, Metrics.Px(8), Metrics.Px(6), 0));
         editorLabel.Anchor = AnchorStyles.Left;
         var editorBox = new TextBox { Dock = DockStyle.Fill, BackColor = Palette.FieldBg, ForeColor = Palette.NeonBlue, Font = Palette.MonoBody, BorderStyle = BorderStyle.FixedSingle };
-        var testButton = new NeonButton { Text = "Test et", Primary = false, AutoSize = true, Margin = new Padding(6, 0, 0, 0) };
+        var testButton = new NeonButton { Text = "Test et", Primary = false, AutoSize = true, Margin = new Padding(Metrics.Px(6), 0, 0, 0) };
         testButton.Click += OnTestEditorClicked;
         editorRow.Controls.Add(editorLabel, 0, 0);
         editorRow.Controls.Add(editorBox, 1, 0);
         editorRow.Controls.Add(testButton, 2, 0);
         layout.Controls.Add(editorRow, 0, 2);
 
-        var logRow = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, Margin = new Padding(0, 10, 0, 0), BackColor = Color.Transparent };
-        var logCheck = new NeonCheckBox { Text = "Günlük tut", AutoSize = true, Margin = new Padding(0, 4, 12, 0) };
+        var logRow = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, Margin = new Padding(0, Metrics.Px(10), 0, 0), BackColor = Color.Transparent };
+        var logCheck = new NeonCheckBox { Text = "Günlük tut", AutoSize = true, Margin = new Padding(0, Metrics.Px(4), Metrics.Px(12), 0) };
         var openLogButton = new NeonButton { Text = "Günlük klasörünü aç", Primary = false, AutoSize = true };
         openLogButton.Click += (_, _) => OpenFolder(RunlyPaths.AppDataDir);
         logRow.Controls.Add(logCheck);
@@ -610,7 +658,9 @@ internal sealed class MainForm : NeonForm
         {
             var fileName = RunlyRegistryLayout.CategoryIconFileName(category);
             using var stream = assembly.GetManifestResourceStream("Runly.Settings.assets." + fileName);
-            if (stream is not null) _categoryIcons[category] = new Icon(stream, new Size(20, 20));
+            // Asking the .ico for the scaled size lets it pick a real frame instead of stretching the 20px one.
+            var iconSize = Metrics.CategoryIconSize;
+            if (stream is not null) _categoryIcons[category] = new Icon(stream, new Size(iconSize, iconSize));
         }
     }
 
@@ -624,10 +674,13 @@ internal sealed class MainForm : NeonForm
         if (selected)
         {
             using var strip = new SolidBrush(Palette.NeonBlue);
-            e.Graphics.FillRectangle(strip, e.Bounds.Left, e.Bounds.Top, 3, e.Bounds.Height);
+            e.Graphics.FillRectangle(strip, e.Bounds.Left, e.Bounds.Top, Metrics.Px(3), e.Bounds.Height);
         }
+
+        var iconSize = Metrics.CategoryIconSize;
+        var iconLeft = e.Bounds.Left + Metrics.Px(8);
         if (_categoryIcons.TryGetValue(category, out var icon))
-            e.Graphics.DrawIcon(icon, new Rectangle(e.Bounds.Left + 8, e.Bounds.Top + 7, 20, 20));
+            e.Graphics.DrawIcon(icon, new Rectangle(iconLeft, e.Bounds.Top + ((e.Bounds.Height - iconSize) / 2), iconSize, iconSize));
 
         var entries = ExtensionCatalog.Entries.Where(entry => entry.Category == category).ToArray();
         var catalogExtensions = ExtensionCatalog.Entries.Select(entry => entry.Extension).ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -636,10 +689,14 @@ internal sealed class MainForm : NeonForm
         var total = entries.Length + custom.Length;
         var label = Strings.Get("category." + category);
         var fore = selected ? Palette.NeonBlue : Palette.TextBody;
-        TextRenderer.DrawText(e.Graphics, label, Font, new Rectangle(e.Bounds.Left + 36, e.Bounds.Top, e.Bounds.Width - 88, e.Bounds.Height), fore,
+        var countWidth = Metrics.Px(46);
+        var labelLeft = iconLeft + iconSize + Metrics.Px(8);
+        TextRenderer.DrawText(e.Graphics, label, Font,
+            new Rectangle(labelLeft, e.Bounds.Top, Math.Max(0, e.Bounds.Right - labelLeft - countWidth - Metrics.Px(6)), e.Bounds.Height), fore,
             TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
         TextRenderer.DrawText(e.Graphics, $"{enabled}/{total}", Palette.LabelFont,
-            new Rectangle(e.Bounds.Right - 54, e.Bounds.Top, 46, e.Bounds.Height), selected ? Palette.NeonBlue : Palette.TextHint,
+            new Rectangle(e.Bounds.Right - countWidth - Metrics.Px(8), e.Bounds.Top, countWidth, e.Bounds.Height),
+            selected ? Palette.NeonBlue : Palette.TextHint,
             TextFormatFlags.Right | TextFormatFlags.VerticalCenter);
     }
 

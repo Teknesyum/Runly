@@ -1,4 +1,4 @@
-namespace Runly.Settings.Dialogs;
+﻿namespace Runly.Settings.Dialogs;
 
 /// <summary>Shows a line-by-line "what just happened" report after install/uninstall/restore (SPEC 9, SPEC 10 §5).</summary>
 internal sealed class ResultDialog : NeonForm
@@ -28,9 +28,9 @@ internal sealed class ResultDialog : NeonForm
         MaximizeBox = false;
         ShowIcon = false;
         ShowInTaskbar = false;
-        ClientSize = new Size(540, 360);
+        ClientSize = new Size(Metrics.Px(540), Metrics.Px(360));
         AutoScaleMode = AutoScaleMode.Dpi;
-        Padding = new Padding(12);
+        Padding = new Padding(Metrics.Px(12));
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
         Font = Palette.Body;
@@ -40,7 +40,7 @@ internal sealed class ResultDialog : NeonForm
         var headline = new Label
         {
             Dock = DockStyle.Top,
-            Height = 44,
+            Height = Metrics.Row(Palette.H2, 19),
             Font = Palette.H2,
             Text = success
                 ? warned ? "⚠ " + warningHeadline : "✅ İşlem tamamlandı."
@@ -76,7 +76,7 @@ internal sealed class ResultDialog : NeonForm
         {
             Dock = DockStyle.Bottom,
             FlowDirection = FlowDirection.RightToLeft,
-            Height = 40,
+            Height = Metrics.ButtonHeight + Metrics.Px(8),
             BackColor = Palette.AppBg,
         };
         buttonPanel.Controls.Add(closeButton);

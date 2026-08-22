@@ -10,8 +10,15 @@ namespace Runly.Settings.Dialogs;
 internal sealed class ChooseApplicationDialog : NeonForm
 {
     private const int SearchDebounceMs = 180;
-    private const int RowHeight = 48;
-    private const int IconSize = 32;
+
+    /// <summary>Shell icon edge. U1 replaces how the bitmap is fetched; changing it here is enough,
+    /// because the row below is sized from it rather than from a second number that has to be kept in sync.</summary>
+    private static int IconSize => Metrics.Px(32);
+
+    /// <summary>The row carries the icon on one side and two stacked lines of text on the other, so it is
+    /// the taller of the two plus a gutter. A literal here clipped the path line at 125% and 150%.</summary>
+    private static int RowHeight =>
+        Math.Max(IconSize, Metrics.Line(Palette.Body) + Metrics.Line(Palette.MonoBody)) + Metrics.Px(12);
 
     private static readonly Color ChipFill = Tint(Palette.NeonPink, 26);
     private static readonly Color ChipBorder = Tint(Palette.NeonPink, 150);
@@ -59,8 +66,8 @@ internal sealed class ChooseApplicationDialog : NeonForm
         StartPosition = FormStartPosition.CenterParent;
         MinimizeBox = false;
         ShowInTaskbar = false;
-        ClientSize = new Size(600, 560);
-        MinimumSize = new Size(520, 460);
+        ClientSize = new Size(Metrics.Px(600), Metrics.Px(560));
+        MinimumSize = new Size(Metrics.Px(520), Metrics.Px(460));
         AutoScaleMode = AutoScaleMode.Dpi;
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
@@ -72,13 +79,14 @@ internal sealed class ChooseApplicationDialog : NeonForm
             Dock = DockStyle.Fill,
             ColumnCount = 1,
             RowCount = 4,
-            Padding = new Padding(16, 12, 16, 12),
+            Padding = new Padding(Metrics.Px(16), Metrics.Px(12), Metrics.Px(16), Metrics.Px(12)),
             BackColor = Color.Transparent,
         };
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 52));
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));
+        // The prompt names the extension, so Turkish wraps where English does not: two lines are reserved.
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, (Metrics.Line(Palette.H3) * 2) + Metrics.Px(14)));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, Metrics.TextBoxHeight + Metrics.Px(8)));
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 46));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, Metrics.ButtonHeight + Metrics.Px(14)));
 
         var prompt = new Label
         {
@@ -99,7 +107,7 @@ internal sealed class ChooseApplicationDialog : NeonForm
             ForeColor = Palette.NeonBlue,
             Font = Palette.MonoBody,
             BorderStyle = BorderStyle.FixedSingle,
-            Margin = new Padding(0, 0, 0, 8),
+            Margin = new Padding(0, 0, 0, Metrics.Px(8)),
         };
 
         // Same reason as the main window: every keystroke rebuilt the whole owner-drawn list, and each
@@ -117,7 +125,7 @@ internal sealed class ChooseApplicationDialog : NeonForm
         };
         layout.Controls.Add(_searchBox, 0, 1);
 
-        var listHost = new Panel { Dock = DockStyle.Fill, BackColor = Palette.FieldBg, Padding = new Padding(1) };
+        var listHost = new Panel { Dock = DockStyle.Fill, BackColor = Palette.FieldBg, Padding = new Padding(Metrics.Px(1)) };
         _list = new ListBox
         {
             Dock = DockStyle.Fill,
@@ -148,11 +156,11 @@ internal sealed class ChooseApplicationDialog : NeonForm
             FlowDirection = FlowDirection.RightToLeft,
             WrapContents = false,
             BackColor = Color.Transparent,
-            Padding = new Padding(0, 8, 0, 0),
+            Padding = new Padding(0, Metrics.Px(8), 0, 0),
         };
-        var selectButton = new NeonButton { Text = Strings.Get("chooseApp.select"), Primary = true, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(8, 0, 0, 0) };
-        var cancelButton = new NeonButton { Text = Strings.Get("cancel"), Primary = false, BackColor = Palette.AppBg, DialogResult = DialogResult.Cancel, AutoSize = true, Margin = new Padding(8, 0, 0, 0) };
-        var browseButton = new NeonButton { Text = Strings.Get("chooseApp.browse"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(8, 0, 0, 0) };
+        var selectButton = new NeonButton { Text = Strings.Get("chooseApp.select"), Primary = true, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(Metrics.Px(8), 0, 0, 0) };
+        var cancelButton = new NeonButton { Text = Strings.Get("cancel"), Primary = false, BackColor = Palette.AppBg, DialogResult = DialogResult.Cancel, AutoSize = true, Margin = new Padding(Metrics.Px(8), 0, 0, 0) };
+        var browseButton = new NeonButton { Text = Strings.Get("chooseApp.browse"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(Metrics.Px(8), 0, 0, 0) };
         selectButton.Click += (_, _) => Accept();
         browseButton.Click += (_, _) => Browse();
         buttons.Controls.Add(selectButton);
@@ -233,38 +241,51 @@ internal sealed class ChooseApplicationDialog : NeonForm
             g.FillRectangle(background, e.Bounds);
         }
 
+        var gutter = Metrics.Px(12);
+
         if (selected)
         {
             using var marker = new SolidBrush(Palette.NeonBlue);
-            g.FillRectangle(marker, e.Bounds.Left, e.Bounds.Top + 8, 3, e.Bounds.Height - 16);
+            g.FillRectangle(marker, e.Bounds.Left, e.Bounds.Top + Metrics.Px(8), Metrics.Px(3), e.Bounds.Height - Metrics.Px(16));
         }
 
-        var iconBox = new Rectangle(e.Bounds.Left + 14, e.Bounds.Top + ((RowHeight - IconSize) / 2), IconSize, IconSize);
+        var iconBox = new Rectangle(
+            e.Bounds.Left + Metrics.Px(14),
+            e.Bounds.Top + ((e.Bounds.Height - IconSize) / 2),
+            IconSize,
+            IconSize);
         DrawApplicationIcon(g, choice.Path, iconBox);
 
         var chipWidth = choice.Suggested ? MeasureChip(g) : 0;
-        var textLeft = iconBox.Right + 12;
-        var textWidth = Math.Max(40, e.Bounds.Right - textLeft - 12 - chipWidth);
+        var textLeft = iconBox.Right + gutter;
+        var textWidth = Math.Max(Metrics.Px(40), e.Bounds.Right - textLeft - gutter - chipWidth);
+
+        // Both lines are laid out from the measured line heights and centred as a block, so the pair stays
+        // inside the row whichever of the two fonts grows.
+        var nameLine = Metrics.Line(Palette.Body);
+        var pathLine = Metrics.Line(Palette.MonoBody);
+        var textTop = e.Bounds.Top + ((e.Bounds.Height - nameLine - pathLine) / 2);
 
         TextRenderer.DrawText(g, choice.DisplayName, Palette.Body,
-            new Rectangle(textLeft, e.Bounds.Top + 6, textWidth, 20),
+            new Rectangle(textLeft, textTop, textWidth, nameLine),
             selected ? Palette.NeonBlue : Palette.TextStrong,
             TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
 
         TextRenderer.DrawText(g, choice.Path, Palette.MonoBody,
-            new Rectangle(textLeft, e.Bounds.Top + 26, textWidth, 17),
+            new Rectangle(textLeft, textTop + nameLine, textWidth, pathLine),
             Palette.TextDim,
             TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.PathEllipsis);
 
         if (choice.Suggested)
         {
-            DrawSuggestedChip(g, new Rectangle(e.Bounds.Right - chipWidth - 12,
-                e.Bounds.Top + ((RowHeight - 24) / 2), chipWidth, 24));
+            var chipHeight = Metrics.Row(Palette.H3, 5);
+            DrawSuggestedChip(g, new Rectangle(e.Bounds.Right - chipWidth - gutter,
+                e.Bounds.Top + ((e.Bounds.Height - chipHeight) / 2), chipWidth, chipHeight));
         }
     }
 
     private static int MeasureChip(Graphics g) =>
-        TextRenderer.MeasureText(g, Strings.Get("chooseApp.suggested"), Palette.H3).Width + 22;
+        TextRenderer.MeasureText(g, Strings.Get("chooseApp.suggested"), Palette.H3).Width + Metrics.Px(22);
 
     /// <summary>Chip in the Teknesyum "Çip" role: 6px radius, pre-blended pink fill, pink outline and
     /// a one-pixel outer halo. The glow belongs to the box, never to the glyphs.</summary>
@@ -273,15 +294,18 @@ internal sealed class ChooseApplicationDialog : NeonForm
         var previous = g.SmoothingMode;
         g.SmoothingMode = SmoothingMode.AntiAlias;
 
-        using (var halo = NeonTheme.RoundedRect(Rectangle.Inflate(bounds, 1, 1), 7))
-        using (var haloPen = new Pen(ChipGlow))
+        var radius = Metrics.Px(6);
+        var haloOffset = Metrics.Px(1);
+
+        using (var halo = NeonTheme.RoundedRect(Rectangle.Inflate(bounds, haloOffset, haloOffset), radius + haloOffset))
+        using (var haloPen = new Pen(ChipGlow, Metrics.Scale))
         {
             g.DrawPath(haloPen, halo);
         }
 
-        using (var path = NeonTheme.RoundedRect(bounds, 6))
+        using (var path = NeonTheme.RoundedRect(bounds, radius))
         using (var fill = new SolidBrush(ChipFill))
-        using (var pen = new Pen(ChipBorder))
+        using (var pen = new Pen(ChipBorder, Metrics.Scale))
         {
             g.FillPath(fill, path);
             g.DrawPath(pen, path);
@@ -298,8 +322,10 @@ internal sealed class ChooseApplicationDialog : NeonForm
         var image = ResolveIcon(path);
         if (image is null)
         {
-            using var placeholder = new Pen(Tint(Palette.NeonBlue, 90));
-            g.DrawRectangle(placeholder, bounds.Left + 4, bounds.Top + 4, bounds.Width - 9, bounds.Height - 9);
+            var inset = Metrics.Px(4);
+            using var placeholder = new Pen(Tint(Palette.NeonBlue, 90), Metrics.Scale);
+            g.DrawRectangle(placeholder, bounds.Left + inset, bounds.Top + inset,
+                bounds.Width - (inset * 2) - 1, bounds.Height - (inset * 2) - 1);
             return;
         }
 

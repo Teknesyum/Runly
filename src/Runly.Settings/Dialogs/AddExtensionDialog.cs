@@ -1,4 +1,4 @@
-using Runly.Core.Defaults;
+﻿using Runly.Core.Defaults;
 using Runly.Core.Models;
 
 namespace Runly.Settings.Dialogs;
@@ -19,7 +19,7 @@ internal sealed class AddExtensionDialog : NeonForm
         MaximizeBox = false;
         ShowIcon = false;
         ShowInTaskbar = false;
-        ClientSize = new Size(360, 170);
+        ClientSize = new Size(Metrics.Px(360), Metrics.Px(170));
         AutoScaleMode = AutoScaleMode.Dpi;
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
@@ -30,14 +30,14 @@ internal sealed class AddExtensionDialog : NeonForm
             Dock = DockStyle.Fill,
             ColumnCount = 2,
             RowCount = 4,
-            Padding = new Padding(12),
+            Padding = new Padding(Metrics.Px(12)),
             BackColor = Color.Transparent,
         };
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100));
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Metrics.Px(100)));
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         for (var i = 0; i < 3; i++)
         {
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 32));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, Metrics.TextBoxHeight + Metrics.Px(2)));
         }
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 

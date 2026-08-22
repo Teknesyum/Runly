@@ -1,4 +1,4 @@
-using Runly.Core.Shell;
+﻿using Runly.Core.Shell;
 
 namespace Runly.Settings.Dialogs;
 
@@ -16,9 +16,9 @@ internal sealed class RestoreBackupDialog : NeonForm
         MaximizeBox = false;
         ShowIcon = false;
         ShowInTaskbar = false;
-        ClientSize = new Size(520, 320);
+        ClientSize = new Size(Metrics.Px(520), Metrics.Px(320));
         AutoScaleMode = AutoScaleMode.Dpi;
-        Padding = new Padding(12);
+        Padding = new Padding(Metrics.Px(12));
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
         Font = Palette.Body;
@@ -35,9 +35,9 @@ internal sealed class RestoreBackupDialog : NeonForm
             Font = Palette.MonoBody,
             BorderStyle = BorderStyle.FixedSingle,
         };
-        _list.Columns.Add("Tarih", 160);
-        _list.Columns.Add("Dosya", 240);
-        _list.Columns.Add("Boyut", 90);
+        _list.Columns.Add("Tarih", Metrics.Px(160));
+        _list.Columns.Add("Dosya", Metrics.Px(240));
+        _list.Columns.Add("Boyut", Metrics.Px(90));
 
         foreach (var backup in backups)
         {
@@ -59,7 +59,7 @@ internal sealed class RestoreBackupDialog : NeonForm
         {
             Dock = DockStyle.Bottom,
             FlowDirection = FlowDirection.RightToLeft,
-            Height = 40,
+            Height = Metrics.ButtonHeight + Metrics.Px(8),
             BackColor = Palette.AppBg,
         };
 

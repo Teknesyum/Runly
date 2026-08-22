@@ -5,10 +5,13 @@ namespace Runly.Settings;
 /// <summary>Borderless neon window retaining native move, resize, Snap, system-menu and maximize semantics.</summary>
 internal class NeonForm : Form
 {
-    private const int CaptionHeight = 36;
-    private const int CornerRadius = 12;
-    private const int CaptionButtonWidth = 52;
-    private const int ResizeBorder = 7;
+    // The caption band, its buttons and the grab gutter all carry text or a pointer target, so they are
+    // derived rather than typed: at 150% a 36px band holds a 33px glyph and the close cross is clipped.
+    private static int CaptionHeight => Metrics.CaptionHeight;
+    private static int CornerRadius => Metrics.WindowCornerRadius;
+    private static int CaptionButtonWidth => Metrics.CaptionButtonWidth;
+    private static int ResizeBorder => Metrics.ResizeBorder;
+
     private const int WmNcHitTest = 0x0084;
     private const int WmNcCalcSize = 0x0083;
     private const int WsThickFrame = 0x00040000;
@@ -112,14 +115,18 @@ internal class NeonForm : Form
         using var divider = new Pen(Color.FromArgb(80, Palette.NeonBlue));
         g.DrawLine(divider, 0, CaptionHeight - 1, ClientSize.Width, CaptionHeight - 1);
 
+        var iconInset = Metrics.Px(12);
+        var iconSize = Metrics.CaptionIconSize;
         var icon = Icon;
         if (icon is not null)
         {
-            g.DrawIcon(icon, new Rectangle(12, 10, 16, 16));
+            g.DrawIcon(icon, new Rectangle(iconInset, (CaptionHeight - iconSize) / 2, iconSize, iconSize));
         }
 
+        var titleLeft = iconInset + iconSize + Metrics.Px(8);
         var titleColor = _active ? Palette.NeonBlue : Palette.TextLabel;
-        TextRenderer.DrawText(g, Text, Palette.Body, new Rectangle(36, 0, Math.Max(0, Width - (CaptionButtonWidth * 3) - 44), CaptionHeight),
+        TextRenderer.DrawText(g, Text, Palette.Body,
+            new Rectangle(titleLeft, 0, Math.Max(0, Width - (CaptionButtonWidth * 3) - titleLeft - Metrics.Px(8)), CaptionHeight),
             titleColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
 
         DrawCaptionButton(g, MinimizeBounds, _minimizeHover, "─", Palette.NeonBlue);

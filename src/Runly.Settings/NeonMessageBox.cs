@@ -1,4 +1,4 @@
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
 
 namespace Runly.Settings;
 
@@ -38,11 +38,17 @@ internal sealed class NeonMessageDialog : NeonForm
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
         Font = Palette.Body;
-        Padding = new Padding(20);
+        Padding = new Padding(Metrics.Px(20));
         ClientSize = MeasureDialog(message);
 
+        // The badge sits in the card's left padding, so that padding is the badge slot rather than a number
+        // of its own; the same applies to the title band above it.
         var card = new NeonGroupPanel(CaptionFor(icon)) { Dock = DockStyle.Fill };
-        card.Padding = new Padding(70, 42, 20, 18);
+        card.Padding = new Padding(
+            BadgeInset + BadgeSize + Metrics.Px(16),
+            Metrics.GroupTitleBand + Metrics.Px(8),
+            Metrics.Px(20),
+            Metrics.Px(18));
 
         var messageLabel = new Label
         {
@@ -51,23 +57,23 @@ internal sealed class NeonMessageDialog : NeonForm
             ForeColor = Palette.TextBody,
             Font = Palette.Body,
             TextAlign = ContentAlignment.TopLeft,
-            Padding = new Padding(0, 3, 0, 0),
+            Padding = new Padding(0, Metrics.Px(3), 0, 0),
         };
 
         var iconBadge = new IconBadge(icon)
         {
-            Location = new Point(18, 46),
-            Size = new Size(36, 36),
+            Location = new Point(BadgeInset, Metrics.GroupTitleBand + Metrics.Px(12)),
+            Size = new Size(BadgeSize, BadgeSize),
             Anchor = AnchorStyles.Top | AnchorStyles.Left,
         };
 
         var buttonBar = new FlowLayoutPanel
         {
             Dock = DockStyle.Bottom,
-            Height = 50,
+            Height = Metrics.ButtonHeight + Metrics.Px(18),
             FlowDirection = FlowDirection.RightToLeft,
             WrapContents = false,
-            Padding = new Padding(0, 10, 0, 0),
+            Padding = new Padding(0, Metrics.Px(10), 0, 0),
             BackColor = Palette.Surface,
         };
 
@@ -84,7 +90,7 @@ internal sealed class NeonMessageDialog : NeonForm
                 Primary = i == DefaultIndex(defaultButton, definitions.Length),
                 BackColor = Palette.Surface,
                 AutoSize = true,
-                Margin = new Padding(8, 0, 0, 0),
+                Margin = new Padding(Metrics.Px(8), 0, 0, 0),
             };
             buttonBar.Controls.Add(button);
             if (button.Primary) defaultControl = button;
@@ -100,13 +106,24 @@ internal sealed class NeonMessageDialog : NeonForm
         Shown += (_, _) => defaultControl?.Focus();
     }
 
+    private static int BadgeInset => Metrics.Px(18);
+
+    private static int BadgeSize => Metrics.Px(36);
+
+    /// <summary>Chrome around the wrapped message: badge column, card padding, title band and button bar.
+    /// Measured text already grows with the DPI, so only the chrome had to be derived.</summary>
     private static Size MeasureDialog(string message)
     {
-        var width = Math.Clamp(TextRenderer.MeasureText(message, Palette.Body, new Size(520, 0),
-            TextFormatFlags.WordBreak).Width + 150, 430, 620);
-        var textHeight = TextRenderer.MeasureText(message, Palette.Body, new Size(width - 150, 0),
+        var chromeWidth = Metrics.Px(150);
+        var chromeHeight = Metrics.Px(210);
+        var width = Math.Clamp(
+            TextRenderer.MeasureText(message, Palette.Body, new Size(Metrics.Px(520), 0),
+                TextFormatFlags.WordBreak).Width + chromeWidth,
+            Metrics.Px(430),
+            Metrics.Px(620));
+        var textHeight = TextRenderer.MeasureText(message, Palette.Body, new Size(width - chromeWidth, 0),
             TextFormatFlags.WordBreak).Height;
-        return new Size(width, Math.Clamp(textHeight + 210, 270, 490));
+        return new Size(width, Math.Clamp(textHeight + chromeHeight, Metrics.Px(270), Metrics.Px(490)));
     }
 
     private static string CaptionFor(MessageBoxIcon icon) => icon switch
@@ -155,10 +172,12 @@ internal sealed class NeonMessageDialog : NeonForm
                 MessageBoxIcon.Question => Palette.NeonPurple,
                 _ => Palette.NeonBlue,
             };
+            var inset = Metrics.Px(2);
+            var diameter = Math.Max(1, Math.Min(Width, Height) - (inset * 2) - 1);
             using var glow = new SolidBrush(Color.FromArgb(32, color));
-            using var ring = new Pen(color, 2f);
-            e.Graphics.FillEllipse(glow, 2, 2, 31, 31);
-            e.Graphics.DrawEllipse(ring, 2, 2, 31, 31);
+            using var ring = new Pen(color, 2f * Metrics.Scale);
+            e.Graphics.FillEllipse(glow, inset, inset, diameter, diameter);
+            e.Graphics.DrawEllipse(ring, inset, inset, diameter, diameter);
             var glyph = _kind switch
             {
                 MessageBoxIcon.Error => "×",

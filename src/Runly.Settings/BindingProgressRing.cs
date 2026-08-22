@@ -7,12 +7,14 @@ internal sealed class BindingProgressRing : Control
     private int _bound;
     private int _total;
 
+    private const int RingGrid = 58;
+
     public BindingProgressRing()
     {
         DoubleBuffered = true;
-        Height = 82;
         Dock = DockStyle.Top;
         Font = Palette.MonoBody;
+        Height = Metrics.Px(RingGrid) + Metrics.Px(24);
     }
 
     public void SetProgress(int bound, int total)
@@ -26,12 +28,22 @@ internal sealed class BindingProgressRing : Control
     {
         base.OnPaint(e);
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-        var circle = new Rectangle(10, 9, 58, 58);
-        using var track = new Pen(Palette.FieldBg, 7);
-        using var progress = new Pen(Palette.NeonBlue, 7) { StartCap = LineCap.Round, EndCap = LineCap.Round };
+        var ring = Metrics.Px(RingGrid);
+        var circle = new Rectangle(Metrics.Px(10), Metrics.Px(9), ring, ring);
+        var stroke = ring * 7f / RingGrid;
+        using var track = new Pen(Palette.FieldBg, stroke);
+        using var progress = new Pen(Palette.NeonBlue, stroke) { StartCap = LineCap.Round, EndCap = LineCap.Round };
         e.Graphics.DrawEllipse(track, circle);
         if (_total > 0) e.Graphics.DrawArc(progress, circle, -90, 360f * _bound / _total);
-        TextRenderer.DrawText(e.Graphics, $"{_bound}/{_total}", Font, new Rectangle(76, 19, Width - 82, 24), Palette.TextBody);
-        TextRenderer.DrawText(e.Graphics, Strings.Get("binding.progress"), Palette.LabelFont, new Rectangle(76, 43, Width - 82, 20), Palette.TextHint);
+
+        var textLeft = circle.Right + Metrics.Px(8);
+        var textWidth = Math.Max(0, Width - textLeft - Metrics.Px(6));
+        var countLine = Metrics.Line(Font);
+        var labelLine = Metrics.Line(Palette.LabelFont);
+        var top = (Height - countLine - labelLine - Metrics.Px(4)) / 2;
+        TextRenderer.DrawText(e.Graphics, $"{_bound}/{_total}", Font,
+            new Rectangle(textLeft, top, textWidth, countLine), Palette.TextBody);
+        TextRenderer.DrawText(e.Graphics, Strings.Get("binding.progress"), Palette.LabelFont,
+            new Rectangle(textLeft, top + countLine + Metrics.Px(4), textWidth, labelLine), Palette.TextHint);
     }
 }
