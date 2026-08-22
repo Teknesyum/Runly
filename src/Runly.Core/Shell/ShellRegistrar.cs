@@ -505,7 +505,10 @@ public sealed class ShellRegistrar : IShellRegistrar
 
         WriteVerb(key, "open", "Runly ile çalıştır", consoleCommand + " \"%1\" %*");
         WriteVerb(key, "runas", "Yönetici olarak çalıştır (Runly)", consoleCommand + " --verb runas \"%1\" %*");
-        WriteVerb(key, "edit", "Düzenle", consoleCommand + " --verb edit \"%1\"");
+        // "Düzenle" is the one Run-side verb that never needs a console: it hands the file to the
+        // configured editor and returns without waiting, so the console binary would flash a black
+        // window for nothing — the same defect K29 removed from double-click.
+        WriteVerb(key, "edit", "Düzenle", command + " --verb edit \"%1\"");
         WriteVerb(key, "runlyargs", "Runly ile argümanlarla çalıştır…", consoleCommand + " --verb prompt-args \"%1\"");
     }
 

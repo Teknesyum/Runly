@@ -85,7 +85,9 @@ public sealed class ShellRegistrarTests : IDisposable
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\open\command", "")!.AsString());
         Assert.Equal("\"C:\\Program Files\\Runly\\RunlyConsole.exe\" --verb runas \"%1\" %*",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\runas\command", "")!.AsString());
-        Assert.Equal("\"C:\\Program Files\\Runly\\RunlyConsole.exe\" --verb edit \"%1\"",
+        // "Düzenle" hands the file to the editor and returns, so it uses the GUI binary even on a Run
+        // mapping; the console binary would flash a black window for a verb that never writes to it.
+        Assert.Equal("\"C:\\Program Files\\Runly\\Runly.exe\" --verb edit \"%1\"",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\edit\command", "")!.AsString());
         Assert.Equal("\"C:\\Program Files\\Runly\\RunlyConsole.exe\" --verb prompt-args \"%1\"",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\runlyargs\command", "")!.AsString());
