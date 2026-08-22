@@ -11,7 +11,11 @@
                               "notepad.exe",
                               "Code.exe"
                           ],
-        "blocked":  false
+        "blocked":  false,
+        "riskNote":  {
+                         "tr":  "Windows üzerinde çift tıklanan bir JavaScript dosyası tarayıcıda değil, wscript ile ve sizin tam yetkilerinizle çalışır. Tarayıcı içinde çalışan JavaScript'in aksine dosyalarınıza ve sisteminize erişebilir.",
+                         "en":  "On Windows a double-clicked JavaScript file runs through wscript rather than in a browser, with your full privileges. Unlike JavaScript inside a browser, it can reach your files and your system."
+                     }
     },
     {
         "extension":  ".mjs",
@@ -67,7 +71,11 @@
                               "notepad.exe",
                               "Code.exe"
                           ],
-        "blocked":  false
+        "blocked":  false,
+        "riskNote":  {
+                         "tr":  "PowerShell betikleri çalıştırma ilkesiyle bir ölçüde korunur, ancak bu koruma kolayca atlatılabilir. Betiği çalıştırmadan önce içeriğini gözden geçirin.",
+                         "en":  "PowerShell scripts are partly protected by the execution policy, but that protection can be bypassed easily. Review the contents of the script before you run it."
+                     }
     },
     {
         "extension":  ".py",
@@ -193,7 +201,11 @@
                               "notepad.exe",
                               "Code.exe"
                           ],
-        "blocked":  false
+        "blocked":  false,
+        "riskNote":  {
+                         "tr":  "JAR dosyaları çalışmak için kurulu bir Java çalışma ortamı gerektirir ve çoğunlukla meşru uygulamalar olarak dağıtılır. Yine de kaynağını bildiğiniz dosyaları tercih edin.",
+                         "en":  "JAR files need an installed Java runtime and are usually distributed as legitimate applications. Even so, prefer files whose source you know."
+                     }
     },
     {
         "extension":  ".bash",
@@ -305,7 +317,11 @@
                               "notepad.exe",
                               "Code.exe"
                           ],
-        "blocked":  false
+        "blocked":  false,
+        "riskNote":  {
+                         "tr":  "VBS dosyaları wscript ile çalışır ve dosyalarınıza tam olarak erişebilir. E-posta ekleri ve indirmeler yoluyla yayılan zararlı yazılımların bilinen bir taşıyıcısıdır.",
+                         "en":  "VBS files run through wscript with full access to your files. They are a well-known carrier for malware spread by email attachments and downloads."
+                     }
     },
     {
         "extension":  ".wsf",
@@ -319,7 +335,11 @@
                               "notepad.exe",
                               "Code.exe"
                           ],
-        "blocked":  false
+        "blocked":  false,
+        "riskNote":  {
+                         "tr":  "WSF dosyaları wscript ile çalışır ve tek dosyada birden fazla betik dilini barındırabilir. E-posta ekleri ve indirmeler yoluyla yayılan zararlı yazılımlarda sıkça kullanılır.",
+                         "en":  "WSF files run through wscript and can combine several scripting languages in one file. They are frequently used by malware spread through email attachments and downloads."
+                     }
     },
     {
         "extension":  ".wsh",
@@ -347,7 +367,11 @@
                               "notepad.exe",
                               "Code.exe"
                           ],
-        "blocked":  false
+        "blocked":  false,
+        "riskNote":  {
+                         "tr":  "HTA dosyaları mshta ile, tarayıcı korumaları olmadan ve doğrudan sizin yetkilerinizle çalışır. Yalnızca kaynağına güvendiğiniz dosyaları açın.",
+                         "en":  "HTA files run through mshta with your full user privileges and none of the browser's protections. Only open files from a source you trust."
+                     }
     },
     {
         "extension":  ".groovy",
