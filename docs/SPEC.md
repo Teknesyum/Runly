@@ -192,11 +192,16 @@ Runly.exe [--verb <run|runas|edit|prompt-args>] [--no-wait] <script-path> [scrip
 PATH araması `where.exe` çağırmadan yapılmalı: `PATH` + `PATHEXT` üzerinden manuel tarama
 (hız için). Sonuç `%LOCALAPPDATA%\Runly\ipcache.json`'da 24 saat cache'lenir.
 
-**Python tuzağı (karar K9 ile güncellendi):** `%LOCALAPPDATA%\Microsoft\WindowsApps\*.exe`
-app-execution alias'ları 0 bayt görünür. Bunların bir kısmı Store'u açan install stub'ı, bir kısmı
-çalışan gerçek alias — **boyutla ayırt edilemezler.** Kural: gerçek bir exe varsa her zaman o tercih
-edilir; hiç yoksa 0 baytlık aday **son çare olarak kabul edilir**. Bu makinede `py.exe` tek adaydır,
-0 bayttır ve çalışır (Python 3.14.2). `py` launcher'ı `python`'a tercih edilir.
+**Python tuzağı (K9 ile açıldı, K28 ile kapandı):** `%LOCALAPPDATA%\Microsoft\WindowsApps\*.exe`
+app-execution alias'ları 0 bayt görünür. Bir kısmı Store'u açan ölü yönlendirici, bir kısmı çalışan
+gerçek alias. K9 bunların **boyutla ayırt edilemediğini** söylüyordu ve bu doğruydu — ama boyut tek
+bilgi değil. Bu dosyalar birer **reparse point**: `FSCTL_GET_REPARSE_POINT` ile etiket okunur,
+`IO_REPARSE_TAG_APPEXECLINK` ise yükün içindeki hedef yol çözülür. Hedef bir `*Redirector.exe` ise
+ölü takozdur ve atlanır; değilse çalışan alias'tır ve doğrudan kabul edilir. Reparse hiç okunamazsa
+K9'un eski davranışına düşülür: 0 baytlık aday son çare olarak saklanır.
+
+Kural yine de şu: gerçek bir exe varsa her zaman o tercih edilir. Bu makinede `py.exe` 0 bayttır ve
+çalışır; `py` launcher'ı `python`'a tercih edilir.
 
 ## 9. Shell entegrasyonu
 
@@ -295,6 +300,7 @@ Paketler arası çelişkiler burada çözülür. Bir paket dosyası bu bölümle
 | K6 | `ExtensionStatus.UserChoiceOwnerName` | **Eklenmesi onaylandı** — `string? UserChoiceOwnerName { get; init; }`. Bu, T1 modeline yapılan tek yetkili eklemedir; T4 ekleyecek. Gerekçe: §10.2'deki turuncu satır "Windows bu uzantıyı *Not Defteri*'ne bağlamış" diyebilmeli; isim olmadan mesaj soyut kalıyor. | 2026-08-09 |
 | K7 | `editorCommand` boşsa | `notepad.exe`'ye düş. Sabit T3'te (`Ui/EditorLauncher.cs`), Core'a konmayacak. | 2026-08-09 |
 | K9 | 0-byte aday (Store alias) | **Kural değişti.** §8'in "0 bayt adayı atla" kuralı mutlak değil: gerçek bir exe her zaman tercih edilir, **ama hiç bulunamazsa 0 baytlık aday son çare olarak kabul edilir.** Gerekçe: bu makinede `py.exe` **tek** aday ve 0 bayt; kural harfiyen uygulanınca `.py` hiç bağlanamıyordu. Store install stub'ı ile çalışan app-execution alias'ı bayt boyutuyla ayırt edilemiyor. Yönetici tarafından `PathSearcher.cs`'te düzeltildi + 2 test. | 2026-08-09 |
+| K28 | Store takozunu boyutla ayırt etme | **K9 kapandı.** 0 bayt sezgisi yerine reparse point okunuyor: `FSCTL_GET_REPARSE_POINT` + `IO_REPARSE_TAG_APPEXECLINK`, hedef `*Redirector.exe` ise ölü takoz sayılıp atlanıyor, değilse alias doğrudan kabul ediliyor. Reparse okunamazsa K9'un son-çare davranışına düşülüyor. `uv` ve CPython `launcher2.c` aynı yolu kullanıyor. Yönlendirici kararı yalnız hedef adına bağlı — paket ailesine bağlamak `winget.exe`'yi yanlışlıkla eliyordu. | 2026-08-22 |
 | K10 | Shebang + config eşlemesi çakışması | **Shebang config'i tamamen bypass eder**, argüman şablonu `"{script}" {args}` olur. T2'nin seçimi onaylandı. Gerekçe: shebang dosyanın kendi beyanıdır ve `.ts` gibi bir uzantının bayrakları başka bir yorumlayıcıya taşınırsa anlamsız/tehlikeli olur. | 2026-08-09 |
 | K11 | `TrustFile`/`TrustFolder` diske yazmaz | Onaylandı — bellekte mutasyon, çağıran `Save()` eder. T3 kullanıcı onayından **sonra** açıkça `trustStore.Save()` çağırmalı; unutulursa güven kalıcı olmaz. | 2026-08-09 |
 | K12 | Yedekteki silme satırı kapsamı | T4'ün daraltması **onaylandı**: paylaşılan anahtarlara (`.ext`, `RegisteredApplications`) silme satırı yazılmaz, sadece dışa aktarılır. Gerekçe: 71 uygulamanın kaydını tutan paylaşılan bir anahtarı "sil + yeniden yaz" yapmak kabul edilemez risk. Kozmetik bedeli (yedek tek başına geri yüklenirse Runly "Birlikte aç" listesinde kalır) kabul edildi. | 2026-08-09 |
