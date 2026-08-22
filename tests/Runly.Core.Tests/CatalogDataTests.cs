@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace Runly.Core.Tests;
 
@@ -65,6 +65,36 @@ public sealed class CatalogDataTests
             Assert.True(entry.TryGetProperty("riskNote", out var riskNote), $"Missing riskNote: {extension}");
             Assert.False(string.IsNullOrWhiteSpace(riskNote.GetProperty("tr").GetString()), $"Empty Turkish riskNote: {extension}");
             Assert.False(string.IsNullOrWhiteSpace(riskNote.GetProperty("en").GetString()), $"Empty English riskNote: {extension}");
+        }
+    }
+
+    /// <summary>
+    /// Guards against double-encoded Turkish. Sixteen blocked entries shipped with their risk note
+    /// UTF-8 encoded twice ("gÃ¼venliÄŸi"), which reached the settings window verbatim; the sequence is
+    /// invisible in a diff unless someone reads the Turkish, so a test has to read it instead.
+    /// </summary>
+    [Fact]
+    public void Catalog_HasNoDoubleEncodedText()
+    {
+        var path = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,
+            "..", "..", "..", "..", "..", "src", "Runly.Settings", "Catalog", "catalog.json"));
+        using var document = JsonDocument.Parse(File.ReadAllText(path));
+
+        foreach (var entry in document.RootElement.EnumerateArray())
+        {
+            var extension = entry.GetProperty("extension").GetString();
+            foreach (var field in new[] { "displayName", "riskNote" })
+            {
+                if (!entry.TryGetProperty(field, out var block)) continue;
+                foreach (var language in new[] { "tr", "en" })
+                {
+                    var text = block.GetProperty(language).GetString() ?? string.Empty;
+                    Assert.DoesNotContain('Ã', text);
+                    Assert.DoesNotContain('Å', text);
+                    Assert.False(text.Contains('Ä') && !text.Contains("Ä°"),
+                        $"Double-encoded text in {extension}.{field}.{language}: {text}");
+                }
+            }
         }
     }
 }
