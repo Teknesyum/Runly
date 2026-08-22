@@ -1,6 +1,50 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 
 namespace Runly.Settings;
+
+internal enum CaptionItemStyle
+{
+    Text,
+    Link,
+    Outline,
+}
+
+internal enum CaptionItemIcon
+{
+    None,
+    Coffee,
+}
+
+/// <summary>One element carried by <see cref="NeonForm"/>'s own caption band.
+///
+/// Deliberately not a <see cref="Control"/>. A child control dropped over the band would be laid out
+/// against <see cref="NeonForm.DisplayRectangle"/>, which starts below the caption, and every one of
+/// them would have to be carved out of the drag hit test by hand. Owner-drawn items keep the band a
+/// single painted surface with one hit-test rule.</summary>
+internal sealed class CaptionItem
+{
+    public string Text { get; set; } = string.Empty;
+
+    public CaptionItemStyle Style { get; init; } = CaptionItemStyle.Text;
+
+    public CaptionItemIcon Icon { get; init; } = CaptionItemIcon.None;
+
+    public Font Font { get; init; } = Palette.Body;
+
+    public Color Color { get; init; } = Palette.TextStrong;
+
+    public Color Accent { get; init; } = Palette.NeonBlue;
+
+    /// <summary>Status marker drawn ahead of the text, or null for no marker.</summary>
+    public Color? Dot { get; set; }
+
+    public Action? Click { get; init; }
+
+    internal Rectangle Bounds { get; set; }
+
+    internal bool Clickable => Click is not null;
+}
 
 /// <summary>Borderless neon window retaining native move, resize, Snap, system-menu and maximize semantics.</summary>
 internal class NeonForm : Form
@@ -29,10 +73,14 @@ internal class NeonForm : Form
     private const int HtBottomLeft = 16;
     private const int HtBottomRight = 17;
 
+    private readonly List<CaptionItem> _captionItems = [];
+
     private bool _active;
     private bool _closeHover;
     private bool _maximizeHover;
     private bool _minimizeHover;
+    private CaptionItem? _hoverItem;
+    private int _captionItemsLeft;
 
     protected NeonForm()
     {
@@ -50,7 +98,7 @@ internal class NeonForm : Form
         MouseMove += OnCaptionMouseMove;
         MouseLeave += (_, _) => ClearCaptionHover();
         MouseDown += OnCaptionMouseDown;
-        Resize += (_, _) => ApplyCornerRegion();
+        Resize += (_, _) => { ApplyCornerRegion(); LayoutCaptionItems(); };
     }
 
     /// <summary>Restores the window styles that <see cref="FormBorderStyle.None"/> strips. The hit test
@@ -66,6 +114,23 @@ internal class NeonForm : Form
             parameters.Style |= WsThickFrame | WsMaximizeBox | WsMinimizeBox;
             return parameters;
         }
+    }
+
+    /// <summary>Fills the caption band, right to left, starting next to the minimise button. Items are
+    /// given in the order the standard lists them: signature, support link, then everything else.</summary>
+    protected void SetCaptionItems(params CaptionItem[] items)
+    {
+        _captionItems.Clear();
+        _captionItems.AddRange(items);
+        RefreshCaptionItems();
+    }
+
+    /// <summary>Re-measures the band. Item text is not fixed — the version, the status and the language
+    /// switch all change width — so the layout has to be redone whenever one of them is rewritten.</summary>
+    protected void RefreshCaptionItems()
+    {
+        LayoutCaptionItems();
+        InvalidateCaption();
     }
 
     /// Rounds the window corners. FormBorderStyle.None windows get no DWM rounding, so the shape is
@@ -126,18 +191,57 @@ internal class NeonForm : Form
         var titleLeft = iconInset + iconSize + Metrics.Px(8);
         var titleColor = _active ? Palette.NeonBlue : Palette.TextLabel;
         TextRenderer.DrawText(g, Text, Palette.Body,
-            new Rectangle(titleLeft, 0, Math.Max(0, Width - (CaptionButtonWidth * 3) - titleLeft - Metrics.Px(8)), CaptionHeight),
+            new Rectangle(titleLeft, 0, Math.Max(0, _captionItemsLeft - Metrics.Px(16) - titleLeft), CaptionHeight),
             titleColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        foreach (var item in _captionItems)
+        {
+            DrawCaptionItem(g, item);
+        }
+
+        g.SmoothingMode = SmoothingMode.Default;
 
         DrawCaptionButton(g, MinimizeBounds, _minimizeHover, "─", Palette.NeonBlue);
         DrawCaptionButton(g, MaximizeBounds, _maximizeHover, WindowState == FormWindowState.Maximized ? "❐" : "□", Palette.NeonBlue);
         DrawCaptionButton(g, CloseBounds, _closeHover, "×", Palette.NeonPink);
+
+        DrawWindowOutline(g);
+    }
+
+    /// <summary>Our own edge, drawn inside the corner region. The system border is switched off in
+    /// <see cref="OnHandleCreated"/>, and without a replacement a black window has no boundary at all
+    /// on a dark desktop. A maximized window gets none: it has no visible edge to draw, and the docked
+    /// child fills the gutter the outline would need.</summary>
+    private void DrawWindowOutline(Graphics g)
+    {
+        if (WindowState == FormWindowState.Maximized || ClientSize.Width <= 1 || ClientSize.Height <= 1)
+        {
+            return;
+        }
+
+        var previous = g.SmoothingMode;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        using (var path = NeonTheme.RoundedRect(new Rectangle(0, 0, ClientSize.Width - 1, ClientSize.Height - 1), CornerRadius))
+        using (var pen = new Pen(Color.FromArgb(77, Palette.NeonBlue)))
+        {
+            g.DrawPath(pen, path);
+        }
+
+        g.SmoothingMode = previous;
+    }
+
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        NeonTheme.RemoveSystemBorder(this);
     }
 
     protected override void OnShown(EventArgs e)
     {
         Strings.Apply(this);
         ApplyCornerRegion();
+        LayoutCaptionItems();
         base.OnShown(e);
     }
 
@@ -196,7 +300,162 @@ internal class NeonForm : Form
             if (bottom) return HtBottom;
         }
 
-        return point.Y < CaptionHeight && !CaptionButtonsBounds.Contains(point) ? HtCaption : HtClient;
+        // HTCAPTION is what gives the band drag, double-click-to-maximize and Snap, so anything that is
+        // not an item or a window button has to keep reporting it. The items report HTCLIENT instead,
+        // which is what routes the click to the mouse handlers below.
+        if (point.Y >= CaptionHeight)
+        {
+            return HtClient;
+        }
+
+        return !CaptionButtonsBounds.Contains(point) && CaptionItemAt(point) is null ? HtCaption : HtClient;
+    }
+
+    private CaptionItem? CaptionItemAt(Point point)
+    {
+        foreach (var item in _captionItems)
+        {
+            if (item.Bounds.Contains(point))
+            {
+                return item;
+            }
+        }
+
+        return null;
+    }
+
+    private void LayoutCaptionItems()
+    {
+        var height = Metrics.CaptionItemHeight;
+        var top = (CaptionHeight - height) / 2;
+        var gap = Metrics.Px(16);
+        var right = ClientSize.Width - (CaptionButtonWidth * 3) - Metrics.Px(8);
+        _captionItemsLeft = right;
+
+        foreach (var item in _captionItems)
+        {
+            var width = MeasureCaptionItem(item);
+            right -= width;
+            item.Bounds = new Rectangle(right, top, width, height);
+            _captionItemsLeft = right;
+            right -= gap;
+        }
+    }
+
+    private static int MeasureCaptionItem(CaptionItem item)
+    {
+        var width = TextRenderer.MeasureText(item.Text, item.Font, Size.Empty, TextFormatFlags.NoPadding).Width;
+        if (item.Dot is not null)
+        {
+            width += CaptionDotSize + Metrics.Px(6);
+        }
+
+        if (item.Icon != CaptionItemIcon.None)
+        {
+            width += CaptionSponsorIconSize + Metrics.Px(6);
+        }
+
+        var padding = item.Style == CaptionItemStyle.Outline ? Metrics.Px(12) : Metrics.Px(8);
+        return Math.Max(Metrics.Px(24), width + (padding * 2));
+    }
+
+    private static int CaptionDotSize => Metrics.Px(8);
+
+    private static int CaptionSponsorIconSize => Metrics.Px(12);
+
+    private void DrawCaptionItem(Graphics g, CaptionItem item)
+    {
+        var hover = ReferenceEquals(item, _hoverItem);
+        var bounds = item.Bounds;
+        Rectangle content;
+
+        if (item.Style == CaptionItemStyle.Outline)
+        {
+            var frame = new Rectangle(bounds.X, bounds.Y, bounds.Width - 1, bounds.Height - 1);
+            using var path = NeonTheme.RoundedRect(frame, Metrics.Px(12));
+
+            // Outline button, R5 §4: no fill, ever. Hover only takes the border to full opacity and
+            // opens the outer glow, which is drawn as widening low-alpha strokes because GDI+ has no
+            // shadow primitive.
+            if (hover)
+            {
+                for (var ring = 3; ring >= 1; ring--)
+                {
+                    using var glow = new Pen(Color.FromArgb(26, item.Accent), ((ring * 2) + 1) * Metrics.Scale);
+                    g.DrawPath(glow, path);
+                }
+            }
+
+            using var border = new Pen(hover ? item.Accent : Color.FromArgb(128, item.Accent), 1.5f * Metrics.Scale);
+            g.DrawPath(border, path);
+            content = Rectangle.Inflate(bounds, -Metrics.Px(12), 0);
+        }
+        else
+        {
+            content = Rectangle.Inflate(bounds, -Metrics.Px(8), 0);
+            if (hover && item.Clickable)
+            {
+                using var underline = new Pen(item.Accent, Metrics.Scale);
+                var baseline = content.Bottom - Metrics.Px(4);
+                g.DrawLine(underline, content.Left, baseline, content.Right, baseline);
+            }
+        }
+
+        var left = content.Left;
+        if (item.Dot is Color dot)
+        {
+            var diameter = CaptionDotSize;
+            using var marker = new SolidBrush(dot);
+            g.FillEllipse(marker, left, content.Top + ((content.Height - diameter) / 2), diameter, diameter);
+            left += diameter + Metrics.Px(6);
+        }
+
+        if (item.Icon == CaptionItemIcon.Coffee)
+        {
+            var size = CaptionSponsorIconSize;
+            DrawCoffeeIcon(g, new Rectangle(left, content.Top + ((content.Height - size) / 2), size, size), item.Accent);
+            left += size + Metrics.Px(6);
+        }
+
+        var color = item.Style switch
+        {
+            CaptionItemStyle.Outline => item.Accent,
+            CaptionItemStyle.Link when hover => item.Accent,
+            _ => item.Color,
+        };
+
+        TextRenderer.DrawText(g, item.Text, item.Font,
+            new Rectangle(left, content.Top, Math.Max(0, content.Right - left), content.Height), color,
+            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+    }
+
+    /// <summary>Support-link mark, R5 §4: a stroked 12 DIP shape, not the ☕ emoji — the emoji renders
+    /// in the system colour font and cannot take the accent colour.</summary>
+    private static void DrawCoffeeIcon(Graphics g, Rectangle box, Color color)
+    {
+        var unit = box.Width / 12f;
+        using var pen = new Pen(color, Math.Max(1f, unit * 1.2f))
+        {
+            StartCap = LineCap.Round,
+            EndCap = LineCap.Round,
+            LineJoin = LineJoin.Round,
+        };
+
+        float X(float u) => box.X + (u * unit);
+        float Y(float u) => box.Y + (u * unit);
+
+        using (var cup = new GraphicsPath())
+        {
+            cup.AddLine(X(1.6f), Y(4.6f), X(2.7f), Y(10.4f));
+            cup.AddLine(X(2.7f), Y(10.4f), X(7.3f), Y(10.4f));
+            cup.AddLine(X(7.3f), Y(10.4f), X(8.4f), Y(4.6f));
+            cup.CloseFigure();
+            g.DrawPath(pen, cup);
+        }
+
+        g.DrawArc(pen, X(8.0f), Y(5.4f), unit * 3.4f, unit * 3.4f, -70f, 150f);
+        g.DrawLine(pen, X(3.9f), Y(2.8f), X(3.9f), Y(1.0f));
+        g.DrawLine(pen, X(6.2f), Y(2.8f), X(6.2f), Y(1.0f));
     }
 
     private void OnCaptionMouseMove(object? sender, MouseEventArgs e)
@@ -204,17 +463,35 @@ internal class NeonForm : Form
         var close = CloseBounds.Contains(e.Location);
         var maximize = MaximizeBox && MaximizeBounds.Contains(e.Location);
         var minimize = MinimizeBox && MinimizeBounds.Contains(e.Location);
-        if (close == _closeHover && maximize == _maximizeHover && minimize == _minimizeHover) return;
+        var item = CaptionItemAt(e.Location);
+        if (item is not null && !item.Clickable)
+        {
+            item = null;
+        }
+
+        if (close == _closeHover && maximize == _maximizeHover && minimize == _minimizeHover &&
+            ReferenceEquals(item, _hoverItem))
+        {
+            return;
+        }
+
         _closeHover = close;
         _maximizeHover = maximize;
         _minimizeHover = minimize;
+        _hoverItem = item;
+        Cursor = item is null ? Cursors.Default : Cursors.Hand;
         InvalidateCaption();
     }
 
     private void OnCaptionMouseDown(object? sender, MouseEventArgs e)
     {
         if (e.Button != MouseButtons.Left) return;
-        if (CloseBounds.Contains(e.Location)) Close();
+        var item = CaptionItemAt(e.Location);
+        if (item?.Click is not null)
+        {
+            item.Click();
+        }
+        else if (CloseBounds.Contains(e.Location)) Close();
         else if (MaximizeBox && MaximizeBounds.Contains(e.Location))
             WindowState = WindowState == FormWindowState.Maximized ? FormWindowState.Normal : FormWindowState.Maximized;
         else if (MinimizeBox && MinimizeBounds.Contains(e.Location)) WindowState = FormWindowState.Minimized;
@@ -234,8 +511,10 @@ internal class NeonForm : Form
 
     private void ClearCaptionHover()
     {
-        if (!_closeHover && !_maximizeHover && !_minimizeHover) return;
+        if (!_closeHover && !_maximizeHover && !_minimizeHover && _hoverItem is null) return;
         _closeHover = _maximizeHover = _minimizeHover = false;
+        _hoverItem = null;
+        Cursor = Cursors.Default;
         InvalidateCaption();
     }
 

@@ -13,6 +13,11 @@ internal static class NeonTheme
     // build on. Sending only 20 leaves the title bar white on older builds.
     private const int DwmwaUseImmersiveDarkModeLegacy = 19;
 
+    private const int DwmwaBorderColor = 34;
+
+    /// DWMWA_COLOR_NONE: suppresses the border entirely rather than tinting it.
+    private const uint DwmColorNone = 0xFFFFFFFE;
+
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(nint hwnd, int attribute, ref int value, int size);
 
@@ -28,6 +33,18 @@ internal static class NeonTheme
         {
             DwmSetWindowAttribute(form.Handle, DwmwaUseImmersiveDarkModeLegacy, ref value, sizeof(int));
         }
+    }
+
+    /// <summary>Drops the frame Windows 11 draws around every top-level window. Against a black
+    /// surface that frame reads as a light grey hairline, and because <see cref="NeonForm"/> clips its
+    /// corners with a <see cref="Region"/> the system border falls outside the clip on a restored
+    /// window and vanishes when the region is dropped on maximize — which is why it looks intermittent
+    /// rather than constant. Returns false on builds before Windows 11 22000, where the attribute does
+    /// not exist: the border stays, and that is preferable to refusing to show the window.</summary>
+    public static bool RemoveSystemBorder(Form form)
+    {
+        var value = unchecked((int)DwmColorNone);
+        return DwmSetWindowAttribute(form.Handle, DwmwaBorderColor, ref value, sizeof(int)) >= 0;
     }
 
     [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
@@ -180,7 +197,7 @@ internal sealed class NeonGroupPanel : Panel
         DoubleBuffered = true;
         BackColor = Palette.Surface;
         ForeColor = Palette.TextBody;
-        Padding = new Padding(Metrics.Px(16), Metrics.GroupTitleBand, Metrics.Px(16), Metrics.Px(16));
+        Padding = new Padding(Metrics.Px(24), Metrics.GroupTitleBand, Metrics.Px(24), Metrics.Px(24));
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -201,7 +218,7 @@ internal sealed class NeonGroupPanel : Panel
             g.DrawPath(border, path);
         }
 
-        var inset = Metrics.Px(16);
+        var inset = Metrics.Px(24);
         TextRenderer.DrawText(g, Title, Palette.H3,
             new Rectangle(inset, Metrics.Px(10), Width - (inset * 2), Metrics.Line(Palette.H3)),
             Palette.NeonBlue, TextFormatFlags.Left | TextFormatFlags.NoPadding);
@@ -319,25 +336,6 @@ internal sealed class NeonCheckBox : CheckBox
     }
 }
 
-/// <summary>Single neon-blue link in the footer strip. Opens its target in the default browser.</summary>
-internal class NeonLink : LinkLabel
-{
-    public NeonLink(string text, string url)
-    {
-        AutoSize = true;
-        Text = text;
-        Font = Palette.LabelFont;
-        LinkColor = Palette.NeonBlue;
-        ActiveLinkColor = Palette.NeonPink;
-        VisitedLinkColor = Palette.NeonBlue;
-        LinkBehavior = LinkBehavior.HoverUnderline;
-        BackColor = Color.Transparent;
-        Cursor = Cursors.Hand;
-        LinkClicked += (_, _) =>
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = url, UseShellExecute = true })?.Dispose();
-    }
-}
-
 /// <summary>Owner-drawn dark combo box. A native ComboBox paints its list and its closed field with
 /// system colours, which reads as a white hole in this theme once the control is actually visible.</summary>
 internal sealed class NeonComboBox : ComboBox
@@ -386,14 +384,5 @@ internal sealed class NeonComboBox : ComboBox
         base.OnPaint(e);
         using var border = new Pen(Color.FromArgb(120, Palette.NeonBlue));
         e.Graphics.DrawRectangle(border, 0, 0, Width - 1, Height - 1);
-    }
-}
-
-/// <summary>Signature block, R5 §"İmza bloğu": exactly one instance, bottom-right of the settings window.</summary>
-internal sealed class SignatureBlock : NeonLink
-{
-    public SignatureBlock() : base("Teknesyum", Palette.GitHubUrl)
-    {
-        TextAlign = ContentAlignment.MiddleRight;
     }
 }
