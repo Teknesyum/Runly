@@ -138,6 +138,9 @@ internal class NeonForm : Form
     {
         Strings.Apply(this);
         ApplyCornerRegion();
+        // Every window, not just the main one: native scroll bars and combo popups render light by default
+        // and a dialog that skips this opens with white bars inside a black theme.
+        NeonTheme.ApplyDarkScrollBars(this);
         base.OnShown(e);
     }
 

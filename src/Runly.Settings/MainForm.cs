@@ -184,10 +184,6 @@ internal sealed class MainForm : NeonForm
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
         Font = Palette.Body;
-        // Native scrollbars (grid, list boxes, result text) render white by default and break the
-        // theme. Applied on Shown so every child handle already exists.
-        Shown += (_, _) => NeonTheme.ApplyDarkScrollBars(this);
-
         var root = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, BackColor = Palette.AppBg };
         root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         // A flat 270 could not hold the security panel once the third radio and the second folder button
@@ -302,7 +298,7 @@ internal sealed class MainForm : NeonForm
 
         var searchGroup = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
         var searchLabel = new Label { Text = Strings.Get("catalog.searchLabel"), AutoSize = true, Font = Palette.H3, ForeColor = Palette.NeonBlue, Margin = new Padding(0, Metrics.Px(11), Metrics.Px(8), Metrics.Px(4)) };
-        _searchBox = new TextBox { Width = Metrics.Px(280), PlaceholderText = Strings.Get("catalog.searchPlaceholder"), BackColor = Palette.FieldBg, ForeColor = Palette.NeonBlue, Font = Palette.MonoBody, BorderStyle = BorderStyle.FixedSingle, Margin = new Padding(0, Metrics.Px(8), Metrics.Px(8), Metrics.Px(4)) };
+        _searchBox = new NeonTextBox { Width = Metrics.Px(280), PlaceholderText = Strings.Get("catalog.searchPlaceholder"), Margin = new Padding(0, Metrics.Px(8), Metrics.Px(8), Metrics.Px(4)) };
 
         // The catalog carries 400+ rows and every refresh reprojects and refills the whole grid, so
         // rebuilding on each keystroke makes typing stutter. Only typing is delayed: ApplyLanguage and
@@ -513,9 +509,9 @@ internal sealed class MainForm : NeonForm
             SelectionBackColor = ColorTranslator.FromHtml("#123238"),
         };
 
-        grid.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Enabled", HeaderText = "ETKİN", FillWeight = 8, MinimumWidth = Metrics.Px(60), Resizable = DataGridViewTriState.False });
+        grid.Columns.Add(new NeonCheckColumn { Name = "Enabled", HeaderText = "ETKİN", FillWeight = 8, MinimumWidth = Metrics.Px(60), Resizable = DataGridViewTriState.False });
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Extension", HeaderText = "UZANTI", FillWeight = 10, MinimumWidth = Metrics.Px(72), ReadOnly = true });
-        grid.Columns.Add(new DataGridViewComboBoxColumn { Name = "Kind", HeaderText = "TÜR", FillWeight = 13, MinimumWidth = Metrics.Px(90), DataSource = new[] { Strings.Get("kind.run"), Strings.Get("kind.open") } });
+        grid.Columns.Add(new NeonChipColumn { Name = "Kind", HeaderText = "TÜR", FillWeight = 13, MinimumWidth = Metrics.Px(90), OffTextKey = "kind.run", OnTextKey = "kind.open" });
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Interpreter", HeaderText = "İŞLEYİCİ", FillWeight = 20, MinimumWidth = Metrics.Px(130) });
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Found", HeaderText = "BULUNDU", FillWeight = 18, MinimumWidth = Metrics.Px(130), ReadOnly = true });
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Args", HeaderText = "ARGÜMANLAR", FillWeight = 12, MinimumWidth = Metrics.Px(90) });
@@ -531,6 +527,7 @@ internal sealed class MainForm : NeonForm
         grid.CellValueChanged += OnGridCellValueChanged;
         grid.CellContentClick += OnGridCellContentClick;
         grid.CellDoubleClick += OnGridCellDoubleClick;
+        grid.KeyDown += OnGridKeyDown;
         grid.SelectionChanged += (_, _) => UpdateDetailPanel();
 
         return grid;
@@ -565,7 +562,7 @@ internal sealed class MainForm : NeonForm
         var foldersArea = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent };
         foldersArea.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         foldersArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, FolderButtonWidth + Metrics.Px(4)));
-        var foldersList = new ListBox { Dock = DockStyle.Fill, BackColor = Palette.FieldBg, ForeColor = Palette.TextBody, Font = Palette.MonoBody, BorderStyle = BorderStyle.FixedSingle };
+        var foldersList = new NeonListBox { Dock = DockStyle.Fill };
         // No margin of its own: the default 3px inset shrinks the cell below the fixed button width and
         // GDI clips the right half of the outline away, which is invisible in a build log.
         var folderButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, BackColor = Color.Transparent, Margin = Padding.Empty };
@@ -620,7 +617,7 @@ internal sealed class MainForm : NeonForm
         editorRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         var editorLabel = SectionLabel("DÜZENLEYİCİ KOMUTU", new Padding(0, Metrics.Px(8), Metrics.Px(6), 0));
         editorLabel.Anchor = AnchorStyles.Left;
-        var editorBox = new TextBox { Dock = DockStyle.Fill, BackColor = Palette.FieldBg, ForeColor = Palette.NeonBlue, Font = Palette.MonoBody, BorderStyle = BorderStyle.FixedSingle };
+        var editorBox = new NeonTextBox { Dock = DockStyle.Fill };
         var testButton = new NeonButton { Text = "Test et", Primary = false, AutoSize = true, Margin = new Padding(Metrics.Px(6), 0, 0, 0) };
         testButton.Click += OnTestEditorClicked;
         editorRow.Controls.Add(editorLabel, 0, 0);
@@ -758,7 +755,10 @@ internal sealed class MainForm : NeonForm
                 row.CreateCells(_grid);
                 row.Cells[ColEnabled].Value = mapping.Enabled;
                 row.Cells[ColExtension].Value = status.Extension;
-                row.Cells[ColKind].Value = mapping.Kind == HandlerKind.Run ? Strings.Get("kind.run") : Strings.Get("kind.open");
+                // The chip stores the state, not the caption it happens to be showing: a language switch
+                // used to have to rewrite every cell, and comparing localised text back to a kind was one
+                // renamed string away from silently saving the wrong handler.
+                row.Cells[ColKind].Value = mapping.Kind == HandlerKind.Open;
                 // NullValue rather than a placeholder string: the hint has to be visible in the cell
                 // without ever becoming the cell's value, which OnGridCellValueChanged would save.
                 var handler = mapping.Kind == HandlerKind.Run ? mapping.Interpreter : mapping.OpenWith;
@@ -985,8 +985,7 @@ internal sealed class MainForm : NeonForm
         var mapping = EffectiveMapping(status.Extension);
 
         var enabled = row.Cells[ColEnabled].Value is bool b ? b : mapping.Enabled;
-        var kind = string.Equals(row.Cells[ColKind].Value as string, Strings.Get("kind.open"), StringComparison.Ordinal)
-            ? HandlerKind.Open : HandlerKind.Run;
+        var kind = row.Cells[ColKind].Value is true ? HandlerKind.Open : HandlerKind.Run;
         var handler = row.Cells[ColInterpreter].Value as string ?? (kind == HandlerKind.Run ? mapping.Interpreter : mapping.OpenWith ?? string.Empty);
         var args = row.Cells[ColArgs].Value as string ?? mapping.Args;
         var catalogTypeName = ExtensionCatalog.Entries.FirstOrDefault(entry =>
@@ -1070,6 +1069,25 @@ internal sealed class MainForm : NeonForm
         RefreshExtensionGrid();
         RefreshCategoryRail();
         _progressLabel.Text = Strings.Get("profile.imported");
+    }
+
+    /// <summary>Space and Enter flip the focused toggle cell. The columns they act on used to be a system
+    /// check box and a combo box, which handled this themselves; owner-drawing them means owning it too.</summary>
+    private void OnGridKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.KeyCode is not (Keys.Space or Keys.Enter))
+        {
+            return;
+        }
+
+        if (_grid.CurrentCell is not INeonToggleCell toggle || _grid.CurrentCell.ReadOnly)
+        {
+            return;
+        }
+
+        toggle.Toggle();
+        e.Handled = true;
+        e.SuppressKeyPress = true;
     }
 
     private void OnGridCellContentClick(object? sender, DataGridViewCellEventArgs e)
@@ -2038,10 +2056,6 @@ internal sealed class MainForm : NeonForm
         _grid.Columns[ColEnabled].HeaderText = Strings.Get("enabled");
         _grid.Columns[ColExtension].HeaderText = Strings.Get("extension");
         _grid.Columns[ColKind].HeaderText = Strings.Get("kind.column");
-        if (_grid.Columns[ColKind] is DataGridViewComboBoxColumn kindColumn)
-        {
-            kindColumn.DataSource = new[] { Strings.Get("kind.run"), Strings.Get("kind.open") };
-        }
         _grid.Columns[ColInterpreter].HeaderText = Strings.Get("interpreter");
         _grid.Columns[ColFound].HeaderText = Strings.Get("found");
         _grid.Columns[ColArgs].HeaderText = Strings.Get("arguments");

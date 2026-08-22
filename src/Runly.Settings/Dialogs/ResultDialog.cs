@@ -50,7 +50,7 @@ internal sealed class ResultDialog : NeonForm
                 : Palette.NeonPink,
         };
 
-        var textBox = new TextBox
+        var textBox = new NeonTextBox
         {
             Dock = DockStyle.Fill,
             Multiline = true,
@@ -58,8 +58,6 @@ internal sealed class ResultDialog : NeonForm
             ScrollBars = ScrollBars.Vertical,
             BackColor = Palette.Surface,
             ForeColor = Palette.TextBody,
-            BorderStyle = BorderStyle.FixedSingle,
-            Font = Palette.MonoBody,
             Text = BuildText(lines, errorMessage),
         };
 

@@ -41,9 +41,9 @@ internal sealed class AddExtensionDialog : NeonForm
         }
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
-        _extensionBox = new TextBox { Dock = DockStyle.Fill, PlaceholderText = ".rb", BackColor = Palette.FieldBg, ForeColor = Palette.NeonBlue, Font = Palette.MonoBody, BorderStyle = BorderStyle.FixedSingle };
-        _interpreterBox = new TextBox { Dock = DockStyle.Fill, PlaceholderText = "ruby", BackColor = Palette.FieldBg, ForeColor = Palette.NeonBlue, Font = Palette.MonoBody, BorderStyle = BorderStyle.FixedSingle };
-        _argsBox = new TextBox { Dock = DockStyle.Fill, Text = DefaultConfig.ScriptThenArgs, BackColor = Palette.FieldBg, ForeColor = Palette.NeonBlue, Font = Palette.MonoBody, BorderStyle = BorderStyle.FixedSingle };
+        _extensionBox = new NeonTextBox { Dock = DockStyle.Fill, PlaceholderText = ".rb" };
+        _interpreterBox = new NeonTextBox { Dock = DockStyle.Fill, PlaceholderText = "ruby" };
+        _argsBox = new NeonTextBox { Dock = DockStyle.Fill, Text = DefaultConfig.ScriptThenArgs };
 
         layout.Controls.Add(new Label { Text = "Uzantı:", ForeColor = Palette.TextDim, Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft }, 0, 0);
         layout.Controls.Add(_extensionBox, 1, 0);
