@@ -111,12 +111,20 @@ Current source version: **v0.2.0**
 
 ---
 
+## License
+
+AGPL-3.0-or-later — see [LICENSE](LICENSE).
+
+Copyright (C) 2026 Teknesyum
+
+---
+
 ## Support
 
 This application is built in spare time and is free.
 
 <a href="https://github.com/sponsors/Teknesyum"><img src="https://img.shields.io/badge/Buy_me_a_coffee-b026ff?style=for-the-badge&logo=githubsponsors&logoColor=b026ff&labelColor=0d0d0f" alt="Sponsor" /></a>
 
-**[github.com/Teknesyum](https://github.com/Teknesyum)** · [MIT](LICENSE)
+**[github.com/Teknesyum](https://github.com/Teknesyum)** · [AGPL-3.0-or-later](LICENSE)
 
 

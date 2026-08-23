@@ -59,7 +59,7 @@ The new cyan/pink icon was visually verified in the live Release Settings title 
   `irm https://raw.githubusercontent.com/Teknesyum/Runly/main/scripts/install.ps1 | iex`
 - Installs under `%LOCALAPPDATA%\Programs\Runly`.
 - Creates `Runly.lnk` on the desktop.
-- Repository now has an MIT `LICENSE`.
+- Repository now has an AGPL-3.0-or-later `LICENSE`.
 - `scripts/build.ps1` copies `LICENSE` into the release package.
 
 ## README
