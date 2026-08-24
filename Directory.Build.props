@@ -12,6 +12,8 @@
     <Product>Runly</Product>
     <Version>0.2.0</Version>
     <NeutralLanguage>tr-TR</NeutralLanguage>
+    <Copyright>Copyright (C) 2026 Teknesyum</Copyright>
+    <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
 
 </Project>
