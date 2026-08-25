@@ -101,12 +101,28 @@ Türkçe genelde daha uzun, ama doğrulanmadı.
 
 **Kabul:** dil değiştirilip her panel ve diyalog gezilir, kırpılan tek etiket kalmaz.
 
+**Yapıldı** — varsayım doğru çıkmadı: kırpılan taraf **İngilizce** oldu. `ENABLED` ve `EXTENSION`
+başlıkları `Enab…` / `Extensi…` diye kesiliyordu, çünkü `MinimumWidth` değerleri Türkçe başlığa
+göre seçilmişti. `WidenHeadersToLongestTranslation` her sütunu **en uzun çevirisine** göre
+ölçüyor (`Strings.GetIn` yeni); durum sütunu ayrıca hücre metnini de ölçüyor, çünkü tablodaki
+tek eylem çağrısı orada (`⚠ Set default`) ve kırpılınca ne istendiği kayboluyor. İki dilin
+ekran görüntüsü: `docs/reports/U6-ingilizce-ana-pencere.png`, `U6-turkce-ana-pencere.png`.
+Kategori rayı etiketleri iki dilde de kısalıyor (`Ofis/Dok…`, `Office/Do…`) — ray sabit
+genişlikte, bu tasarım kararı, taşma değil.
+
 ### U7 · Büyük liste
 
 Debounce eklendi (180 ms) ama filtreleme hâlâ tam yeniden projeksiyon. PowerToys deseni: bir kez
 kurulan indeks + `CancellationToken`'lı iptal.
 
 **Kabul:** 400+ satırda yazarken ölçülen yenileme süresi kaydedilir; bugünkü 15–47 ms taban.
+
+**Yapıldı** — katalog bir kez indekslenir (`CatalogSearchIndex`), filtreleme `CancellationToken`
+alır, ızgara `SuspendLayout` + `Rows.AddRange` ile tek seferde dolar ve tuş vuruşu kayıt defterini
+yeniden okumaz (`ScanStatuses` anlık görüntüsü; arama dışındaki her yol taze tarar). 412 satırda
+225 ms → 56 ms, 397 satırda 178 ms → 18 ms; satır sayıları birebir aynı kaldı. Ölçüm
+`docs/reports/U7-liste-basarimi-olcumu.txt`. **Sözleşmedeki 15–47 ms tabanı yanlıştı:** o bant
+küçük sonuç kümelerine ait, 400+ satır önceden 169–225 ms sürüyordu.
 
 ---
 

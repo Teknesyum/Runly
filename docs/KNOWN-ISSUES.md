@@ -94,9 +94,9 @@ Version 0.2.0 · Last updated: 2026-08-15
   verification deliberately does not click or forge `UserChoice`; binding counts are only truthful after
   Windows reports Runly as the protected choice and `AssocQueryString` agrees.
 
-- **Yeni arama satırı ve uygulama seçme diyaloğu yalnız Türkçe arayüzde ve %100 DPI'da gözle
-  doğrulandı.** Metinler `locale/*.json` üzerinden geliyor ve anahtar eşliği testle korunuyor, ama
-  İngilizce arayüzde taşma kontrolü canlı yapılmadı.
+- ~~Yeni arama satırı ve uygulama seçme diyaloğu yalnız Türkçe arayüzde doğrulandı~~ — İngilizce
+  arayüz 25.08.2026'da canlı gezildi, iki kırpılan sütun başlığı düzeltildi, bkz. `docs/UI-PLAN.md`
+  U6. **%125 / %150 DPI hâlâ doğrulanmadı** (aşağıdaki madde).
 
 - **`ftfilter` yalnız Ayarlar kapalıyken açılışta doluyor.** 22.08.2026'da iki kez ölçüldü.
   `SystemSettings` süreci öldürülüp `ms-settings:defaultapps?ftfilter=.md` açıldığında UI Automation

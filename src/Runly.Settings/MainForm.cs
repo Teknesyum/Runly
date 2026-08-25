@@ -119,6 +119,12 @@ internal sealed partial class MainForm : NeonForm
     private readonly Label _searchResultLabel;
     private readonly Button _chooseAppButton;
     private readonly System.Windows.Forms.Timer _searchDebounce;
+    private CancellationTokenSource? _searchScan;
+
+    /// <summary>The last registry scan, kept so a keystroke can redraw the grid without re-reading the
+    /// registry: typing cannot change a binding. Every other refresh path rebuilds it from scratch.</summary>
+    private readonly Dictionary<string, ExtensionStatus> _statusSnapshot = new(StringComparer.OrdinalIgnoreCase);
+    private bool _reuseStatusSnapshot;
     private readonly ComboBox _bulkAppBox;
     private readonly IReadOnlyList<InstalledApplication> _installedApplications;
     private readonly Dictionary<string, Icon> _categoryIcons = new(StringComparer.Ordinal);
@@ -324,10 +330,26 @@ internal sealed partial class MainForm : NeonForm
         _searchDebounce.Tick += (_, _) =>
         {
             _searchDebounce.Stop();
-            RefreshExtensionGrid();
+            var scan = new CancellationTokenSource();
+            _searchScan = scan;
+            _reuseStatusSnapshot = true;
+            try
+            {
+                RefreshExtensionGrid(scan.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            finally
+            {
+                _reuseStatusSnapshot = false;
+                if (ReferenceEquals(_searchScan, scan)) _searchScan = null;
+                scan.Dispose();
+            }
         };
         _searchBox.TextChanged += (_, _) =>
         {
+            _searchScan?.Cancel();
             _searchDebounce.Stop();
             _searchDebounce.Start();
         };
@@ -542,6 +564,8 @@ internal sealed partial class MainForm : NeonForm
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Args", HeaderText = "ARGÜMANLAR", FillWeight = 12, MinimumWidth = Metrics.Px(90) });
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "DURUM", FillWeight = 19, MinimumWidth = Metrics.Px(110), ReadOnly = true });
 
+        WidenHeadersToLongestTranslation(grid);
+
         grid.CurrentCellDirtyStateChanged += (_, _) =>
         {
             if (grid.IsCurrentCellDirty)
@@ -727,8 +751,7 @@ internal sealed partial class MainForm : NeonForm
     private ExtensionMapping EffectiveMapping(string extension)
     {
         if (_config.Extensions.TryGetValue(extension, out var configured)) return configured;
-        var entry = ExtensionCatalog.Entries.FirstOrDefault(item =>
-            string.Equals(item.Extension, extension, StringComparison.OrdinalIgnoreCase));
+        var entry = CatalogSearchIndex.Find(extension);
         return entry is null ? new ExtensionMapping { Category = "special" } : CatalogDefault(entry);
     }
 
@@ -739,9 +762,18 @@ internal sealed partial class MainForm : NeonForm
         return CatalogGridProjection.GetExtensions(ExtensionCatalog.Entries, _config, category, query);
     }
 
-    private RunlyConfig VisibleStatusConfig()
+    private IEnumerable<string> VisibleExtensions(CancellationToken cancellationToken)
     {
-        var visible = VisibleExtensions().ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var category = _categoryList.SelectedItem as string;
+        var query = _searchBox.Text.Trim();
+        return CatalogGridProjection.GetExtensions(ExtensionCatalog.Entries, _config, category, query, cancellationToken);
+    }
+
+    private RunlyConfig VisibleStatusConfig() => VisibleStatusConfig(CancellationToken.None);
+
+    private RunlyConfig VisibleStatusConfig(CancellationToken cancellationToken)
+    {
+        var visible = VisibleExtensions(cancellationToken).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         // Outside a search every enabled mapping is appended, so an enabled extension can never hide
         // in a category the user is not looking at. During a search that union is wrong: it answered
@@ -756,11 +788,41 @@ internal sealed partial class MainForm : NeonForm
         };
     }
 
-    private void RefreshExtensionGrid()
+    private IReadOnlyList<ExtensionStatus> ScanStatuses(RunlyConfig visible)
+    {
+        if (!_reuseStatusSnapshot)
+        {
+            var fresh = _shellRegistrar.GetStatus(visible);
+            _statusSnapshot.Clear();
+            foreach (var status in fresh) _statusSnapshot[status.Extension] = status;
+            return fresh;
+        }
+
+        var missing = visible.Extensions
+            .Where(pair => !_statusSnapshot.ContainsKey(pair.Key))
+            .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase);
+        if (missing.Count > 0)
+        {
+            foreach (var status in _shellRegistrar.GetStatus(visible with { Extensions = missing }))
+            {
+                _statusSnapshot[status.Extension] = status;
+            }
+        }
+
+        return [.. visible.Extensions.Keys
+            .OrderBy(extension => extension, StringComparer.OrdinalIgnoreCase)
+            .Select(extension => _statusSnapshot.GetValueOrDefault(extension))
+            .OfType<ExtensionStatus>()];
+    }
+
+    private void RefreshExtensionGrid() => RefreshExtensionGrid(CancellationToken.None);
+
+    private void RefreshExtensionGrid(CancellationToken cancellationToken)
     {
         var refreshTimer = Stopwatch.StartNew();
         _suppressGridEvents = true;
         string? selectedExtension = null;
+        var selectedIndex = -1;
         try
         {
             if (_grid.SelectedRows.Count > 0 && _grid.SelectedRows[0].Tag is ExtensionStatus selected)
@@ -770,8 +832,10 @@ internal sealed partial class MainForm : NeonForm
 
             _grid.Rows.Clear();
 
-            var statuses = _shellRegistrar.GetStatus(VisibleStatusConfig());
+            var statuses = ScanStatuses(VisibleStatusConfig(cancellationToken));
+            cancellationToken.ThrowIfCancellationRequested();
             _bindingProgress.SetProgress(statuses.Count(status => status.Bound == BindingState.Bound), statuses.Count);
+            var rows = new List<DataGridViewRow>(statuses.Count);
             foreach (var status in statuses)
             {
                 var mapping = EffectiveMapping(status.Extension);
@@ -816,13 +880,29 @@ internal sealed partial class MainForm : NeonForm
                     row.Cells[ColStatus].Value = catalogEntry.RiskNote is null ? Strings.Get("catalog.blocked") : (Strings.Language == "en" ? catalogEntry.RiskNote.En : catalogEntry.RiskNote.Tr);
                 }
 
-                _grid.Rows.Add(row);
-
                 if (selectedExtension is not null && string.Equals(selectedExtension, status.Extension, StringComparison.OrdinalIgnoreCase))
                 {
-                    row.Selected = true;
+                    selectedIndex = rows.Count;
+                }
+
+                rows.Add(row);
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            if (rows.Count > 0)
+            {
+                _grid.SuspendLayout();
+                try
+                {
+                    _grid.Rows.AddRange([.. rows]);
+                }
+                finally
+                {
+                    _grid.ResumeLayout();
                 }
             }
+
+            if (selectedIndex >= 0) _grid.Rows[selectedIndex].Selected = true;
         }
         finally
         {
@@ -1494,8 +1574,36 @@ internal sealed partial class MainForm : NeonForm
         RenderMarkdownLite(_detailText, body);
     }
 
-    internal static CatalogEntry? CatalogEntryFor(string extension) =>
-        ExtensionCatalog.Entries.FirstOrDefault(entry => string.Equals(entry.Extension, extension, StringComparison.OrdinalIgnoreCase));
+    /// <summary>FillWeight decides how the spare width is shared, but a column never shrinks below its
+    /// MinimumWidth — and those were sized against the Turkish headers, so ENABLED and EXTENSION arrived
+    /// in English already ellipsised. The layout is sized against the longest translation instead.</summary>
+    private static void WidenHeadersToLongestTranslation(DataGridView grid)
+    {
+        var header = grid.ColumnHeadersDefaultCellStyle.Font;
+        var padding = Metrics.Px(8);
+        foreach (var (column, keys, font) in new[]
+                 {
+                     (grid.Columns[ColEnabled], new[] { "enabled" }, header),
+                     (grid.Columns[ColExtension], ["extension"], header),
+                     (grid.Columns[ColKind], ["kind.column", "kind.run", "kind.open"], header),
+                     (grid.Columns[ColInterpreter], ["interpreter"], header),
+                     (grid.Columns[ColFound], ["found"], header),
+                     (grid.Columns[ColArgs], ["arguments"], header),
+
+                     // The status cell is the one column whose content is longer than its header, and it
+                     // carries the only call to action in the table — an ellipsised "Set default" is the
+                     // row telling the user to do something and hiding what.
+                     (grid.Columns[ColStatus], ["status", "askWindows", "bound", "notBound", "needsApproval"], grid.Font),
+                 })
+        {
+            var widest = keys
+                .SelectMany(key => Strings.Languages.Select(language => Strings.GetIn(language, key)))
+                .Max(text => TextRenderer.MeasureText(text, font).Width);
+            column.MinimumWidth = Math.Max(column.MinimumWidth, widest + padding);
+        }
+    }
+
+    internal static CatalogEntry? CatalogEntryFor(string extension) => CatalogSearchIndex.Find(extension);
 
     private static string? RiskNoteFor(string extension)
     {

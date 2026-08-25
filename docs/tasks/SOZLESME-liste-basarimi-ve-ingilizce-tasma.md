@@ -62,3 +62,45 @@ kalmaz. Kalan varsa neden kalamadığı yazılır.
 
 Türkçe, en fazla 15 satır: hangi dosyada ne değişti, U7 öncesi/sonrası ölçüm tablosu,
 U6'da düzeltilen taşmaların listesi, kabul çıktıları.
+
+---
+
+## Rapor — ui-builder (a39d399de02352dae), 2026-08-25
+
+**U7 yapıldı.** `src/Runly.Settings/Catalog/CatalogSearchIndex.cs` (yeni): katalog bir kez
+indekslenir — normalleştirilmiş uzantı, küçük harfli uzantı/İngilizce ad/önerilen uygulamalar,
+uzantıdan girdiye O(1) sözlük. `CatalogGridProjection.cs`: indeksi kullanır, `CancellationToken`
+alır. `MainForm.cs`: `CatalogEntryFor` ve `EffectiveMapping` doğrusal taramadan sözlüğe geçti;
+ızgara `SuspendLayout` + `Rows.AddRange` ile tek seferde dolar; arama debounce'ı önceki taramayı
+iptal eder; yeni `ScanStatuses` tuş vuruşunda kayıt defterini yeniden okumaz (yazmak bir bağı
+değiştiremez), arama dışındaki her yol eskisi gibi taze tarar.
+
+| Sorgu | Satır | Öncesi | Sonrası |
+|---|---|---|---|
+| "e" | 412 | 225,0 ms | 56,1 ms |
+| "ex" | 397 | 177,6 ms | 17,6 ms |
+| "exe" | 397 | 169,4 ms | 21,6 ms |
+| "exec" | 0 | 34,2 ms | 6,3 ms |
+
+Satır sayıları iki yapıda birebir aynı. Ölçüm üründeki mevcut `Stopwatch` günlüğünden alındı,
+yeni ölçüm kodu üründe kalmadı. **Sözleşmedeki 15–47 ms tabanı doğrulanmadı:** o bant küçük
+sonuç kümelerine ait; 400+ satır önceden 169–225 ms sürüyordu. Geçici profil, sürenin
+%90'ından fazlasının `GetStatus` kayıt defteri okumalarında geçtiğini gösterdi — sözleşmenin
+"asıl maliyet yeniden projeksiyon" varsayımı yanlıştı. Ayrıntı:
+`docs/reports/U7-liste-basarimi-olcumu.txt`.
+
+**U6 yapılmadı — engel.** Ölçüm koşumunu (`src/Runly.Settings/UiAudit.cs` + `Program.cs`
+`--ui-audit`) yazıp derledim; her diyalogu görünmez açıp `TextRenderer.MeasureText` ile
+kırpılan denetimi listeleyecekti. Koşum sırasında dosya silindi ve `Program.cs` geri alındı;
+aynı anda `Strings.cs`'e benim yazmadığım `GetIn`/`Languages` eklendi. Aynı çalışma ağacında
+ikinci bir yazıcı U6'yı paralel yürütüyor. Çakışmayı büyütmemek için U6 dosyalarına
+dokunmayı bıraktım; ekran görüntüsü alınmadı, `docs/KNOWN-ISSUES.md`'deki madde kapatılmadı.
+Satır `.claude/relay/live/_sorun.log`'a yazıldı.
+
+**Kabul:** `dotnet build Runly.sln -c Debug` 0 hata 0 uyarı · `dotnet test` 241/241 geçti ·
+`dotnet format --verify-no-changes` temiz · uygulama açıldı, 412 satırlık listede arama
+gezildi, süreç kapatıldı, `%APPDATA%\Runly\config.json` ve `runly.log` eski hâline getirildi
+(dil hiç değiştirilmedi, `tr` kaldı) · `docs/UI-PLAN.md` U7 altına "yapıldı" notu düşüldü.
+U6 kabulleri (iki dilin ekran görüntüleri, KNOWN-ISSUES maddesi) **karşılanmadı**.
+
+`status: blocked` — U6 için aynı ağaçta ikinci yazıcı var.

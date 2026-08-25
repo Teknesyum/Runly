@@ -22,6 +22,15 @@ internal static class Strings
             ? value
             : Catalogs[SourceLanguage].TryGetValue(key, out var source) ? source : key;
 
+    /// <summary>Reads a key in a named language regardless of the current one, so a layout can be sized
+    /// against the longest translation instead of whichever language happens to be showing.</summary>
+    public static string GetIn(string language, string key) =>
+        Catalogs.TryGetValue(language, out var catalog) && catalog.TryGetValue(key, out var value)
+            ? value
+            : Get(key);
+
+    public static IReadOnlyCollection<string> Languages => Catalogs.Keys;
+
     public static string Translate(string text) =>
         string.IsNullOrEmpty(text) ? text : KeyByText.TryGetValue(text, out var key) ? Get(key) : text;
 
