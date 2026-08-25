@@ -18,7 +18,6 @@ internal sealed unsafe class TaskDialogInterop : IDialogService
     private const int MotwDelayMilliseconds = 3000;
 
     private const int RunButtonId = 1001;
-    private const int SettingsButtonId = 1002;
     private const int RadioOnlyOnceId = 2001;
     private const int RadioTrustFileId = 2002;
     private const int RadioTrustFolderId = 2003;
@@ -160,17 +159,17 @@ internal sealed unsafe class TaskDialogInterop : IDialogService
         }
     }
 
-    /// <summary>Shows a question with an extra "Ayarları aç" button; returns whether that button was pressed.</summary>
-    internal bool AskOpenSettings(string title, string body)
+    /// <summary>Shows the neon "Ayarları aç" question; returns whether that button was pressed.</summary>
+    internal bool AskOpenSettings(string title, string body, string fileName)
     {
-        if (!ShowSimple(title, body, NativeMethods.TdWarningIcon, NativeMethods.TdcbfCancelButton,
-                [(SettingsButtonId, "Ayarları aç")], out var pressedButton))
+        if (MissingHandlerDialog.Show(title, body, fileName, _logger) is { } answer)
         {
-            Console.Error.WriteLine($"{title}: {body}");
-            return false;
+            return answer;
         }
 
-        return pressedButton == SettingsButtonId;
+        // No GUI surface (console host, or the window could not be created): stderr is the only channel left.
+        Console.Error.WriteLine($"{title}: {body}");
+        return false;
     }
 
     private bool ShowSimple(

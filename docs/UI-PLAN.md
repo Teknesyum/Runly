@@ -29,6 +29,9 @@ Bugün `ChooseApplicationDialog.ResolveIcon` `Icon.ExtractAssociatedIcon` kullan
 
 **Kabul:** %100 ve %150'de aynı liste ekran görüntüsüyle karşılaştırılır, simgeler net.
 
+**Yapıldı** — `Discovery/ShellIconLoader.cs`; kanıt `docs/reports/U1-simge-olcek-karsilastirma.png`.
+Canlı %150 ekranı yerine 32/48 px karşılaştırma sayfası basıldı (ekran kapısı kapalı).
+
 ### U2 · Windows'un kendi "birlikte aç" listesi
 
 `SHAssocEnumHandlers` / `IAssocHandler` hiç kullanılmıyor. `GetUIName`, `GetIconLocation`,
@@ -40,6 +43,10 @@ Bugün `ChooseApplicationDialog.ResolveIcon` `Icon.ExtractAssociatedIcon` kullan
 
 **Kabul:** `.md` için liste Windows'un kendi "Birlikte aç" listesini kapsar; kapsamayan varsa
 gerekçesi yazılır.
+
+**Yapıldı** — `Discovery/AssocHandlerFinder.cs` + `ChooseApplicationDialog.Merge`; kanıt
+`docs/reports/U2-birlikte-ac-karsilastirma.txt`. `SHOpenWithDialog` yerine ham `IAssocHandler`
+dökümü ile karşılaştırıldı (ekran kapısı kapalı).
 
 ### U3 · DPI
 

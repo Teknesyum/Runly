@@ -5,34 +5,30 @@ using Runly.Core.Abstractions;
 namespace Runly.Launcher.Ui;
 
 /// <summary>
-/// A small native input window for the <c>prompt-args</c> verb (SPEC 7). TaskDialog has no text field,
-/// so this is a plain Win32 window; going through <c>RunlySettings.exe</c> instead would make the
-/// launcher depend on a package that does not exist yet (T3.md).
-/// Teknesyum neon styling (R5) comes from <see cref="NeonWindowChrome"/> — WinForms/WPF are not usable
-/// in an AOT-published, trimmed executable.
+/// The "no handler for this extension" question, drawn as a neon Win32 window instead of a TaskDialog:
+/// <c>TaskDialogIndirect</c> renders in the shell's own light chrome and cannot be themed (R5).
+/// Returns <see langword="null"/> when no GUI surface is available, so callers can fall back to stderr.
 /// </summary>
 [SupportedOSPlatform("windows")]
-internal static unsafe class ArgumentPromptDialog
+internal static unsafe class MissingHandlerDialog
 {
-    private const string ClassName = "RunlyArgumentPrompt";
+    private const string ClassName = "RunlyMissingHandler";
 
     private const int WindowWidth = 440;
     private const int WindowHeight = 186;
-    private const int CaptionButtons = 3;
+    private const int CaptionButtons = 1;
 
     private static bool s_classRegistered;
-    private static nint s_editHandle;
-    private static nint s_okHandle;
+    private static nint s_settingsHandle;
     private static nint s_cancelHandle;
     private static nint s_backgroundBrush;
-    private static nint s_editBrush;
     private static nint s_sansFont;
-    private static string s_acceptedText = string.Empty;
-    private static bool s_accepted;
+    private static bool s_openSettings;
     private static bool s_closing;
+    private static string s_caption = "Runly";
 
-    /// <summary>Asks for a raw argument string; returns <see langword="null"/> when the user cancels.</summary>
-    internal static string? Show(string scriptFileName, ILogger logger)
+    /// <summary>Shows the question; <see langword="true"/> means the user chose "Ayarları aç".</summary>
+    internal static bool? Show(string title, string message, string fileName, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(logger);
 
@@ -42,28 +38,25 @@ internal static unsafe class ArgumentPromptDialog
             return null;
         }
 
-        s_editHandle = 0;
-        s_okHandle = 0;
+        s_settingsHandle = 0;
         s_cancelHandle = 0;
-        s_acceptedText = string.Empty;
-        s_accepted = false;
+        s_openSettings = false;
         s_closing = false;
+        s_caption = $"Runly — {title}";
 
         s_backgroundBrush = NativeMethods.CreateSolidBrush(NeonWindowChrome.ColorSurface);
-        s_editBrush = NativeMethods.CreateSolidBrush(NeonWindowChrome.ColorEditBg);
 
         var window = NativeMethods.CreateWindowExW(
             NativeMethods.WsExDlgModalFrame | NativeMethods.WsExControlParent,
             ClassName,
-            "Runly — Argümanlarla çalıştır",
-            NativeMethods.WsPopup | NativeMethods.WsThickFrame | NativeMethods.WsSysMenu |
-            NativeMethods.WsMinimizeBox | NativeMethods.WsMaximizeBox,
+            s_caption,
+            NativeMethods.WsPopup | NativeMethods.WsSysMenu,
             0, 0, 100, 100,
             0, 0, instance, 0);
 
         if (window == 0)
         {
-            logger.Error($"Argüman penceresi oluşturulamadı (Win32 hata kodu {Marshal.GetLastPInvokeError()}).");
+            logger.Error($"Yorumlayıcı penceresi oluşturulamadı (Win32 hata kodu {Marshal.GetLastPInvokeError()}).");
             CleanupGdiObjects();
             return null;
         }
@@ -73,28 +66,25 @@ internal static unsafe class ArgumentPromptDialog
             var dpi = NeonWindowChrome.ReadDpi(window);
 
             s_sansFont = NeonWindowChrome.ResolveSansFont((int)(9 * dpi / 72.0));
-            BuildControls(window, instance, s_sansFont, dpi, scriptFileName);
+            BuildControls(window, instance, s_sansFont, dpi, message, fileName);
             NeonWindowChrome.RoundWindowCorners(window, WindowWidth, WindowHeight, dpi);
 
-            // Must be set after the window has a DWM-composited frame (i.e. after it is shown at least
-            // once); calling it immediately after CreateWindowExW is silently ignored on this machine.
+            // Must be set after the window has a DWM-composited frame; calling it immediately after
+            // CreateWindowExW is silently ignored on this machine.
             NeonWindowChrome.ApplyDarkFrame(window);
 
             NeonWindowChrome.CenterAndShow(window, WindowWidth, WindowHeight, dpi);
-            NativeMethods.SetFocus(s_editHandle);
+            NativeMethods.SetFocus(s_settingsHandle);
 
-            // Re-applied post-show: some builds only honour the attribute once the window has an actual
-            // DWM-composited frame on screen, and silently ignore it beforehand.
             NeonWindowChrome.ApplyDarkFrame(window);
 
             RunMessageLoop(window);
 
-            return s_accepted ? s_acceptedText : null;
+            return s_openSettings;
         }
         finally
         {
             CleanupGdiObjects();
-            s_editHandle = 0;
         }
     }
 
@@ -110,12 +100,6 @@ internal static unsafe class ArgumentPromptDialog
         {
             NativeMethods.DeleteObject(s_backgroundBrush);
             s_backgroundBrush = 0;
-        }
-
-        if (s_editBrush != 0)
-        {
-            NativeMethods.DeleteObject(s_editBrush);
-            s_editBrush = 0;
         }
     }
 
@@ -141,7 +125,7 @@ internal static unsafe class ArgumentPromptDialog
 
             if (NativeMethods.RegisterClassExW(in windowClass) == 0)
             {
-                logger.Error($"Argüman penceresi sınıfı kaydedilemedi (Win32 hata kodu {Marshal.GetLastPInvokeError()}).");
+                logger.Error($"Yorumlayıcı penceresi sınıfı kaydedilemedi (Win32 hata kodu {Marshal.GetLastPInvokeError()}).");
                 return false;
             }
 
@@ -150,8 +134,6 @@ internal static unsafe class ArgumentPromptDialog
         }
         finally
         {
-            // The class keeps a pointer to this string for the process lifetime only when registration
-            // succeeded; it is released either way because the class is never unregistered before exit.
             if (!s_classRegistered)
             {
                 Marshal.FreeHGlobal(classNamePointer);
@@ -159,37 +141,36 @@ internal static unsafe class ArgumentPromptDialog
         }
     }
 
-    private static void BuildControls(nint window, nint instance, nint font, uint dpi, string scriptFileName)
+    private static void BuildControls(nint window, nint instance, nint font, uint dpi, string message, string fileName)
     {
         int Scale(int value) => NeonWindowChrome.Scale(value, dpi);
 
-        var label = NativeMethods.CreateWindowExW(
-            0, "STATIC", $"\"{scriptFileName}\" dosyasına verilecek argümanlar:",
+        var messageLabel = NativeMethods.CreateWindowExW(
+            0, "STATIC", message,
             NativeMethods.WsChild | NativeMethods.WsVisible,
             Scale(12), Scale(48), Scale(400), Scale(20),
             window, 0, instance, 0);
 
-        s_editHandle = NativeMethods.CreateWindowExW(
-            0, "EDIT", string.Empty,
-            NativeMethods.WsChild | NativeMethods.WsVisible | NativeMethods.WsBorder |
-            NativeMethods.WsTabStop | NativeMethods.EsAutoHScroll,
-            Scale(12), Scale(72), Scale(400), Scale(24),
+        var fileLabel = NativeMethods.CreateWindowExW(
+            0, "STATIC", $"Dosya: {fileName}",
+            NativeMethods.WsChild | NativeMethods.WsVisible,
+            Scale(12), Scale(72), Scale(400), Scale(20),
             window, 0, instance, 0);
 
-        s_okHandle = NativeMethods.CreateWindowExW(
-            0, "BUTTON", "Çalıştır",
+        s_settingsHandle = NativeMethods.CreateWindowExW(
+            0, "BUTTON", "Ayarları aç",
             NativeMethods.WsChild | NativeMethods.WsVisible | NativeMethods.WsTabStop |
             NativeMethods.BsDefPushButton | NativeMethods.BsOwnerDraw,
-            Scale(232), Scale(108), Scale(88), Scale(28),
+            Scale(220), Scale(108), Scale(96), Scale(28),
             window, NativeMethods.IdOk, instance, 0);
 
         s_cancelHandle = NativeMethods.CreateWindowExW(
-            0, "BUTTON", "İptal",
+            0, "BUTTON", "Vazgeç",
             NativeMethods.WsChild | NativeMethods.WsVisible | NativeMethods.WsTabStop | NativeMethods.BsOwnerDraw,
             Scale(328), Scale(108), Scale(84), Scale(28),
             window, NativeMethods.IdCancel, instance, 0);
 
-        foreach (var control in new[] { label, s_editHandle })
+        foreach (var control in new[] { messageLabel, fileLabel })
         {
             if (control != 0)
             {
@@ -212,31 +193,6 @@ internal static unsafe class ArgumentPromptDialog
         }
     }
 
-    private static string ReadEditText(nint edit)
-    {
-        if (edit == 0)
-        {
-            return string.Empty;
-        }
-
-        var length = NativeMethods.GetWindowTextLengthW(edit);
-        if (length <= 0)
-        {
-            return string.Empty;
-        }
-
-        var buffer = Marshal.AllocHGlobal((length + 1) * sizeof(char));
-        try
-        {
-            var copied = NativeMethods.GetWindowTextW(edit, buffer, length + 1);
-            return copied <= 0 ? string.Empty : Marshal.PtrToStringUni(buffer, copied);
-        }
-        finally
-        {
-            Marshal.FreeHGlobal(buffer);
-        }
-    }
-
     [UnmanagedCallersOnly]
     private static nint WindowProc(nint hwnd, uint message, nint wParam, nint lParam)
     {
@@ -246,7 +202,7 @@ internal static unsafe class ArgumentPromptDialog
                 return NeonWindowChrome.HitTest(hwnd, lParam, CaptionButtons);
 
             case NativeMethods.WmPaint:
-                NeonWindowChrome.DrawCaption(hwnd, s_backgroundBrush, "Runly", CaptionButtons, s_sansFont);
+                NeonWindowChrome.DrawCaption(hwnd, s_backgroundBrush, s_caption, CaptionButtons, s_sansFont);
                 return 0;
 
             case NativeMethods.WmActivate:
@@ -258,19 +214,13 @@ internal static unsafe class ArgumentPromptDialog
                 NativeMethods.SetTextColor(wParam, NeonWindowChrome.ColorTextDim);
                 return s_backgroundBrush;
 
-            case NativeMethods.WmCtlColorEdit:
-                NativeMethods.SetBkMode(wParam, NativeMethods.OpaqueBkMode);
-                NativeMethods.SetBkColor(wParam, NeonWindowChrome.ColorEditBg);
-                NativeMethods.SetTextColor(wParam, NeonWindowChrome.ColorNeonBlue);
-                return s_editBrush;
-
             case NativeMethods.WmDrawItem:
                 var item = *(NativeMethods.DrawItemStruct*)lParam;
-                if (item.HwndItem == s_okHandle || item.HwndItem == s_cancelHandle)
+                if (item.HwndItem == s_settingsHandle || item.HwndItem == s_cancelHandle)
                 {
                     var focused = (item.ItemState & NativeMethods.OdsFocus) != 0;
-                    var text = item.HwndItem == s_okHandle ? "Çalıştır" : "İptal";
-                    NeonWindowChrome.DrawNeonButton(item.Hdc, item.RcItem, text, primary: item.HwndItem == s_okHandle, focused);
+                    var primary = item.HwndItem == s_settingsHandle;
+                    NeonWindowChrome.DrawNeonButton(item.Hdc, item.RcItem, primary ? "Ayarları aç" : "Vazgeç", primary, focused);
                     return 1;
                 }
 
@@ -280,13 +230,7 @@ internal static unsafe class ArgumentPromptDialog
                 var controlId = (int)(wParam & 0xFFFF);
                 if (controlId is NativeMethods.IdOk or NativeMethods.IdCancel)
                 {
-                    // The text is read before the window dies, since the edit control dies with it.
-                    s_accepted = controlId == NativeMethods.IdOk;
-                    if (s_accepted)
-                    {
-                        s_acceptedText = ReadEditText(s_editHandle);
-                    }
-
+                    s_openSettings = controlId == NativeMethods.IdOk;
                     s_closing = true;
                     NativeMethods.DestroyWindow(hwnd);
                     return 0;
@@ -295,7 +239,7 @@ internal static unsafe class ArgumentPromptDialog
                 break;
 
             case NativeMethods.WmClose:
-                s_accepted = false;
+                s_openSettings = false;
                 s_closing = true;
                 NativeMethods.DestroyWindow(hwnd);
                 return 0;
@@ -303,7 +247,7 @@ internal static unsafe class ArgumentPromptDialog
             case NativeMethods.WmDestroy:
                 if (!s_closing)
                 {
-                    s_accepted = false;
+                    s_openSettings = false;
                 }
 
                 NativeMethods.PostQuitMessage(0);

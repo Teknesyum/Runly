@@ -130,8 +130,9 @@ internal static class LauncherHost
         {
             var openSettings = dialogs.AskOpenSettings(
                 "Uygulama seçilmedi",
-                $"\"{file.Extension}\" uzantısı için açılacak uygulama seçilmedi.\n\nRunly Ayarları açılsın mı?");
-            if (openSettings) TryStartSettings();
+                $"\"{file.Extension}\" uzantısı için açılacak uygulama seçilmedi.",
+                file.FileName);
+            if (openSettings) TryStartSettings(file.Extension);
             return ExitCode.NoInterpreter;
         }
         var trustStore = new TrustStoreService(logger: s_logger);
@@ -252,11 +253,12 @@ internal static class LauncherHost
 
         var openSettings = dialogs.AskOpenSettings(
             "Yorumlayıcı bulunamadı",
-            $"\"{extension}\" için yorumlayıcı ayarlı değil ya da kurulu değil.\n\nAyarları açmak ister misiniz?");
+            $"\"{extension}\" için yorumlayıcı ayarlı değil ya da kurulu değil.",
+            script.FileName);
 
         if (openSettings)
         {
-            TryStartSettings();
+            TryStartSettings(script.Extension);
         }
 
         return ExitCode.NoInterpreter;
@@ -316,7 +318,7 @@ internal static class LauncherHost
 
     private static TaskDialogInterop Dialogs() => s_dialogs ??= new TaskDialogInterop(s_logger);
 
-    private static void TryStartSettings()
+    private static void TryStartSettings(string? extension = null)
     {
         var directory = Path.GetDirectoryName(Environment.ProcessPath);
         if (string.IsNullOrEmpty(directory))
@@ -333,7 +335,13 @@ internal static class LauncherHost
 
         try
         {
-            using var process = Process.Start(new ProcessStartInfo { FileName = settingsPath, UseShellExecute = true });
+            var startInfo = new ProcessStartInfo { FileName = settingsPath, UseShellExecute = true };
+            if (SettingsCommandLine.NormalizeExtension(extension) is { } selected)
+            {
+                startInfo.Arguments = $"{SettingsCommandLine.SelectSwitch} {selected}";
+            }
+
+            using var process = Process.Start(startInfo);
         }
         catch (Exception ex) when (ex is Win32Exception or InvalidOperationException)
         {

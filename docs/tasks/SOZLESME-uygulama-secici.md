@@ -1,5 +1,6 @@
 # Sözleşme — Uygulama seçici: doğru simge + Windows'un kendi "Birlikte aç" listesi
 
+**Durum:** submitted · round: 1
 **Proje:** C:\Users\Administrator\Desktop\Projeler\Runly (.NET 8 / WinForms)
 **Dal:** main üzerinde çalış, worktree açma.
 **Kaynak:** `docs/UI-PLAN.md` U1 ve U2 maddeleri. Planı oku, buradaki metin onun özeti.
@@ -66,3 +67,43 @@ giriş varsa gerekçesini yaz.
 
 Türkçe, en fazla 15 satır: hangi dosyada ne değişti, U2'de iki listenin karşılaştırması,
 kabul kriterlerinin çıktıları, takıldığın nokta.
+
+---
+
+## Rapor — ui-builder, tur 1
+
+**Değişen dosyalar**
+- `src/Runly.Settings/Discovery/ShellIconLoader.cs` (yeni) — `IShellItemImageFactory` ile istenen boyda
+  kare; `"yol,indeks"` → `PrivateExtractIcons`, olmazsa `ExtractIconEx`; `@{paket?ms-resource://…}` →
+  `SHLoadIndirectString`, çözülen hedef bir bitmap varlığıysa doğrudan okunur. Her yolun sonunda
+  `Icon.ExtractAssociatedIcon` fallback'i duruyor, hiçbir yol dışarı istisna sızdırmıyor.
+- `src/Runly.Settings/Discovery/AssocHandlerFinder.cs` (yeni) — `SHAssocEnumHandlers` / `IAssocHandler`;
+  `GetName`, `GetUIName`, `GetIconLocation`, `IsRecommended`. COM hatasında boş liste döner.
+- `src/Runly.Settings/Dialogs/ChooseApplicationDialog.cs` — `Merge` iki kaynağı tam yol
+  (`OrdinalIgnoreCase`, yoksa görünen ad) ile tekilleştiriyor; sıra katalog → `IsRecommended` → kalan.
+  `_iconCache` artık `(kaynak, boy)` anahtarlı; `OnFormClosed` aynı şekilde hepsini bırakıyor.
+  Sabit piksel eklenmedi, `IconSize` (`Metrics.Px(32)`) türetilmeye devam ediyor.
+
+**İki tuzak çıktı.** (1) `IShellItemImageFactory`'nin DIB'i alt-üst geliyor, pozitif stride ile okununca
+her simge dikey aynalanıyordu — ilk karşılaştırma sayfasında görüldü, negatif stride ile düzeltildi.
+(2) `NoOpenWith` dosya adına göre aranınca paketli Not Defteri eleniyordu; bayrak `system32` kaydına ait.
+Artık kayıt kendi `shell\open\command`'ı ile aynı exe'yi gösteriyorsa uygulanıyor.
+
+**U2 karşılaştırması (`.md`).** Windows'un ham `IAssocHandler` dökümü 15 giriş; Runly 11'ini gösteriyor
+(+ Runly.exe kendi kendini elediği için listede 10 satır kalıyor). Kapsanmayan 4:
+`Windows Fotoğraf Görüntüleyicisi` → `PhotoViewer.dll`, çalıştırılabilir değil;
+üç giriş `GetName` ve `GetUIName`'i boş döndürüyor (paketli uygulamalar, ör. kullanıcının MRU'sundaki
+`WhatsApp.Root.exe`) — kullanılabilir ne yol ne ad var. Tam döküm:
+`docs/reports/U2-birlikte-ac-karsilastirma.txt`.
+
+**Kabul kriterleri.** 1) build: 0 hata 0 uyarı ✓ · 2) test: 241/241 geçti ✓ · 3) `dotnet format
+--verify-no-changes`: temiz ✓ · 5) `docs/UI-PLAN.md` U1/U2 altına "yapıldı" satırı düşüldü ✓
+· 4) **ÖLÇEMEDİM** — ekran kapısı kapalı, pencere açan komutlar hook tarafından engelleniyor.
+Yerine başsız ölçüm: `docs/reports/U1-simge-olcek-karsilastirma.png` aynı listeyi 32 px (%100) ve
+48 px (%150) kutularda önce/sonra basıyor; eski yol 48'de 32'yi büyütüyor, yeni yol gerçek 48 px kareyi
+getiriyor. Canlı diyalog ekran görüntüsü ve `SHOpenWithDialog` yan yana karşılaştırması alınamadı;
+aynı satır `.claude/relay/live/_sorun.log`'a yazıldı.
+
+**Not.** `teknesyum-ui` standardı kurulu (`~/.claude/teknesyum-ui.json`); bu iş renk/ölçü üretmedi,
+mevcut `Palette`/`Metrics` dışına çıkılmadı. `MainForm.cs`, `Program.cs`, `NeonControls.cs` ve
+`Runly.Launcher/` hiç açılmadı.

@@ -25,10 +25,13 @@ internal sealed class ChooseApplicationDialog : NeonForm
     private static readonly Color ChipGlow = Tint(Palette.NeonPink, 60);
     private static readonly Color RowSelected = Tint(Palette.NeonBlue, 34);
 
-    private sealed record AppChoice(string DisplayName, string Path, bool Suggested);
+    private sealed record AppChoice(string DisplayName, string Path, string IconSource, bool Suggested, bool Recommended);
 
     private readonly List<AppChoice> _all;
-    private readonly Dictionary<string, Image?> _iconCache = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Keyed by icon source *and* requested edge, because the same executable drawn at 32 and at
+    /// 48 pixels is two different bitmaps and a single-key cache would hand the small one to both.</summary>
+    private readonly Dictionary<(string Source, int Size), Image?> _iconCache = [];
     private readonly TextBox _searchBox;
     private readonly System.Windows.Forms.Timer _searchDebounce;
     private readonly ListBox _list;
@@ -49,18 +52,7 @@ internal sealed class ChooseApplicationDialog : NeonForm
         string? currentPath)
     {
         var suggested = suggestedExecutables.ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        // The Where clause keeps Runly out of its own handler list: the launcher would hand the file
-        // straight back to itself. ProcessLauncher catches that loop at run time and returns Recursive,
-        // but by then the mapping is already saved and the user has no idea why nothing opens.
-        _all = applications
-            .Where(app => !ProcessLauncher.IsRunlyExecutable(app.Path))
-            .GroupBy(app => app.Path, StringComparer.OrdinalIgnoreCase)
-            .Select(group => group.First())
-            .Select(app => new AppChoice(app.DisplayName, app.Path, suggested.Contains(app.ExecutableName)))
-            .OrderByDescending(choice => choice.Suggested)
-            .ThenBy(choice => choice.DisplayName, StringComparer.CurrentCultureIgnoreCase)
-            .ToList();
+        _all = Merge(extension, applications, suggested);
 
         Text = Strings.Get("chooseApp.title");
         StartPosition = FormStartPosition.CenterParent;
@@ -174,6 +166,91 @@ internal sealed class ChooseApplicationDialog : NeonForm
         KeyDown += OnDialogKeyDown;
     }
 
+    /// <summary>Registry discovery and the shell's own handler list, folded into one list.
+    ///
+    /// Neither source contains the other. The registry scan sees every installed program, including ones
+    /// that were never associated with this extension; <see cref="AssocHandlerFinder"/> sees what the
+    /// system "Open with" dialog shows for it, which is the list the user recognises, and it carries the
+    /// shell's recommendation flag and a usable icon location. A handler that the registry scan already
+    /// found upgrades that entry rather than adding a second row.</summary>
+    private static List<AppChoice> Merge(
+        string extension,
+        IReadOnlyList<InstalledApplication> applications,
+        HashSet<string> suggested)
+    {
+        var merged = new Dictionary<string, AppChoice>(StringComparer.OrdinalIgnoreCase);
+
+        // The filter keeps Runly out of its own handler list: the launcher would hand the file straight
+        // back to itself. ProcessLauncher catches that loop at run time and returns Recursive, but by then
+        // the mapping is already saved and the user has no idea why nothing opens.
+        foreach (var app in applications)
+        {
+            if (ProcessLauncher.IsRunlyExecutable(app.Path))
+            {
+                continue;
+            }
+
+            merged.TryAdd(
+                Key(app.Path, app.DisplayName),
+                new AppChoice(app.DisplayName, app.Path, app.Path, suggested.Contains(app.ExecutableName), false));
+        }
+
+        foreach (var handler in AssocHandlerFinder.Find(extension))
+        {
+            if (ProcessLauncher.IsRunlyExecutable(handler.Path))
+            {
+                continue;
+            }
+
+            var key = Key(handler.Path, handler.DisplayName);
+            var isSuggested = suggested.Contains(Path.GetFileName(handler.Path));
+            if (merged.TryGetValue(key, out var existing))
+            {
+                merged[key] = existing with
+                {
+                    IconSource = handler.IconLocation,
+                    Suggested = existing.Suggested || isSuggested,
+                    Recommended = existing.Recommended || handler.IsRecommended,
+                };
+                continue;
+            }
+
+            merged[key] = new AppChoice(
+                handler.DisplayName, handler.Path, handler.IconLocation, isSuggested, handler.IsRecommended);
+        }
+
+        // Catalogue suggestions stay on top; the shell's recommendations form the second block; everything
+        // else falls below, alphabetically within each block.
+        return merged.Values
+            .OrderByDescending(choice => choice.Suggested)
+            .ThenByDescending(choice => choice.Recommended)
+            .ThenBy(choice => choice.DisplayName, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
+    }
+
+    /// <summary>Identity of a row: the resolved full path, falling back to the display name when a source
+    /// produced no path.</summary>
+    private static string Key(string path, string displayName)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return displayName;
+        }
+
+        try
+        {
+            return Path.GetFullPath(path);
+        }
+        catch (ArgumentException)
+        {
+            return path;
+        }
+        catch (IOException)
+        {
+            return path;
+        }
+    }
+
     public string SelectedPath { get; private set; } = string.Empty;
 
     public string SelectedDisplayName { get; private set; } = string.Empty;
@@ -250,7 +327,7 @@ internal sealed class ChooseApplicationDialog : NeonForm
             e.Bounds.Top + ((e.Bounds.Height - IconSize) / 2),
             IconSize,
             IconSize);
-        DrawApplicationIcon(g, choice.Path, iconBox);
+        DrawApplicationIcon(g, choice.IconSource, iconBox);
 
         var chipWidth = choice.Suggested ? MeasureChip(g) : 0;
         var textLeft = iconBox.Right + gutter;
@@ -313,9 +390,9 @@ internal sealed class ChooseApplicationDialog : NeonForm
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
     }
 
-    private void DrawApplicationIcon(Graphics g, string path, Rectangle bounds)
+    private void DrawApplicationIcon(Graphics g, string source, Rectangle bounds)
     {
-        var image = ResolveIcon(path);
+        var image = ResolveIcon(source, bounds.Width);
         if (image is null)
         {
             var inset = Metrics.Px(4);
@@ -331,30 +408,16 @@ internal sealed class ChooseApplicationDialog : NeonForm
         g.InterpolationMode = previous;
     }
 
-    private Image? ResolveIcon(string path)
+    private Image? ResolveIcon(string source, int size)
     {
-        if (_iconCache.TryGetValue(path, out var cached))
+        var key = (source.ToUpperInvariant(), size);
+        if (_iconCache.TryGetValue(key, out var cached))
         {
             return cached;
         }
 
-        Image? image = null;
-        try
-        {
-            using var icon = Icon.ExtractAssociatedIcon(path);
-            image = icon?.ToBitmap();
-        }
-        catch (ArgumentException)
-        {
-        }
-        catch (IOException)
-        {
-        }
-        catch (UnauthorizedAccessException)
-        {
-        }
-
-        _iconCache[path] = image;
+        var image = ShellIconLoader.Load(source, size);
+        _iconCache[key] = image;
         return image;
     }
 

@@ -110,3 +110,41 @@ kimse ekransız ortamda kilitlenmesin.
 
 Türkçe, en fazla 15 satır: hangi dosyada ne değişti, kabul kriterlerinin ölçüm çıktıları
 (5. ve 6. maddede gerçek değerler), takıldığın nokta varsa.
+
+---
+
+## Rapor (ui-builder, 2026-08-25)
+
+**Değişen dosyalar.** Yeni: `src/Runly.Launcher/Ui/NeonWindowChrome.cs` (iki pencerenin paylaştığı
+renk/ölçü sabitleri, font çözümü, buton ve caption çizimi, hit-test),
+`src/Runly.Launcher/Ui/MissingHandlerDialog.cs`, `src/Runly.Core/Services/SettingsCommandLine.cs`,
+`tests/Runly.Core.Tests/SettingsCommandLineTests.cs`. Değişen: `ArgumentPromptDialog.cs` (sabitler ve
+çizim ortak sınıfa taşındı, davranış aynı), `TaskDialogInterop.cs` (`AskOpenSettings` artık neon
+pencereyi çağırıyor, pencere kurulamazsa `Console.Error` düşüşü duruyor), `LauncherHost.cs`
+(`TryStartSettings(string? extension)` → `--select <.uzanti>`, iki çağrı yeri uzantıyı geçiyor),
+`Runly.Settings/Program.cs` (`Main(string[] args)`), `MainForm.cs` (`ApplyRequestedExtension()`
+`Shown` içinde: gerekirse `Enabled=false` kayıt ekler, kategori rayını geçirir, aramayı temizler,
+satırı seçer, bulamazsa günlüğe yazar), `locale/tr.json` + `en.json` (`select.selected`,
+`select.added`, `select.notFound`).
+
+**Kabul kriterleri.** 1) `dotnet build Runly.sln -c Debug` → 0 uyarı, 0 hata. 2) `dotnet test
+--no-build` → 241/241 geçti (yeni dosya 13 test). 3) `dotnet format --verify-no-changes` → çıkış 0.
+4) `dotnet publish src/Runly.Launcher.Gui -c Release` → uyarısız; yeni pencere trim/AOT uyarısı
+üretmedi. 5) Canlı: `%TEMP%\deneme.zzq` ile yayınlanan `Runly.exe` çalıştırıldı, sınıf
+`RunlyMissingHandler`, `GetWindowLong(hwnd,-16)` = **0x94080000** → `WS_CAPTION (0x00C00000)` yok,
+`WS_BORDER` yok, `WS_DLGFRAME` yok; `WS_POPUP` + `WS_SYSMENU` var. Başlık
+`Runly — Yorumlayıcı bulunamadı`, boyut 440x186. `PrintWindow` görüntüsü:
+`docs/reports/missing-handler-dialog.png`. 6) Canlı: `RunlySettings.exe --select .zzq`, 6 sn bekleme;
+durum şeridi `.zzq listeye eklendi ve seçildi. Şimdi bir uygulama seçin.` yazdı (bu metin yalnız satır
+gerçekten seçiliyken yazılıyor), ekran görüntüsünde `Özel` kategorisi açık, `.zzq` satırı görünür ve
+seçili, ayrıntı paneli `.zzq` gösteriyor: `docs/reports/settings-select-zzq.png`. `%APPDATA%\Runly\config.json`
+yedeklendi ve geri yüklendi; dosyada `.zzq` yok (kayıt yalnız MarkDirty ile bellekte kaldı). 7) Çözümleyici
+`Runly.Core` içinde, `Main` dışında; nokta ekleme, küçültme, geçersiz karakter, 24 karakter sınırı ve
+argümansız çağrı test edildi.
+
+**Ölçemediğim.** 6. maddede UI Automation `.zzq` adlı öğe için 0 sonuç döndürdü — `DataGridView`
+hücreleri bu ağaçta `Name` ile görünmüyor. Seçili olduğunu ekran görüntüsü ve durum şeridi metniyle
+gösterdim, UIA `SelectionItemPattern` ile doğrulayamadım.
+
+**Not.** `docs/reports/` bu depoda `.gitignore` içinde; iki PNG diskte duruyor, git'e girmiyor.
+Commit ve push atılmadı.

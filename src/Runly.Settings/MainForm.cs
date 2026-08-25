@@ -148,6 +148,7 @@ internal sealed class MainForm : NeonForm
     private readonly Button _restoreButton;
     private readonly Button _saveButton;
     private readonly Label _progressLabel;
+    private readonly string? _selectedExtension;
     private readonly CaptionItem _captionStatus;
     private readonly CaptionItem _captionVersion;
     private readonly CaptionItem _captionLanguage;
@@ -160,8 +161,11 @@ internal sealed class MainForm : NeonForm
         ITrustStore trustStore,
         IShellRegistrar shellRegistrar,
         RegistryBackup registryBackup,
-        ILogger logger)
+        ILogger logger,
+        string? selectedExtension = null)
     {
+        _selectedExtension = SettingsCommandLine.NormalizeExtension(selectedExtension);
+
         // Before any control exists: every size below is derived from this one reading, and re-reading it
         // per control would let two halves of the window disagree.
         Metrics.Initialize(this);
@@ -351,6 +355,7 @@ internal sealed class MainForm : NeonForm
         gridArea.SetColumnSpan(extButtons, 3);
 
         Shown += (_, _) => _searchBox.Focus();
+        Shown += (_, _) => ApplyRequestedExtension();
         KeyPreview = true;
         KeyDown += OnMainFormKeyDown;
 
@@ -1205,6 +1210,64 @@ internal sealed class MainForm : NeonForm
         RunlyRegistryLayout.IsBlockedExtension(extension) ||
         ExtensionCatalog.Entries.Any(entry =>
             string.Equals(entry.Extension, extension, StringComparison.OrdinalIgnoreCase) && entry.Blocked);
+
+    /// <summary>
+    /// Applies the <c>--select</c> extension the launcher passed in. It runs from <see cref="Form.Shown"/>
+    /// rather than the constructor because <see cref="SelectExtensionRow"/> can only see rows the grid has
+    /// already materialised, and the rail has to be moved to the extension's own category first.
+    /// </summary>
+    private void ApplyRequestedExtension()
+    {
+        if (_selectedExtension is not { Length: > 1 } extension)
+        {
+            return;
+        }
+
+        var blocked = IsBlocked(extension);
+        var added = false;
+
+        if (!blocked && !_config.Extensions.ContainsKey(extension))
+        {
+            _config.Extensions[extension] = new ExtensionMapping
+            {
+                Category = "special",
+                Enabled = false,
+            };
+            added = true;
+            MarkDirty();
+            RefreshCategoryRail();
+        }
+
+        var category = EffectiveMapping(extension).Category;
+        var categoryIndex = _categoryList.Items.IndexOf(category);
+        if (categoryIndex >= 0 && _categoryList.SelectedIndex != categoryIndex)
+        {
+            _categoryList.SelectedIndex = categoryIndex;
+        }
+
+        ClearSearch();
+        RefreshExtensionGrid();
+        SelectExtensionRow(extension);
+
+        if (!IsRowSelected(extension))
+        {
+            _logger.Warn($"--select ile istenen uzantı ızgarada bulunamadı: {extension}");
+            _progressLabel.Text = blocked
+                ? Strings.Get("extension.blockedAdd")
+                : Strings.Get("select.notFound").Replace("{extension}", extension, StringComparison.Ordinal);
+            return;
+        }
+
+        _grid.Focus();
+        _progressLabel.Text = Strings.Get(added ? "select.added" : "select.selected")
+            .Replace("{extension}", extension, StringComparison.Ordinal);
+        _logger.Info($"--select uygulandı: {extension} (listeye eklendi: {added})");
+    }
+
+    private bool IsRowSelected(string extension) =>
+        _grid.SelectedRows.Count > 0 &&
+        _grid.SelectedRows[0].Tag is ExtensionStatus status &&
+        string.Equals(status.Extension, extension, StringComparison.OrdinalIgnoreCase);
 
     private void SelectExtensionRow(string extension)
     {

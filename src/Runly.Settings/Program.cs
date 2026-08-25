@@ -8,8 +8,10 @@ namespace Runly.Settings;
 internal static class Program
 {
     [STAThread]
-    private static void Main()
+    private static void Main(string[] args)
     {
+        var selectedExtension = SettingsCommandLine.ParseSelectedExtension(args);
+
         // Must run before any window exists, otherwise Win32 scrollbars stay light.
         NeonTheme.EnableDarkMode();
         Application.EnableVisualStyles();
@@ -32,7 +34,7 @@ internal static class Program
 
         try
         {
-            Application.Run(new MainForm(configStore, config, trustStore, shellRegistrar, registryBackup, logger));
+            Application.Run(new MainForm(configStore, config, trustStore, shellRegistrar, registryBackup, logger, selectedExtension));
         }
         catch (Exception ex)
         {
