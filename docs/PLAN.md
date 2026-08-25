@@ -136,10 +136,11 @@ STATUS: TAMAM
 | R2 | Junction + script düzeltmeleri (B3/B4/B5) | ✅ ONAYLANDI (180 test; README `-Silent` bölümünü yönetici düzeltti) |
 | R3 | Kısa regresyon + paketleme | ✅ ONAYLANDI — 6/6 geçti, zip SHA doğrulandı, makine temiz |
 | R4 | Bayat durum çubuğu (B7) | ✅ ONAYLANDI — gerçek makinede doğrulandı, B7 kapandı |
-| R5 | Teknesyum Neon arayüz geçişi | ⏳ açık · **usta-arayuz** |
+| R5 | Teknesyum Neon arayüz geçişi | ✅ ONAYLANDI |
+| R6 | Çerçevesiz neon pencere + üst/alt şerit | ✅ ONAYLANDI |
 
-**Yayın durumu:** İşlevsel olarak yayına hazır (180/180, dürüstlük denetimi temiz, B1/B2/B3/B7
-kapalı). Sürüm 0.1.0 arayüz geçişinden (R5) sonra yayınlanacak.
+**Yayın durumu:** 0.2.0 yayında (AGPL-3.0-or-later, 228/228 test, 0 uyarı). Bundan sonraki iş
+`docs/UI-PLAN.md` üzerinden yürüyor; T/R paket dizisi kapandı.
 
 Toplam durum: 166/166 test yeşil, 0 uyarı, registry ve `%APPDATA%\Runly` temiz, `.ps1` UserChoice
 sağlam (K17 — bildirilen kayıp yanlış alarmdı).
