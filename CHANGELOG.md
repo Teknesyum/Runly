@@ -56,26 +56,26 @@ application, chosen from a picker instead of typed as an absolute path.
 - `SHOpenWithDialog` was sent registration flags that Windows has ignored since Windows 10.
 - A stray tooltip showed `False` over the enabled checkbox.
 
-## [0.1.3] — 2026-08-14
+## 0.1.3 — 2026-08-14
 
 ### Fixed
 
 - Extension installation flow corrections.
 
-## [0.1.2] — 2026-08-14
+## 0.1.2 — 2026-08-14
 
 ### Fixed
 
 - Installation and packaging corrections.
 
-## [0.1.1] — 2026-08-13
+## 0.1.1 — 2026-08-13
 
 ### Fixed
 
 - Junction handling in trusted folder matching, and script corrections found during the first
   release round.
 
-## [0.1.0] — 2026-08-13
+## 0.1.0 — 2026-08-13
 
 First public release.
 
@@ -88,8 +88,4 @@ First public release.
 - A settings window in the Teknesyum neon theme, with registry backup, restore and uninstall.
 
 [Unreleased]: https://github.com/Teknesyum/Runly/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/Teknesyum/Runly/compare/v0.1.3...v0.2.0
-[0.1.3]: https://github.com/Teknesyum/Runly/compare/v0.1.2...v0.1.3
-[0.1.2]: https://github.com/Teknesyum/Runly/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/Teknesyum/Runly/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/Teknesyum/Runly/releases/tag/v0.1.0
+[0.2.0]: https://github.com/Teknesyum/Runly/releases/tag/v0.2.0
