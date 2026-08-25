@@ -9,8 +9,6 @@
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <!-- SPEC 10 / T5: per-monitor v2 DPI awareness, set at the project level (no manifest). -->
-    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <ApplicationIcon>..\..\assets\runly.ico</ApplicationIcon>
     <!-- SPEC 3: WinForms does not support trimming or AOT. Never turn these on. -->
     <PublishTrimmed>false</PublishTrimmed>

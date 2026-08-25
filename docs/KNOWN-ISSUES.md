@@ -116,14 +116,40 @@ Version 0.2.0 · Last updated: 2026-08-15
 - **R3'ün 6 maddesi (S1, S7, S12, B3 regresyonu, B5, dürüstlük denetimi)** — bu oturumda gerçek
   makinede çalıştırılamadı, bkz. `docs/reports/R3-COMPLETE.md`.
 
-- **Ayarlar penceresi bazen klasik Windows çerçevesiyle açılıyor (25.08.2026, ekran
-  görüntüsüyle raporlandı).** Mevcut kodda `NeonForm` çerçevesiz (`FormBorderStyle.None`) ve
-  başlık bandını kendisi çizer — klasik beyaz başlık çubuğu bu koddan **çıkamaz**. Görüntüdeki
-  pencere büyük olasılıkla özel çerçeve öncesi eski bir ikili. Diskte 8 kopya `RunlySettings.exe`
-  var ve giriş yolları farklı kopyalara gidiyor: masaüstü kısayolu `dist\`e, kayıt defteri fiilleri
-  (`HKCU\Software\Classes\Runly.*\shell\*\command`) `src\...\bin\Debug\...`e işaret ediyor;
-  `dist-e2e\` ve `bin\Release\` kopyaları 0.1.x döneminden kalma olabilir. İkinci şüpheli uzak
-  masaüstü oturumu (TeamViewer/AnyDesk) sırasında DWM davranışı. **Teşhis:** günlük tutma açık —
-  bir dahaki sefere `Get-Process RunlySettings,Runly | Select-Object Path` çalıştırıp yolun
-  hangi kopya olduğuna bakılmalı. Kopya eskiyse çözüm tekleştirme: her giriş yolu `dist\`e
-  bağlanır, bayat kopyalar silinir.
+- **Ayarlar penceresi bazen klasik Windows başlık çubuğuyla görünüyor (25.08.2026,
+  kullanıcı ekran görüntüsü).** Neon başlık bandı yerinde duruyor, sistem çubuğu onun
+  **üstüne** biniyor. Ölçülenler:
+
+  - Güncel `dist\RunlySettings.exe` (v0.2.0) canlı ölçüldü: `WS_CAPTION` yok,
+    `GetWindowRect` ile `GetClientRect` farkı 0px. Maximize / restore / minimize
+    turlarında ve Explorer üzerinden kısayolla başlatmada da bozulmuyor.
+    **Yeniden üretilemedi.**
+  - `dist-e2e\RunlySettings.exe` (v0.1.0, 13.08 14:14) klasik çubuk veriyor —
+    `WS_CAPTION` var, 39px başlık. İçinde `NeonForm` sınıfı hiç yok, çünkü o sınıf
+    ağaca 13.08 **20:48**'de girdi. Ama içerik düzeni 0.1.0; kullanıcının gördüğü
+    ekranda kategori kenar çubuğu ve uygulama seçici var, bunlar 22.08 tarihli.
+    **Suçlu bu ikili değil.**
+  - `MainForm` 13.08 20:48'den beri `NeonForm`'dan türüyor, yani 0.2.0 içeriği
+    taşıyan her yapı çerçevesiz. Ekran görüntüsünde içerik aşağı kaymamış —
+    konumlar güncel yapıyla birebir — dolayısıyla çubuk istemci alanını
+    daraltmıyor, üzerine çiziliyor.
+
+  En tutarlı açıklama pencereye **dışarıdan** `WS_CAPTION` eklenmesi. Makinede
+  `StartAllBack 3.9.23` kurulu (pencere çerçevesi yeniden çizen araç) ve sürece
+  `RTSSHooks64.dll` enjekte oluyor. Kaynağı kesinleşmediği için savunma kodun kendi
+  tarafına kondu: `NeonForm.OnHandleCreated` ve `WM_STYLECHANGED` stili denetleyip
+  kirli bayrağı düşürüyor, `ApplyDarkTitleBar` da yedek olarak bağlandı.
+
+  **Tekrarlarsa:** pencere açıkken `GetWindowLong(hwnd, -16)` okunup style değeri
+  kaydedilmeli, ayrıca sürecin yüklü modül listesi alınmalı — hangi DLL'in enjekte
+  olduğu orada görünür.
+
+- **DPI zinciri kurulu değil (25.08.2026'da ölçüldü, bilinçli olarak açılmadı).**
+  `Runly.Settings.csproj` `ApplicationHighDpiMode=PerMonitorV2` diyordu ama bu ayar yalnız
+  üretilen `ApplicationConfiguration.Initialize()` üzerinden uygulanır ve o metot projede
+  hiç çağrılmıyor — süreç SystemAware koşuyor. Yalan yapılandırma bırakmamak için satır
+  silindi; PerMonitorV2 açılmadı. Açılabilmesi için önce `Metrics` DPI'ya göre yeniden
+  hesaplanabilir olmalı (`Metrics.Initialize` şu an tek seferlik, `s_initialized`
+  bayrağıyla) ve formlara `OnDpiChanged` override'ı girmeli. Test makinesi 96 dpi tek
+  monitör olduğu için değişiklik canlı doğrulanamıyordu; doğrulanamayan riskli değişiklik
+  yerine ölü ayar kaldırıldı.

@@ -62,6 +62,16 @@ internal class NeonForm : Form
     private const int WsMaximizeBox = 0x00010000;
     private const int WsMinimizeBox = 0x00020000;
     private const int WmGetMinMaxInfo = 0x0024;
+    private const int WmStyleChanged = 0x007D;
+    private const int GwlStyle = -16;
+    private const int WsBorder = 0x00800000;
+    private const int WsDlgFrame = 0x00400000;
+    private const int WsCaption = WsBorder | WsDlgFrame;
+    private const uint SwpNoSize = 0x0001;
+    private const uint SwpNoMove = 0x0002;
+    private const uint SwpNoZOrder = 0x0004;
+    private const uint SwpFrameChanged = 0x0020;
+    private const uint SwpNoActivate = 0x0010;
     private const int HtClient = 1;
     private const int HtCaption = 2;
     private const int HtLeft = 10;
@@ -98,7 +108,7 @@ internal class NeonForm : Form
         MouseMove += OnCaptionMouseMove;
         MouseLeave += (_, _) => ClearCaptionHover();
         MouseDown += OnCaptionMouseDown;
-        Resize += (_, _) => { ApplyCornerRegion(); LayoutCaptionItems(); };
+        Resize += (_, _) => { EnforceBorderlessStyle(); ApplyCornerRegion(); LayoutCaptionItems(); };
     }
 
     /// <summary>Restores the window styles that <see cref="FormBorderStyle.None"/> strips. The hit test
@@ -235,7 +245,48 @@ internal class NeonForm : Form
     {
         base.OnHandleCreated(e);
         NeonTheme.RemoveSystemBorder(this);
+
+        // Second line of defence: if the guard below is ever bypassed, the caption that surfaces is at
+        // least dark instead of a white strip across the neon band.
+        NeonTheme.ApplyDarkTitleBar(this);
+        EnforceBorderlessStyle();
     }
+
+    /// <summary>Strips WS_CAPTION, WS_DLGFRAME and WS_BORDER back off the window. FormBorderStyle.None
+    /// never sets them, but shell extensions that redraw window frames (StartAllBack and the like) and
+    /// injected hooks do add them from outside the process, and the result is a classic light title bar
+    /// painted over our own band. WS_THICKFRAME, WS_MAXIMIZEBOX and WS_MINIMIZEBOX are left alone —
+    /// <see cref="CreateParams"/> adds them on purpose for edge resizing, Snap and double-click maximize.
+    /// The write only happens when the style is actually dirty, so the WM_STYLECHANGED that SetWindowLong
+    /// raises cannot feed back into another write.</summary>
+    private void EnforceBorderlessStyle()
+    {
+        if (!IsHandleCreated)
+        {
+            return;
+        }
+
+        var style = GetWindowLong(Handle, GwlStyle);
+        var cleaned = style & ~(WsCaption | WsDlgFrame | WsBorder);
+        if (cleaned == style)
+        {
+            return;
+        }
+
+        SetWindowLong(Handle, GwlStyle, cleaned);
+        SetWindowPos(Handle, nint.Zero, 0, 0, 0, 0,
+            SwpFrameChanged | SwpNoMove | SwpNoSize | SwpNoZOrder | SwpNoActivate);
+    }
+
+    [DllImport("user32.dll", EntryPoint = "GetWindowLongW")]
+    private static extern int GetWindowLong(nint hwnd, int index);
+
+    [DllImport("user32.dll", EntryPoint = "SetWindowLongW")]
+    private static extern int SetWindowLong(nint hwnd, int index, int value);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetWindowPos(nint hwnd, nint insertAfter, int x, int y, int cx, int cy, uint flags);
 
     protected override void OnShown(EventArgs e)
     {
@@ -257,6 +308,13 @@ internal class NeonForm : Form
         if (m.Msg == WmNcCalcSize && m.WParam != IntPtr.Zero)
         {
             m.Result = IntPtr.Zero;
+            return;
+        }
+
+        if (m.Msg == WmStyleChanged)
+        {
+            base.WndProc(ref m);
+            EnforceBorderlessStyle();
             return;
         }
 

@@ -5,6 +5,20 @@ All notable changes to Runly are recorded here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project
 uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Window frame.** The settings window now strips WS_CAPTION, WS_DLGFRAME and WS_BORDER
+  back off itself whenever they appear, so shell extensions that redraw window frames can no
+  longer paint a classic light title bar over the neon caption band. The dark title bar
+  attribute is applied as a second line of defence.
+
+### Removed
+
+- Dead `ApplicationHighDpiMode` property that was never applied, since
+  `ApplicationConfiguration.Initialize()` is not called.
+
 ## [0.2.0] — 2026-08-24
 
 Handlers are no longer limited to interpreters: an extension can be opened with any installed
