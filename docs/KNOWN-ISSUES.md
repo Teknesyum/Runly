@@ -115,3 +115,15 @@ Version 0.2.0 · Last updated: 2026-08-15
 - ~~Başlık çubuğu fiziksel etkileşimleri~~ — 0.1.3'te ölçüldü ve kapatıldı, bkz. B10.
 - **R3'ün 6 maddesi (S1, S7, S12, B3 regresyonu, B5, dürüstlük denetimi)** — bu oturumda gerçek
   makinede çalıştırılamadı, bkz. `docs/reports/R3-COMPLETE.md`.
+
+- **Ayarlar penceresi bazen klasik Windows çerçevesiyle açılıyor (25.08.2026, ekran
+  görüntüsüyle raporlandı).** Mevcut kodda `NeonForm` çerçevesiz (`FormBorderStyle.None`) ve
+  başlık bandını kendisi çizer — klasik beyaz başlık çubuğu bu koddan **çıkamaz**. Görüntüdeki
+  pencere büyük olasılıkla özel çerçeve öncesi eski bir ikili. Diskte 8 kopya `RunlySettings.exe`
+  var ve giriş yolları farklı kopyalara gidiyor: masaüstü kısayolu `dist\`e, kayıt defteri fiilleri
+  (`HKCU\Software\Classes\Runly.*\shell\*\command`) `src\...\bin\Debug\...`e işaret ediyor;
+  `dist-e2e\` ve `bin\Release\` kopyaları 0.1.x döneminden kalma olabilir. İkinci şüpheli uzak
+  masaüstü oturumu (TeamViewer/AnyDesk) sırasında DWM davranışı. **Teşhis:** günlük tutma açık —
+  bir dahaki sefere `Get-Process RunlySettings,Runly | Select-Object Path` çalıştırıp yolun
+  hangi kopya olduğuna bakılmalı. Kopya eskiyse çözüm tekleştirme: her giriş yolu `dist\`e
+  bağlanır, bayat kopyalar silinir.
