@@ -124,7 +124,8 @@ Version 0.2.0 · Last updated: 2026-08-15
     `GetWindowRect` ile `GetClientRect` farkı 0px. Maximize / restore / minimize
     turlarında ve Explorer üzerinden kısayolla başlatmada da bozulmuyor.
     **Yeniden üretilemedi.**
-  - `dist-e2e\RunlySettings.exe` (v0.1.0, 13.08 14:14) klasik çubuk veriyor —
+  - `dist-e2e\RunlySettings.exe` (v0.1.0, 13.08 14:14 — bu klasör 25.08'de silindi)
+    klasik çubuk veriyor —
     `WS_CAPTION` var, 39px başlık. İçinde `NeonForm` sınıfı hiç yok, çünkü o sınıf
     ağaca 13.08 **20:48**'de girdi. Ama içerik düzeni 0.1.0; kullanıcının gördüğü
     ekranda kategori kenar çubuğu ve uygulama seçici var, bunlar 22.08 tarihli.
