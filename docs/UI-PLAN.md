@@ -69,6 +69,11 @@ binmiyor. `docs/KNOWN-ISSUES.md`'deki DPI maddesi kapanır.
 **Kabul:** hover, focus, seçili, devre dışı ve **açık dropdown** durumlarının hepsi ekran
 görüntüsüyle gezilir. Tek bir beyaz yüzey kalmaz.
 
+**Yapıldı** — `NeonToolTip` (owner-draw koyu kart), `ThemeClassFor` `ComboBox` için
+`DarkMode_CFD`, `EnableDarkMode` artık 18362 altındaki derlemelerde `SetPreferredAppMode`'u
+hiç çağırmıyor. **Eksik:** hover / focus / açık dropdown turu ekran kapısı kapalı olduğu için
+canlı gezilemedi.
+
 ### U5 · Risk notları arayüzde
 
 Katalogda altı uzantının `riskNote`'u var (`.hta`, `.vbs`, `.wsf`, `.js`, `.ps1`, `.jar`) ama
@@ -82,6 +87,12 @@ arayüz hiç göstermiyor. LOLBAS denetimi ayrıca beş uzantının katalogda **
 
 **Kabul:** `.hta` satırı seçilince not okunur; `catalog.json` testi altı yerine on bir uzantıda not
 arar.
+
+**Yapıldı** — notlar barındırıcıyı adıyla söylüyor, ızgarada notlu uzantı işaretleniyor,
+ayrıntılar panelinde `catalog.riskNote` başlığıyla görünüyor. `.wsh` notu yazıldı; `.vbe`,
+`.jse`, `.wsc`, `.chm` ölçülüp eklendi. **`.sct` eklenmedi:** bu makinede uzantı makine
+düzeyinde Photoshop'a devredilmiş, Windows'un kendi varsayılanı gözlemlenemiyor —
+ölçüm `docs/reports/U5-uzanti-barindirici-olcumu.txt`. Test on bir uzantı arıyor.
 
 ### U6 · İngilizce arayüzde taşma
 

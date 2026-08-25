@@ -74,9 +74,20 @@ internal static class NeonTheme
 
     private const int PreferredAppModeForceDark = 2;
 
+    /// Ordinal 135 exists from Windows 10 1809 (17763), but there it is <c>AllowDarkModeForApp(BOOL)</c>
+    /// and only from 1903 (18362) is it <c>SetPreferredAppMode(PreferredAppMode)</c>. Passing 2 to the
+    /// 1809 build is a BOOL of 2 into an undocumented export, and the ordinal resolving is exactly why
+    /// the try/catch below cannot catch it.
+    private const int FirstBuildWithPreferredAppMode = 18362;
+
     /// <summary>Opts the process into dark mode so native scrollbars are drawn dark. Best effort.</summary>
     public static void EnableDarkMode()
     {
+        if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, FirstBuildWithPreferredAppMode))
+        {
+            return;
+        }
+
         try
         {
             SetPreferredAppMode(PreferredAppModeForceDark);
@@ -238,6 +249,61 @@ internal static class NeonTheme
         path.AddArc(bounds.X, bounds.Bottom - d, d, d, 90, 90);
         path.CloseFigure();
         return path;
+    }
+}
+
+/// <summary>Dark tooltip. The tip is a window the system creates and paints from the system theme, and
+/// neither <c>DarkMode_Explorer</c> nor the app-wide dark mode reaches it — WinForms still has no dark
+/// tooltip of its own (dotnet/winforms#12420), so against this theme the default is a white card with a
+/// grey border. <see cref="ToolTip.BackColor"/> and <see cref="ToolTip.ForeColor"/> are ignored unless
+/// <see cref="ToolTip.OwnerDraw"/> is on, which is why the whole card is drawn here.</summary>
+internal sealed class NeonToolTip : ToolTip
+{
+    private const TextFormatFlags Format =
+        TextFormatFlags.Left | TextFormatFlags.WordBreak | TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix;
+
+    private static Font Face => Palette.Body;
+
+    private static int Inset => Metrics.Px(10);
+
+    public NeonToolTip()
+    {
+        OwnerDraw = true;
+        BackColor = Palette.FieldBg;
+        ForeColor = Palette.TextBody;
+        Popup += OnPopup;
+        Draw += OnDraw;
+    }
+
+    /// <summary>The system measures the tip against its own font and padding, so the card would be cut
+    /// short of the text this class actually draws.</summary>
+    private void OnPopup(object? sender, PopupEventArgs e)
+    {
+        var text = e.AssociatedControl is null ? string.Empty : GetToolTip(e.AssociatedControl);
+        var wrap = TextRenderer.MeasureText(text, Face, new Size(Metrics.Px(420), 0), Format);
+        e.ToolTipSize = new Size(wrap.Width + (Inset * 2), Math.Max(Metrics.Row(Face, 12), wrap.Height + (Inset * 2)));
+    }
+
+    private static void OnDraw(object? sender, DrawToolTipEventArgs e)
+    {
+        var g = e.Graphics;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+
+        var card = new Rectangle(0, 0, Math.Max(1, e.Bounds.Width - 1), Math.Max(1, e.Bounds.Height - 1));
+        using var path = NeonTheme.RoundedRect(card, Metrics.Px(6));
+
+        using (var fill = new SolidBrush(Palette.FieldBg))
+        {
+            g.FillPath(fill, path);
+        }
+
+        using (var border = new Pen(Color.FromArgb(NeonTheme.OutlineAlpha, Palette.NeonBlue), Metrics.Scale))
+        {
+            g.DrawPath(border, path);
+        }
+
+        TextRenderer.DrawText(g, e.ToolTipText, Face,
+            Rectangle.Inflate(card, -Inset, -Inset), Palette.TextBody, Format);
     }
 }
 

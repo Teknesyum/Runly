@@ -68,6 +68,7 @@
   "catalog.searchPlaceholder": ".md, markdown veya notepad ara",
   "catalog.bulkOpen": "Kategoriyi bu uygulamayla aç",
   "catalog.blocked": "Windows güvenliği nedeniyle devre dışı",
+  "catalog.riskNote": "Risk notu:",
   "binding.progress": "uzantı bağlı",
   "profile.export": "Profili dışa aktar",
   "profile.import": "Profili içe aktar",

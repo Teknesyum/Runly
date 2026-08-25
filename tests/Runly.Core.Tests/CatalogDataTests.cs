@@ -11,9 +11,11 @@ public sealed class CatalogDataTests
     /// <summary>
     /// Script types that run with the full privileges of the signed-in user once bound to Run.
     /// They stay unblocked on purpose, so the risk note is the only thing that warns the user.
+    /// Every entry here was measured on a live machine (docs/reports/U5-uzanti-barindirici-olcumu.txt);
+    /// .sct is deliberately absent because its Windows default handler could not be observed there.
     /// </summary>
     private static readonly string[] RiskyScriptExtensions =
-    [".hta", ".vbs", ".wsf", ".jar", ".js", ".ps1"];
+    [".hta", ".vbs", ".wsf", ".jar", ".js", ".ps1", ".wsh", ".vbe", ".jse", ".wsc", ".chm"];
 
     private static JsonDocument LoadCatalog()
     {
@@ -65,6 +67,13 @@ public sealed class CatalogDataTests
             Assert.True(entry.TryGetProperty("riskNote", out var riskNote), $"Missing riskNote: {extension}");
             Assert.False(string.IsNullOrWhiteSpace(riskNote.GetProperty("tr").GetString()), $"Empty Turkish riskNote: {extension}");
             Assert.False(string.IsNullOrWhiteSpace(riskNote.GetProperty("en").GetString()), $"Empty English riskNote: {extension}");
+
+            // The host name is the one thing the reader can verify for themselves with assoc/ftype,
+            // so a note that omits it fails the point of having a note at all.
+            foreach (var language in new[] { "tr", "en" })
+            {
+                Assert.Contains(".exe", riskNote.GetProperty(language).GetString()!, StringComparison.OrdinalIgnoreCase);
+            }
         }
     }
 

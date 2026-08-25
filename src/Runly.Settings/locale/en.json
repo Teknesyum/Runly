@@ -68,6 +68,7 @@
   "catalog.searchPlaceholder": "Search .md, markdown, or notepad",
   "catalog.bulkOpen": "Open category with this app",
   "catalog.blocked": "Disabled for Windows security",
+  "catalog.riskNote": "Risk note:",
   "binding.progress": "extensions bound",
   "profile.export": "Export profile",
   "profile.import": "Import profile",

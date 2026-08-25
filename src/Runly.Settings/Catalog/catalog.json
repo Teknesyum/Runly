@@ -13,8 +13,8 @@
                           ],
         "blocked":  false,
         "riskNote":  {
-                         "tr":  "Windows üzerinde çift tıklanan bir JavaScript dosyası tarayıcıda değil, wscript ile ve sizin tam yetkilerinizle çalışır. Tarayıcı içinde çalışan JavaScript'in aksine dosyalarınıza ve sisteminize erişebilir.",
-                         "en":  "On Windows a double-clicked JavaScript file runs through wscript rather than in a browser, with your full privileges. Unlike JavaScript inside a browser, it can reach your files and your system."
+                         "tr":  "Windows üzerinde çift tıklanan bir JavaScript dosyası tarayıcıda değil, wscript.exe ile ve sizin tam yetkilerinizle çalışır. Tarayıcı içinde çalışan JavaScript'in aksine dosyalarınıza ve sisteminize erişebilir.",
+                         "en":  "On Windows a double-clicked JavaScript file runs through wscript.exe rather than in a browser, with your full privileges. Unlike JavaScript inside a browser, it can reach your files and your system."
                      }
     },
     {
@@ -73,8 +73,8 @@
                           ],
         "blocked":  false,
         "riskNote":  {
-                         "tr":  "PowerShell betikleri çalıştırma ilkesiyle bir ölçüde korunur, ancak bu koruma kolayca atlatılabilir. Betiği çalıştırmadan önce içeriğini gözden geçirin.",
-                         "en":  "PowerShell scripts are partly protected by the execution policy, but that protection can be bypassed easily. Review the contents of the script before you run it."
+                         "tr":  "PowerShell betikleri powershell.exe ile çalışır. Çalıştırma ilkesi bir ölçüde korur, ancak bu koruma kolayca atlatılabilir. Betiği çalıştırmadan önce içeriğini gözden geçirin.",
+                         "en":  "PowerShell scripts run through powershell.exe. The execution policy protects them in part, but that protection can be bypassed easily. Review the contents of the script before you run it."
                      }
     },
     {
@@ -203,8 +203,8 @@
                           ],
         "blocked":  false,
         "riskNote":  {
-                         "tr":  "JAR dosyaları çalışmak için kurulu bir Java çalışma ortamı gerektirir ve çoğunlukla meşru uygulamalar olarak dağıtılır. Yine de kaynağını bildiğiniz dosyaları tercih edin.",
-                         "en":  "JAR files need an installed Java runtime and are usually distributed as legitimate applications. Even so, prefer files whose source you know."
+                         "tr":  "JAR dosyaları kurulu bir Java çalışma ortamının javaw.exe dosyasıyla çalışır ve çoğunlukla meşru uygulamalar olarak dağıtılır. Yine de kaynağını bildiğiniz dosyaları tercih edin.",
+                         "en":  "JAR files run through javaw.exe from an installed Java runtime and are usually distributed as legitimate applications. Even so, prefer files whose source you know."
                      }
     },
     {
@@ -319,8 +319,8 @@
                           ],
         "blocked":  false,
         "riskNote":  {
-                         "tr":  "VBS dosyaları wscript ile çalışır ve dosyalarınıza tam olarak erişebilir. E-posta ekleri ve indirmeler yoluyla yayılan zararlı yazılımların bilinen bir taşıyıcısıdır.",
-                         "en":  "VBS files run through wscript with full access to your files. They are a well-known carrier for malware spread by email attachments and downloads."
+                         "tr":  "VBS dosyaları wscript.exe ile çalışır ve dosyalarınıza tam olarak erişebilir. E-posta ekleri ve indirmeler yoluyla yayılan zararlı yazılımların bilinen bir taşıyıcısıdır.",
+                         "en":  "VBS files run through wscript.exe with full access to your files. They are a well-known carrier for malware spread by email attachments and downloads."
                      }
     },
     {
@@ -337,8 +337,8 @@
                           ],
         "blocked":  false,
         "riskNote":  {
-                         "tr":  "WSF dosyaları wscript ile çalışır ve tek dosyada birden fazla betik dilini barındırabilir. E-posta ekleri ve indirmeler yoluyla yayılan zararlı yazılımlarda sıkça kullanılır.",
-                         "en":  "WSF files run through wscript and can combine several scripting languages in one file. They are frequently used by malware spread through email attachments and downloads."
+                         "tr":  "WSF dosyaları wscript.exe ile çalışır ve tek dosyada birden fazla betik dilini barındırabilir. E-posta ekleri ve indirmeler yoluyla yayılan zararlı yazılımlarda sıkça kullanılır.",
+                         "en":  "WSF files run through wscript.exe and can combine several scripting languages in one file. They are frequently used by malware spread through email attachments and downloads."
                      }
     },
     {
@@ -353,7 +353,83 @@
                               "notepad.exe",
                               "Code.exe"
                           ],
-        "blocked":  false
+        "blocked":  false,
+        "riskNote":  {
+                         "tr":  "WSH dosyası bir Windows Script Host ayar dosyasıdır; wscript.exe onu okur ve gösterdiği betiği kendi ayarlarıyla çalıştırır. Betik sizin yetkilerinizle çalışır.",
+                         "en":  "A WSH file is a Windows Script Host settings file; wscript.exe reads it and runs the script it points to with those settings. The script runs with your privileges."
+                     }
+    },
+    {
+        "extension":  ".vbe",
+        "category":  "scripts",
+        "displayName":  {
+                            "tr":  "Kodlanmış VBScript betiği",
+                            "en":  "Encoded VBScript script"
+                        },
+        "defaultKind":  "Run",
+        "suggestedApps":  [
+                              "notepad.exe",
+                              "Code.exe"
+                          ],
+        "blocked":  false,
+        "riskNote":  {
+                         "tr":  "VBE dosyaları wscript.exe ile çalışır ve dosyalarınıza tam olarak erişebilir. İçeriği kodlanmış olduğu için açıp okuyarak ne yaptığını anlayamazsınız.",
+                         "en":  "VBE files run through wscript.exe with full access to your files. Their contents are encoded, so you cannot read the file to see what it does."
+                     }
+    },
+    {
+        "extension":  ".jse",
+        "category":  "scripts",
+        "displayName":  {
+                            "tr":  "Kodlanmış JScript betiği",
+                            "en":  "Encoded JScript script"
+                        },
+        "defaultKind":  "Run",
+        "suggestedApps":  [
+                              "notepad.exe",
+                              "Code.exe"
+                          ],
+        "blocked":  false,
+        "riskNote":  {
+                         "tr":  "JSE dosyaları wscript.exe ile çalışır ve dosyalarınıza tam olarak erişebilir. İçeriği kodlanmış olduğu için açıp okuyarak ne yaptığını anlayamazsınız.",
+                         "en":  "JSE files run through wscript.exe with full access to your files. Their contents are encoded, so you cannot read the file to see what it does."
+                     }
+    },
+    {
+        "extension":  ".wsc",
+        "category":  "scripts",
+        "displayName":  {
+                            "tr":  "Windows betik bileşeni",
+                            "en":  "Windows script component"
+                        },
+        "defaultKind":  "Open",
+        "suggestedApps":  [
+                              "notepad.exe",
+                              "Code.exe"
+                          ],
+        "blocked":  false,
+        "riskNote":  {
+                         "tr":  "WSC dosyasına çift tıklandığında Windows onu notepad.exe ile açar; içindeki betiği çalıştıran fiil regsvr32.exe ve scrobj.dll'dir. Çalıştırıldığında sizin yetkilerinizle çalışır.",
+                         "en":  "Double-clicking a WSC file opens it in notepad.exe; the verb that actually runs the script inside is regsvr32.exe with scrobj.dll. When it runs, it runs with your privileges."
+                     }
+    },
+    {
+        "extension":  ".chm",
+        "category":  "scripts",
+        "displayName":  {
+                            "tr":  "Derlenmiş HTML yardım dosyası",
+                            "en":  "Compiled HTML help file"
+                        },
+        "defaultKind":  "Open",
+        "suggestedApps":  [
+                              "hh.exe",
+                              "notepad.exe"
+                          ],
+        "blocked":  false,
+        "riskNote":  {
+                         "tr":  "CHM dosyaları hh.exe ile açılır. Yardım sayfası gibi görünseler de içlerinde betik barındırabilir ve bu betik sizin yetkilerinizle çalışır.",
+                         "en":  "CHM files open through hh.exe. They look like help pages but can carry script inside, and that script runs with your privileges."
+                     }
     },
     {
         "extension":  ".hta",
@@ -369,8 +445,8 @@
                           ],
         "blocked":  false,
         "riskNote":  {
-                         "tr":  "HTA dosyaları mshta ile, tarayıcı korumaları olmadan ve doğrudan sizin yetkilerinizle çalışır. Yalnızca kaynağına güvendiğiniz dosyaları açın.",
-                         "en":  "HTA files run through mshta with your full user privileges and none of the browser's protections. Only open files from a source you trust."
+                         "tr":  "HTA dosyaları mshta.exe ile, tarayıcı korumaları olmadan ve doğrudan sizin yetkilerinizle çalışır. Yalnızca kaynağına güvendiğiniz dosyaları açın.",
+                         "en":  "HTA files run through mshta.exe with your full user privileges and none of the browser's protections. Only open files from a source you trust."
                      }
     },
     {

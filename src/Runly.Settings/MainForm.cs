@@ -10,6 +10,7 @@ using Runly.Core.Models;
 using Runly.Core.Paths;
 using Runly.Core.Shell;
 using Runly.Core.Services;
+using System.Text.RegularExpressions;
 using Runly.Settings.Dialogs;
 using Runly.Settings.Catalog;
 using Runly.Settings.Discovery;
@@ -17,8 +18,11 @@ using Runly.Settings.Discovery;
 namespace Runly.Settings;
 
 /// <summary>The single settings window: status strip, extension table, security/behavior panels, bottom bar (SPEC 10).</summary>
-internal sealed class MainForm : NeonForm
+internal sealed partial class MainForm : NeonForm
 {
+    [GeneratedRegex(@"\b[A-Za-z0-9_.-]+\.(?:exe|dll)\b", RegexOptions.IgnoreCase)]
+    private static partial Regex HostExecutable();
+
     private const int ColEnabled = 0;
     private const int ColExtension = 1;
     private const int ColKind = 2;
@@ -141,7 +145,7 @@ internal sealed class MainForm : NeonForm
     private readonly TextBox _editorCommandBox;
     private readonly CheckBox _logEnabledCheck;
 
-    private readonly ToolTip _statusTip = new();
+    private readonly NeonToolTip _statusTip = new();
 
     private readonly Button _installButton;
     private readonly Button _uninstallButton;
@@ -791,7 +795,18 @@ internal sealed class MainForm : NeonForm
                 }
                 row.Cells[ColArgs].Value = mapping.Args;
                 ApplyStatusToRow(row, status);
-                var catalogEntry = ExtensionCatalog.Entries.FirstOrDefault(entry => string.Equals(entry.Extension, status.Extension, StringComparison.OrdinalIgnoreCase));
+                var catalogEntry = CatalogEntryFor(status.Extension);
+
+                // A blocked row already says why in its status cell. An unblocked one with a note looks
+                // like every other row, so the extension itself carries the mark — the note is in the
+                // details panel and nothing else on the row hints that it is worth reading.
+                if (catalogEntry?.RiskNote is not null && catalogEntry.Blocked != true)
+                {
+                    row.Cells[ColExtension].Style.Font = Palette.Mono;
+                    row.Cells[ColExtension].Style.ForeColor = Palette.NeonPink;
+                    row.Cells[ColExtension].Style.SelectionForeColor = Palette.NeonPink;
+                }
+
                 if (catalogEntry?.Blocked == true)
                 {
                     row.Cells[ColEnabled].ReadOnly = true;
@@ -1228,9 +1243,12 @@ internal sealed class MainForm : NeonForm
 
         if (!blocked && !_config.Extensions.ContainsKey(extension))
         {
+            var known = CatalogEntryFor(extension);
             _config.Extensions[extension] = new ExtensionMapping
             {
-                Category = "special",
+                Category = string.IsNullOrEmpty(known?.Category) ? "special" : known.Category,
+                Kind = known?.DefaultKind ?? HandlerKind.Run,
+                TypeName = known?.DisplayName.Tr ?? string.Empty,
                 Enabled = false,
             };
             added = true;
@@ -1436,38 +1454,60 @@ internal sealed class MainForm : NeonForm
         _detailChooseButton.Text = Strings.Get("catalog.chooseApp");
         _detailChooseButton.Visible = !IsBlocked(status.Extension);
 
+        string body;
         var selectedMapping = EffectiveMapping(status.Extension);
         if (selectedMapping.Kind == HandlerKind.Open && string.IsNullOrWhiteSpace(selectedMapping.OpenWith))
         {
-            RenderMarkdownLite(_detailText, Strings.Get("handler.notSelectedDetail")
+            body = Strings.Get("handler.notSelectedDetail")
                 .Replace("{extension}", status.Extension, StringComparison.Ordinal)
-                .Replace("{button}", Strings.Get("catalog.chooseApp"), StringComparison.Ordinal));
+                .Replace("{button}", Strings.Get("catalog.chooseApp"), StringComparison.Ordinal);
             _detailAskButton.Visible = false;
-            return;
         }
-
-        if (status.Bound == BindingState.NeedsUserChoice)
+        else if (status.Bound == BindingState.NeedsUserChoice)
         {
-            RenderMarkdownLite(_detailText, BuildNeedsChoiceExplanation(status.Extension, status.UserChoiceOwnerName));
+            body = BuildNeedsChoiceExplanation(status.Extension, status.UserChoiceOwnerName);
             _detailAskButton.Text = Strings.Get("bind.openFileTypePage")
                 .Replace("{extension}", status.Extension, StringComparison.Ordinal);
             _detailAskButton.Visible = true;
         }
         else if (status.Bound == BindingState.Bound)
         {
-            RenderMarkdownLite(_detailText, Strings.Language == "en"
+            body = Strings.Language == "en"
                 ? $"✅ `{status.Extension}` is now bound to Runly."
-                : $"✅ `{status.Extension}` artık Runly'ye bağlı.");
+                : $"✅ `{status.Extension}` artık Runly'ye bağlı.";
             _detailAskButton.Visible = false;
         }
         else
         {
-            RenderMarkdownLite(_detailText, Strings.Language == "en"
+            body = Strings.Language == "en"
                 ? $"`{status.Extension}` is not bound to Runly yet. Use the ‘Install / Update’ button to bind it."
-                : $"`{status.Extension}` henüz Runly'ye bağlı değil. Bağlamak için \"Kur / Güncelle\" düğmesini kullanın.");
+                : $"`{status.Extension}` henüz Runly'ye bağlı değil. Bağlamak için \"Kur / Güncelle\" düğmesini kullanın.";
             _detailAskButton.Visible = false;
         }
+
+        var risk = RiskNoteFor(status.Extension);
+        if (risk is not null)
+        {
+            body += $"\n\n⚠ **{Strings.Get("catalog.riskNote")}** {MarkHostNames(risk)}";
+        }
+
+        RenderMarkdownLite(_detailText, body);
     }
+
+    internal static CatalogEntry? CatalogEntryFor(string extension) =>
+        ExtensionCatalog.Entries.FirstOrDefault(entry => string.Equals(entry.Extension, extension, StringComparison.OrdinalIgnoreCase));
+
+    private static string? RiskNoteFor(string extension)
+    {
+        var note = CatalogEntryFor(extension)?.RiskNote;
+        return note is null ? null : Strings.Language == "en" ? note.En : note.Tr;
+    }
+
+    /// <summary>Wraps every <c>name.exe</c> in the note as a code span so the host — the one claim the
+    /// reader can check for themselves with <c>assoc</c> and <c>ftype</c> — is set apart from the prose
+    /// instead of being spelled the same as it. The catalog keeps the notes as plain sentences so a
+    /// translator never has to type markup.</summary>
+    private static string MarkHostNames(string note) => HostExecutable().Replace(note, "`$0`");
 
     // Text taken from docs/reports/T4-COMPLETE.md ("T5 için GUI metni önerisi"), parameterised on the extension
     // so the same wording works for every extension that needs approval — which, after decision K19, is nearly
