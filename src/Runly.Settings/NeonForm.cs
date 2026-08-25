@@ -102,7 +102,8 @@ internal class NeonForm : Form
         }
 
         FormBorderStyle = FormBorderStyle.None;
-        SetStyle(ControlStyles.ResizeRedraw | ControlStyles.OptimizedDoubleBuffer, true);
+        SetStyle(ControlStyles.ResizeRedraw | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+        DoubleBuffered = true;
         Activated += (_, _) => { _active = true; InvalidateCaption(); };
         Deactivate += (_, _) => { _active = false; InvalidateCaption(); };
         MouseMove += OnCaptionMouseMove;
@@ -181,13 +182,16 @@ internal class NeonForm : Form
         }
     }
 
+    /// <summary>The window ground. One gradient covers the whole client area, caption band included —
+    /// giving the band a surface fill of its own is the seam the standard forbids, so the only thing
+    /// separating it from the content below is the divider drawn in <see cref="OnPaint"/>.</summary>
+    protected override void OnPaintBackground(PaintEventArgs e) => NeonBackground.Paint(e.Graphics, this);
+
     protected override void OnPaint(PaintEventArgs e)
     {
         base.OnPaint(e);
         var g = e.Graphics;
-        using var background = new SolidBrush(Palette.Surface);
-        g.FillRectangle(background, 0, 0, ClientSize.Width, CaptionHeight);
-        using var divider = new Pen(Color.FromArgb(80, Palette.NeonBlue));
+        using var divider = new Pen(Color.FromArgb(NeonTheme.BorderAlpha, Palette.NeonBlue));
         g.DrawLine(divider, 0, CaptionHeight - 1, ClientSize.Width, CaptionHeight - 1);
 
         var iconInset = Metrics.Px(12);
@@ -233,7 +237,7 @@ internal class NeonForm : Form
         var previous = g.SmoothingMode;
         g.SmoothingMode = SmoothingMode.AntiAlias;
         using (var path = NeonTheme.RoundedRect(new Rectangle(0, 0, ClientSize.Width - 1, ClientSize.Height - 1), CornerRadius))
-        using (var pen = new Pen(Color.FromArgb(77, Palette.NeonBlue)))
+        using (var pen = new Pen(Color.FromArgb(NeonTheme.BorderAlpha, Palette.NeonBlue)))
         {
             g.DrawPath(pen, path);
         }
@@ -434,7 +438,7 @@ internal class NeonForm : Form
         if (item.Style == CaptionItemStyle.Outline)
         {
             var frame = new Rectangle(bounds.X, bounds.Y, bounds.Width - 1, bounds.Height - 1);
-            using var path = NeonTheme.RoundedRect(frame, Metrics.Px(12));
+            using var path = NeonTheme.RoundedRect(frame, NeonTheme.CornerRadius);
 
             // Outline button, R5 §4: no fill, ever. Hover only takes the border to full opacity and
             // opens the outer glow, which is drawn as widening low-alpha strokes because GDI+ has no

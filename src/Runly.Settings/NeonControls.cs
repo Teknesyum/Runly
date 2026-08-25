@@ -53,7 +53,7 @@ internal static class NeonTheme
     /// <summary>Outline of a control that is interactive but currently off. Deliberately not
     /// <see cref="Palette.TextLabel"/>: grey means "cannot be clicked" everywhere else in this theme, so
     /// an unchecked box drawn grey reads as a disabled one.</summary>
-    public static readonly Color IdleOutline = Color.FromArgb(120, Palette.NeonBlue);
+    public static readonly Color IdleOutline = Color.FromArgb(BorderAlpha, Palette.NeonBlue);
 
     /// <summary>The one grey in the theme, and the only thing allowed to use it.</summary>
     public static readonly Color DisabledOutline = Palette.TextLabel;
@@ -64,6 +64,22 @@ internal static class NeonTheme
     public const int HoverAlpha = 51;
     public const int PressedAlpha = 77;
     public const int OutlineAlpha = 77;
+
+    /// <summary>The /50 rung: the default border. Measured — neon-blue/30 composites to #00494D on black
+    /// and sits at 2.06:1, under the 3:1 floor for a non-text boundary; /50 gives #007A80 and 4.07:1.
+    /// A panel is separated from the ground by its border alone (the two fills differ by 1.06:1), so this
+    /// number is the panel's visibility, not a taste setting.</summary>
+    public const int BorderAlpha = 128;
+
+    /// <summary>The /30 rung, for lines that draw no boundary and carry no information — a progress
+    /// track, a rule, a separator. Below the 3:1 floor on purpose: the floor applies to borders that say
+    /// "this far and no further", not to decoration.</summary>
+    public const int DecorativeAlpha = 77;
+
+    /// <summary>The single corner radius: box, panel, card, button, cell and chip all take it. The old
+    /// 16/12/8/6 ladder was never measured and is gone; a softer corner is a circle, not a bigger radius.
+    /// The window's own corner is the one exception and lives in <see cref="Metrics.WindowCornerRadius"/>.</summary>
+    public static int CornerRadius => Metrics.Px(6);
 
     // uxtheme.dll ordinal 135 = SetPreferredAppMode. Undocumented but the only way to make Win32
     // scrollbars dark; without it a white scrollbar sits inside every grid and list box and breaks
@@ -332,6 +348,8 @@ internal sealed class NeonButton : Button
         Padding = new Padding(Metrics.Px(14), Metrics.Px(4), Metrics.Px(14), Metrics.Px(4));
         MouseEnter += (_, _) => { _hover = true; Invalidate(); };
         MouseLeave += (_, _) => { _hover = false; Invalidate(); };
+        GotFocus += (_, _) => Invalidate();
+        LostFocus += (_, _) => Invalidate();
     }
 
     public override Size GetPreferredSize(Size proposedSize)
@@ -345,12 +363,12 @@ internal sealed class NeonButton : Button
     protected override void OnPaint(PaintEventArgs pevent)
     {
         var g = pevent.Graphics;
-        g.Clear(BackColor);
+        NeonBackground.Clear(g, this, BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
         var accent = Primary ? Palette.NeonBlue : Palette.NeonPurple;
         var bounds = new Rectangle(1, 1, Math.Max(1, Width - 2), Math.Max(1, Height - 2));
 
-        using var path = NeonTheme.RoundedRect(bounds, Metrics.Px(12));
+        using var path = NeonTheme.RoundedRect(bounds, NeonTheme.CornerRadius);
 
         if (Primary)
         {
@@ -369,9 +387,46 @@ internal sealed class NeonButton : Button
             g.DrawPath(glow, path);
         }
 
-        var textColor = Primary ? Palette.Surface : accent;
+        PaintFocusRing(g, bounds);
+
+        // Filled buttons take black text: white on neon blue is 1.38:1. Outlined ones take the text role
+        // of their accent — the purple fill hex is 4.57:1 and cannot carry a caption.
+        var textColor = Primary ? Palette.AppBg : Palette.PurpleText;
         TextRenderer.DrawText(g, Text, Font, bounds, textColor,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+    }
+
+    /// <summary>Keyboard focus, drawn as the standard's two layers: an opaque black band between the ring
+    /// and whatever the button is filled with, and the 2 DIP neon-blue ring itself. A single-colour ring
+    /// measures 1.00:1 against a neon-blue filled button — it is simply invisible. Drawn inside the
+    /// button because an owner-drawn control cannot paint past its own bounds; <see cref="Control.ShowFocusCues"/>
+    /// is what keeps it off mouse clicks, matching <c>:focus-visible</c>.</summary>
+    private void PaintFocusRing(Graphics g, Rectangle bounds)
+    {
+        if (!Focused || !ShowFocusCues)
+        {
+            return;
+        }
+
+        var stroke = Math.Max(1, Metrics.Px(2));
+        var ring = Rectangle.Inflate(bounds, -stroke, -stroke);
+        var mask = Rectangle.Inflate(bounds, -stroke * 2, -stroke * 2);
+        if (mask.Width <= 0 || mask.Height <= 0)
+        {
+            return;
+        }
+
+        using (var ringPath = NeonTheme.RoundedRect(ring, Math.Max(1, NeonTheme.CornerRadius - stroke)))
+        using (var pen = new Pen(Palette.NeonBlue, stroke))
+        {
+            g.DrawPath(pen, ringPath);
+        }
+
+        using (var maskPath = NeonTheme.RoundedRect(mask, Math.Max(1, NeonTheme.CornerRadius - (stroke * 2))))
+        using (var pen = new Pen(Palette.AppBg, stroke))
+        {
+            g.DrawPath(pen, maskPath);
+        }
     }
 }
 
@@ -394,17 +449,17 @@ internal sealed class NeonGroupPanel : Panel
     protected override void OnPaint(PaintEventArgs e)
     {
         var g = e.Graphics;
-        g.Clear(Parent?.BackColor ?? Palette.AppBg);
+        NeonBackground.Clear(g, this, Parent?.BackColor ?? Palette.AppBg);
         g.SmoothingMode = SmoothingMode.AntiAlias;
         var bounds = new Rectangle(0, 0, Width - 1, Height - 1);
 
-        using var path = NeonTheme.RoundedRect(bounds, Metrics.Px(16));
+        using var path = NeonTheme.RoundedRect(bounds, NeonTheme.CornerRadius);
         using (var fill = new SolidBrush(Palette.Surface))
         {
             g.FillPath(fill, path);
         }
 
-        using (var border = new Pen(Color.FromArgb(80, Palette.NeonBlue), Metrics.Scale))
+        using (var border = new Pen(Color.FromArgb(NeonTheme.BorderAlpha, Palette.NeonBlue), Metrics.Scale))
         {
             g.DrawPath(border, path);
         }
@@ -444,7 +499,7 @@ internal sealed class NeonRadioButton : RadioButton
     protected override void OnPaint(PaintEventArgs pevent)
     {
         var g = pevent.Graphics;
-        g.Clear(BackColor);
+        NeonBackground.Clear(g, this, BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
         var d = Metrics.Px(GlyphGrid);
         var circle = new Rectangle(0, (Height - d) / 2, d, d);
@@ -491,7 +546,7 @@ internal sealed class NeonCheckBox : CheckBox
     protected override void OnPaint(PaintEventArgs pevent)
     {
         var g = pevent.Graphics;
-        g.Clear(BackColor);
+        NeonBackground.Clear(g, this, BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
         var d = Metrics.Px(NeonRadioButton.GlyphGrid);
         var box = new Rectangle(0, (Height - d) / 2, d, d);
@@ -556,7 +611,7 @@ internal sealed class NeonComboBox : ComboBox
         }
 
         var selected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
-        using var background = new SolidBrush(selected ? ColorTranslator.FromHtml("#123238") : Palette.FieldBg);
+        using var background = new SolidBrush(selected ? Palette.SelectedFill : Palette.FieldBg);
         e.Graphics.FillRectangle(background, e.Bounds);
 
         var inset = Metrics.Px(4);

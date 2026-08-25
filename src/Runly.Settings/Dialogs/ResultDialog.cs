@@ -46,8 +46,8 @@ internal sealed class ResultDialog : NeonForm
                 ? warned ? "⚠ " + warningHeadline : "✅ İşlem tamamlandı."
                 : "❌ İşlem başarısız oldu.",
             ForeColor = success
-                ? warned ? Palette.NeonPink : Palette.Success
-                : Palette.NeonPink,
+                ? warned ? Palette.Warning : Palette.Success
+                : Palette.PinkText,
         };
 
         var textBox = new NeonTextBox

@@ -37,8 +37,10 @@ internal sealed partial class MainForm : NeonForm
     // satırı bozar. Tint'ler bu yüzden yüzey rengiyle önceden karıştırılıp opak veriliyor.
     private static readonly Color BoundBack = Tint(Palette.Success, 40);
     private static readonly Color BoundFore = Palette.Success;
-    private static readonly Color NeedsChoiceBack = Tint(Palette.NeonPink, 40);
-    private static readonly Color NeedsChoiceFore = Palette.NeonPink;
+    // "Windows onayı bekliyor" bir uyarıdır, dikkat çeken bir marka vurgusu değil: pembeyle aynı rengi
+    // taşıyınca ikisi ayırt edilemiyordu. Amber yalnız uyarı yüzeyinde durur — metin, çerçeve, ikon.
+    private static readonly Color NeedsChoiceBack = Palette.Surface;
+    private static readonly Color NeedsChoiceFore = Palette.Warning;
     private static readonly Color NotBoundBack = Palette.FieldBg;
     private static readonly Color NotBoundFore = Palette.TextHint;
 
@@ -208,7 +210,7 @@ internal sealed partial class MainForm : NeonForm
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
         Font = Palette.Body;
-        var root = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, BackColor = Palette.AppBg };
+        var root = new NeonLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3 };
         root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         // A flat 270 could not hold the security panel once the third radio and the second folder button
         // were given real room, which is why this is now the sum of those parts rather than a number.
@@ -227,7 +229,7 @@ internal sealed partial class MainForm : NeonForm
         _configPathLink.LinkClicked += (_, _) => OpenContainingFolder(_configStore.ConfigPath);
 
         // ---- 2. Extension table + detail panel -------------------------------------------
-        var gridArea = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 3, BackColor = Palette.AppBg, Padding = new Padding(Metrics.Px(24), Metrics.Px(16), Metrics.Px(24), 0) };
+        var gridArea = new NeonLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 3, Padding = new Padding(Metrics.Px(24), Metrics.Px(16), Metrics.Px(24), 0) };
         gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Metrics.Px(210)));
         gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Metrics.Px(300)));
@@ -356,7 +358,7 @@ internal sealed partial class MainForm : NeonForm
         _searchBox.KeyDown += OnSearchBoxKeyDown;
         var clearSearchButton = new NeonButton { Text = Strings.Get("catalog.searchClear"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, Metrics.Px(5), Metrics.Px(12), Metrics.Px(4)) };
         clearSearchButton.Click += (_, _) => ClearSearch();
-        _searchResultLabel = new Label { AutoSize = true, Font = Palette.MonoBody, ForeColor = Palette.NeonPink, Margin = new Padding(0, Metrics.Px(11), 0, Metrics.Px(4)) };
+        _searchResultLabel = new Label { AutoSize = true, Font = Palette.MonoBody, ForeColor = Palette.PinkText, Margin = new Padding(0, Metrics.Px(11), 0, Metrics.Px(4)) };
         searchGroup.Controls.Add(searchLabel);
         searchGroup.Controls.Add(_searchBox);
         searchGroup.Controls.Add(clearSearchButton);
@@ -388,7 +390,7 @@ internal sealed partial class MainForm : NeonForm
         root.Controls.Add(gridArea, 0, 0);
 
         // ---- 3 & 4. Security + behavior panels --------------------------------------------
-        var panelsRow = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Palette.AppBg, Padding = new Padding(Metrics.Px(24), Metrics.Px(24), Metrics.Px(24), 0) };
+        var panelsRow = new NeonLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, Padding = new Padding(Metrics.Px(24), Metrics.Px(24), Metrics.Px(24), 0) };
         panelsRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
         panelsRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
 
@@ -451,16 +453,19 @@ internal sealed partial class MainForm : NeonForm
             Style = CaptionItemStyle.Link,
             Font = Palette.Mono,
             Color = Palette.NeonBlue,
-            Accent = Palette.NeonPink,
+            Accent = Palette.PinkText,
             Click = () => ChangeLanguage(Strings.Language == "tr" ? "en" : "tr"),
         };
+
+        // Standart §4: destek düğmesinin çerçevesi ve yazısı pink-text, imza neon-blue. Mor buradan
+        // çıktı — metin olarak 4.57:1 veriyordu ve blok kullanıcının zamanının tamamında duruk duruyor.
         _captionSponsor = new CaptionItem
         {
             Text = Strings.Get("caption.sponsor"),
             Style = CaptionItemStyle.Outline,
             Icon = CaptionItemIcon.Coffee,
             Font = Palette.Body,
-            Accent = Palette.NeonPurple,
+            Accent = Palette.PinkText,
             Click = () => OpenUrl(Palette.SponsorUrl),
         };
         var captionSignature = new CaptionItem
@@ -469,7 +474,7 @@ internal sealed partial class MainForm : NeonForm
             Style = CaptionItemStyle.Link,
             Font = Palette.Body,
             Color = Palette.NeonBlue,
-            Accent = Palette.NeonPink,
+            Accent = Palette.NeonBlue,
             Click = () => OpenUrl(Palette.GitHubUrl),
         };
         SetCaptionItems(captionSignature, _captionSponsor, _captionLanguage, _captionVersion, _captionStatus);
@@ -524,7 +529,7 @@ internal sealed partial class MainForm : NeonForm
             // line of text; a literal here is what clips the grid at 125% and 150%.
             RowTemplate = { Height = Metrics.GridRowHeight },
             BackgroundColor = Palette.Surface,
-            GridColor = ColorTranslator.FromHtml("#152229"), // opaque, dim blue-tinted line (GridColor rejects alpha)
+            GridColor = Palette.GridLine, // opaque, dim blue-tinted line (GridColor rejects alpha)
             BorderStyle = BorderStyle.None,
             CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal,
             EnableHeadersVisualStyles = false,
@@ -546,23 +551,26 @@ internal sealed partial class MainForm : NeonForm
         {
             BackColor = Palette.Surface,
             ForeColor = Palette.TextBody,
-            SelectionBackColor = ColorTranslator.FromHtml("#123238"),
+            SelectionBackColor = Palette.SelectedFill,
             SelectionForeColor = Palette.TextBody,
             Alignment = DataGridViewContentAlignment.MiddleCenter,
         };
         grid.AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
         {
             BackColor = Palette.FieldBg,
-            SelectionBackColor = ColorTranslator.FromHtml("#123238"),
+            SelectionBackColor = Palette.SelectedFill,
         };
 
-        grid.Columns.Add(new NeonCheckColumn { Name = "Enabled", HeaderText = "ETKİN", FillWeight = 8, MinimumWidth = Metrics.Px(60), Resizable = DataGridViewTriState.False });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Extension", HeaderText = "UZANTI", FillWeight = 10, MinimumWidth = Metrics.Px(72), ReadOnly = true });
-        grid.Columns.Add(new NeonChipColumn { Name = "Kind", HeaderText = "TÜR", FillWeight = 13, MinimumWidth = Metrics.Px(90), OffTextKey = "kind.run", OnTextKey = "kind.open" });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Interpreter", HeaderText = "İŞLEYİCİ", FillWeight = 20, MinimumWidth = Metrics.Px(130) });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Found", HeaderText = "BULUNDU", FillWeight = 18, MinimumWidth = Metrics.Px(130), ReadOnly = true });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Args", HeaderText = "ARGÜMANLAR", FillWeight = 12, MinimumWidth = Metrics.Px(90) });
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "DURUM", FillWeight = 19, MinimumWidth = Metrics.Px(110), ReadOnly = true });
+        // These captions are dead defaults — ApplyLanguage overwrites all seven from locale/ before the
+        // window is shown. They were still UPPERCASE, which is exactly the thing the standard bans, and a
+        // dead string that contradicts the live one is worse than no string.
+        grid.Columns.Add(new NeonCheckColumn { Name = "Enabled", HeaderText = "Etkin", FillWeight = 8, MinimumWidth = Metrics.Px(60), Resizable = DataGridViewTriState.False });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Extension", HeaderText = "Uzantı", FillWeight = 10, MinimumWidth = Metrics.Px(72), ReadOnly = true });
+        grid.Columns.Add(new NeonChipColumn { Name = "Kind", HeaderText = "Tür", FillWeight = 13, MinimumWidth = Metrics.Px(90), OffTextKey = "kind.run", OnTextKey = "kind.open" });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Interpreter", HeaderText = "İşleyici", FillWeight = 20, MinimumWidth = Metrics.Px(130) });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Found", HeaderText = "Bulundu", FillWeight = 18, MinimumWidth = Metrics.Px(130), ReadOnly = true });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Args", HeaderText = "Argümanlar", FillWeight = 12, MinimumWidth = Metrics.Px(90) });
+        grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "Durum", FillWeight = 19, MinimumWidth = Metrics.Px(110), ReadOnly = true });
 
         WidenHeadersToLongestTranslation(grid);
 
@@ -715,8 +723,16 @@ internal sealed partial class MainForm : NeonForm
         if (e.Index < 0 || e.Index >= _categoryList.Items.Count) return;
         var category = (string)_categoryList.Items[e.Index];
         var selected = (e.State & DrawItemState.Selected) != 0;
-        using var background = new SolidBrush(selected ? Palette.Surface : Palette.AppBg);
-        e.Graphics.FillRectangle(background, e.Bounds);
+        if (selected)
+        {
+            using var background = new SolidBrush(Palette.Surface);
+            e.Graphics.FillRectangle(background, e.Bounds);
+        }
+        else
+        {
+            NeonBackground.Paint(e.Graphics, _categoryList, e.Bounds);
+        }
+
         if (selected)
         {
             using var strip = new SolidBrush(Palette.NeonBlue);
@@ -740,9 +756,10 @@ internal sealed partial class MainForm : NeonForm
         TextRenderer.DrawText(e.Graphics, label, Font,
             new Rectangle(labelLeft, e.Bounds.Top, Math.Max(0, e.Bounds.Right - labelLeft - countWidth - Metrics.Px(6)), e.Bounds.Height), fore,
             TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
-        TextRenderer.DrawText(e.Graphics, $"{enabled}/{total}", Palette.LabelFont,
+        // A count is a data number, so it is mono; the label beside it is a sentence and stays sans.
+        TextRenderer.DrawText(e.Graphics, $"{enabled}/{total}", Palette.MonoBody,
             new Rectangle(e.Bounds.Right - countWidth - Metrics.Px(8), e.Bounds.Top, countWidth, e.Bounds.Height),
-            selected ? Palette.NeonBlue : Palette.TextHint,
+            selected ? Palette.NeonBlue : Palette.TextBody,
             TextFormatFlags.Right | TextFormatFlags.VerticalCenter);
     }
 
@@ -867,8 +884,8 @@ internal sealed partial class MainForm : NeonForm
                 if (catalogEntry?.RiskNote is not null && catalogEntry.Blocked != true)
                 {
                     row.Cells[ColExtension].Style.Font = Palette.Mono;
-                    row.Cells[ColExtension].Style.ForeColor = Palette.NeonPink;
-                    row.Cells[ColExtension].Style.SelectionForeColor = Palette.NeonPink;
+                    row.Cells[ColExtension].Style.ForeColor = Palette.PinkText;
+                    row.Cells[ColExtension].Style.SelectionForeColor = Palette.PinkText;
                 }
 
                 if (catalogEntry?.Blocked == true)
@@ -1275,7 +1292,8 @@ internal sealed partial class MainForm : NeonForm
             mapping.Kind,
             _installedApplications,
             catalogEntry?.SuggestedApps ?? [],
-            runMode ? mapping.Interpreter : mapping.OpenWith);
+            runMode ? mapping.Interpreter : mapping.OpenWith,
+            UsageHistory.Rank(extension, _config.Extensions));
 
         if (dialog.ShowDialog(this) != DialogResult.OK)
         {
@@ -1689,7 +1707,7 @@ internal sealed partial class MainForm : NeonForm
                     break;
                 }
 
-                AppendSegment(box, text.Substring(i + 1, end - (i + 1)), codeFont, Palette.NeonPink);
+                AppendSegment(box, text.Substring(i + 1, end - (i + 1)), codeFont, Palette.PinkText);
                 i = end + 1;
             }
             else

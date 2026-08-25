@@ -142,6 +142,37 @@ aşılmaz; değiştirilirken başlığa yeni karar satırı yazılır: `R6: tekn
 Bu yığın kullanıcıya görünen bir **kusur** değil, stilistik uyum. Testi de yok; geri dönüşü göz
 kontrolü. 0.2.0 yayınlandıktan sonra tek parça hâlinde yapılır.
 
+**Yapıldı** (2026-08-26) — yukarıdaki üç madde zaten kapanmıştı; bu tur standardın o tespitten
+sonra ilerlemiş kısmını kapattı. Kanıt: `docs/reports/yigin1-turkce-ana-pencere.png` ve
+`docs/reports/yigin1-ingilizce-ana-pencere.png`.
+
+- **Tek doğruluk kaynağı:** hex değerleri `src/Runly.Core/Theme/TeknesyumTokens.cs`'e taşındı,
+  `Palette` oradan okuyor. Yüzey `#0A0A0C` → `#08090A`; kaymış ikinci kopya artık yok.
+- **Tipografi:** ölçek beş basamağa çekildi — 14/16/20/24/30 px. H2 24, H3 20, Hero 30,
+  MonoBody 14. Satır yükseklikleri `Metrics` üzerinden kendini topladı, sabit piksel eklenmedi.
+- **Renk rolleri:** `pink-text` `#FF54EB` ve `purple-text` `#C67EFF` eklendi, metin olarak
+  kullanılan her yer bunlara geçti; `warning` `#FBBF24` eklendi ve "Windows onayı bekliyor"
+  pembeden ayrıldı. `FieldBg` yüzeyle aynı oldu, `#123238` ve `#152229` standardın
+  `/30` ve `/10` basamaklarına çekildi.
+- **Gri:** `TextHint` beyaz. Tek gri yalnız devre dışı kontrol için ayrıldı.
+- **Yarıçap:** her yerde 6 DIP; pencere köşesi 12'de kaldı.
+- **Odak halkası:** §5.3'ün çift katmanı — hem ızgara hücrelerinde hem `NeonButton`'da.
+  Buton eskiden odağı hiç çizmiyordu.
+- **Zemin gradienti:** 13 duraklı tek `LinearGradientBrush`, `#000000` → `#08090A`. Başlık
+  şeridi kendi yüzeyini bıraktı, dikiş yok. Ölçüldü: taramada en büyük adım kanal başına
+  1 seviye, ayraç çizgisinin iki yanındaki pikseller birebir aynı.
+- **Gömülü metin:** `NeonMessageBox` başlıkları ve düğmeleri `locale/`'e geçti; ölü UPPERCASE
+  sütun başlığı dizgileri düzeltildi.
+
+**Yapılmadı — bilerek:**
+
+- **Gradient hareketi.** Standart ≥40 s'lik yavaş dönüşe izin veriyor; bu bir ayarlar penceresi
+  olduğu için statik bırakıldı, karar ayrıca verilecek.
+- **Font dosyası.** Zincir `Atkinson Hyperlegible Next → Segoe UI` ve `Cascadia Mono → Consolas`
+  olarak düzeltildi, `PrivateFontCollection` ile gömülü kaynaktan yükleme yolu yazıldı — ama
+  `.ttf` henüz depoda yok, o yüzden zincir Segoe UI'ye düşüyor. Standart buna "eksik teslim"
+  diyor. Dosya eklenince tek yapılacak iş `.ttf`'i `EmbeddedResource` olarak eklemek.
+
 ---
 
 ## Yapılmayacaklar

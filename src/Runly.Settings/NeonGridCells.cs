@@ -51,6 +51,10 @@ internal abstract class NeonToggleCell : DataGridViewTextBoxCell, INeonToggleCel
 
     protected static Color Accent(bool on) => on ? Palette.NeonPurple : Palette.NeonBlue;
 
+    /// <summary>The caption colour that goes with <see cref="Accent"/>. Purple splits into a fill hex and
+    /// a text hex; blue does not need to, one value clears both thresholds.</summary>
+    protected static Color AccentText(bool on) => on ? Palette.PurpleText : Palette.NeonBlue;
+
     protected int FillAlpha() => _pressed ? NeonTheme.PressedAlpha : _hover ? NeonTheme.HoverAlpha : NeonTheme.FillAlpha;
 
     protected abstract void PaintGlyph(Graphics graphics, Rectangle cellBounds, bool on, DataGridViewCellStyle cellStyle);
@@ -83,7 +87,12 @@ internal abstract class NeonToggleCell : DataGridViewTextBoxCell, INeonToggleCel
     }
 
     /// <summary>Focus has to be visible on its own, not inferred from the full-row selection: the row
-    /// highlight says which extension is selected, this says which cell Space and Enter will flip.</summary>
+    /// highlight says which extension is selected, this says which cell Space and Enter will flip.
+    ///
+    /// <para>Two layers, per the standard: an opaque black band against whatever the glyph is filled with,
+    /// then the 2 DIP neon-blue ring outside it. A one-colour ring measures 1.00:1 over a neon fill of the
+    /// same colour and 1.38:1 as white over blue — both invisible. No transparent gap is left between the
+    /// layers, or the fill touches the ring and the ring disappears again.</para></summary>
     protected void PaintFocusRing(Graphics graphics, Rectangle glyph, int radius)
     {
         if (!Focused)
@@ -92,10 +101,20 @@ internal abstract class NeonToggleCell : DataGridViewTextBoxCell, INeonToggleCel
         }
 
         var stroke = Math.Max(1, Metrics.Px(2));
-        var ring = Rectangle.Inflate(glyph, stroke, stroke);
-        using var path = NeonTheme.RoundedRect(ring, radius + stroke);
-        using var pen = new Pen(Palette.NeonPink, stroke);
-        graphics.DrawPath(pen, path);
+
+        var mask = Rectangle.Inflate(glyph, stroke, stroke);
+        using (var path = NeonTheme.RoundedRect(mask, radius + stroke))
+        using (var pen = new Pen(Palette.AppBg, stroke))
+        {
+            graphics.DrawPath(pen, path);
+        }
+
+        var ring = Rectangle.Inflate(glyph, stroke * 2, stroke * 2);
+        using (var path = NeonTheme.RoundedRect(ring, radius + (stroke * 2)))
+        using (var pen = new Pen(Palette.NeonBlue, stroke))
+        {
+            graphics.DrawPath(pen, path);
+        }
     }
 
     protected override void OnMouseEnter(int rowIndex)
@@ -196,7 +215,7 @@ internal sealed class NeonCheckCell : NeonToggleCell
 /// them, where one click on the chip does the same thing.</summary>
 internal sealed class NeonChipCell : NeonToggleCell
 {
-    private static int Radius => Metrics.Px(6);
+    private static int Radius => NeonTheme.CornerRadius;
 
     protected override void PaintGlyph(Graphics graphics, Rectangle cellBounds, bool on, DataGridViewCellStyle cellStyle)
     {
@@ -246,7 +265,7 @@ internal sealed class NeonChipCell : NeonToggleCell
             graphics.DrawPath(border, path);
         }
 
-        TextRenderer.DrawText(graphics, text, font, chip, accent,
+        TextRenderer.DrawText(graphics, text, font, chip, ReadOnly ? NeonTheme.DisabledOutline : AccentText(on),
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding);
 
         PaintFocusRing(graphics, chip, Radius);

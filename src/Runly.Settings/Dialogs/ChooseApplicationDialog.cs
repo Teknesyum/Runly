@@ -25,7 +25,15 @@ internal sealed class ChooseApplicationDialog : NeonForm
     private static readonly Color ChipGlow = Tint(Palette.NeonPink, 60);
     private static readonly Color RowSelected = Tint(Palette.NeonBlue, 34);
 
-    private sealed record AppChoice(string DisplayName, string Path, string IconSource, bool Suggested, bool Recommended);
+    /// <summary><see cref="UsageRank"/> is the position the machine's own usage history gave this
+    /// executable, lowest first; <see cref="int.MaxValue"/> means no usage signal at all.</summary>
+    private sealed record AppChoice(
+        string DisplayName,
+        string Path,
+        string IconSource,
+        bool Suggested,
+        bool Recommended,
+        int UsageRank);
 
     private readonly List<AppChoice> _all;
 
@@ -36,6 +44,7 @@ internal sealed class ChooseApplicationDialog : NeonForm
     private readonly System.Windows.Forms.Timer _searchDebounce;
     private readonly ListBox _list;
     private readonly Label _emptyLabel;
+    private readonly Label _sourceLabel;
 
     /// <summary>Pre-blends an accent against the field background. A translucent brush over an
     /// owner-drawn list row leaves the previous frame showing through when the list scrolls.</summary>
@@ -49,10 +58,11 @@ internal sealed class ChooseApplicationDialog : NeonForm
         HandlerKind kind,
         IReadOnlyList<InstalledApplication> applications,
         IReadOnlyCollection<string> suggestedExecutables,
-        string? currentPath)
+        string? currentPath,
+        IReadOnlyList<string> usageHistory)
     {
         var suggested = suggestedExecutables.ToHashSet(StringComparer.OrdinalIgnoreCase);
-        _all = Merge(extension, applications, suggested);
+        _all = Merge(extension, applications, suggested, usageHistory);
 
         Text = Strings.Get("chooseApp.title");
         StartPosition = FormStartPosition.CenterParent;
@@ -70,13 +80,14 @@ internal sealed class ChooseApplicationDialog : NeonForm
         {
             Dock = DockStyle.Fill,
             ColumnCount = 1,
-            RowCount = 4,
+            RowCount = 5,
             Padding = new Padding(Metrics.Px(16), Metrics.Px(12), Metrics.Px(16), Metrics.Px(12)),
             BackColor = Color.Transparent,
         };
         // The prompt names the extension, so Turkish wraps where English does not: two lines are reserved.
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, (Metrics.Line(Palette.H3) * 2) + Metrics.Px(14)));
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, Metrics.TextBoxHeight + Metrics.Px(8)));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, Metrics.Row(Palette.Help, 8)));
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, Metrics.ButtonHeight + Metrics.Px(14)));
 
@@ -113,6 +124,18 @@ internal sealed class ChooseApplicationDialog : NeonForm
         };
         layout.Controls.Add(_searchBox, 0, 1);
 
+        // SPEC's security stance: a tool that reads the machine's usage history has to say what it read.
+        _sourceLabel = new Label
+        {
+            Dock = DockStyle.Fill,
+            Text = string.Empty,
+            ForeColor = Palette.TextDim,
+            Font = Palette.Help,
+            TextAlign = ContentAlignment.MiddleLeft,
+            AutoEllipsis = true,
+        };
+        layout.Controls.Add(_sourceLabel, 0, 2);
+
         var listHost = new Panel { Dock = DockStyle.Fill, BackColor = Palette.FieldBg, Padding = new Padding(Metrics.Px(1)) };
         _list = new ListBox
         {
@@ -136,7 +159,7 @@ internal sealed class ChooseApplicationDialog : NeonForm
         };
         listHost.Controls.Add(_list);
         listHost.Controls.Add(_emptyLabel);
-        layout.Controls.Add(listHost, 0, 2);
+        layout.Controls.Add(listHost, 0, 3);
 
         var buttons = new FlowLayoutPanel
         {
@@ -154,14 +177,16 @@ internal sealed class ChooseApplicationDialog : NeonForm
         buttons.Controls.Add(selectButton);
         buttons.Controls.Add(cancelButton);
         buttons.Controls.Add(browseButton);
-        layout.Controls.Add(buttons, 0, 3);
+        layout.Controls.Add(buttons, 0, 4);
 
         Controls.Add(layout);
         AcceptButton = selectButton;
         CancelButton = cancelButton;
 
+        _list.SelectedIndexChanged += (_, _) => RefreshSourceLabel();
         ApplyFilter();
         SelectCurrent(currentPath);
+        RefreshSourceLabel();
         Shown += (_, _) => _searchBox.Focus();
         KeyDown += OnDialogKeyDown;
     }
@@ -172,11 +197,15 @@ internal sealed class ChooseApplicationDialog : NeonForm
     /// that were never associated with this extension; <see cref="AssocHandlerFinder"/> sees what the
     /// system "Open with" dialog shows for it, which is the list the user recognises, and it carries the
     /// shell's recommendation flag and a usable icon location. A handler that the registry scan already
-    /// found upgrades that entry rather than adding a second row.</summary>
+    /// found upgrades that entry rather than adding a second row.
+    ///
+    /// <see cref="UsageHistory"/> is the third source and outranks both: what the user opens this
+    /// extension with today beats what either the shell or the catalogue thinks they should.</summary>
     private static List<AppChoice> Merge(
         string extension,
         IReadOnlyList<InstalledApplication> applications,
-        HashSet<string> suggested)
+        HashSet<string> suggested,
+        IReadOnlyList<string> usageHistory)
     {
         var merged = new Dictionary<string, AppChoice>(StringComparer.OrdinalIgnoreCase);
 
@@ -192,7 +221,8 @@ internal sealed class ChooseApplicationDialog : NeonForm
 
             merged.TryAdd(
                 Key(app.Path, app.DisplayName),
-                new AppChoice(app.DisplayName, app.Path, app.Path, suggested.Contains(app.ExecutableName), false));
+                new AppChoice(
+                    app.DisplayName, app.Path, app.Path, suggested.Contains(app.ExecutableName), false, int.MaxValue));
         }
 
         foreach (var handler in AssocHandlerFinder.Find(extension))
@@ -216,16 +246,45 @@ internal sealed class ChooseApplicationDialog : NeonForm
             }
 
             merged[key] = new AppChoice(
-                handler.DisplayName, handler.Path, handler.IconLocation, isSuggested, handler.IsRecommended);
+                handler.DisplayName, handler.Path, handler.IconLocation, isSuggested, handler.IsRecommended,
+                int.MaxValue);
         }
 
-        // Catalogue suggestions stay on top; the shell's recommendations form the second block; everything
-        // else falls below, alphabetically within each block.
+        ApplyUsageRanks(merged, usageHistory);
+
+        // Habit first, then the shell's recommendations, then the catalogue's suggestions; everything else
+        // falls below, alphabetically within each block.
         return merged.Values
-            .OrderByDescending(choice => choice.Suggested)
+            .OrderBy(choice => choice.UsageRank)
             .ThenByDescending(choice => choice.Recommended)
+            .ThenByDescending(choice => choice.Suggested)
             .ThenBy(choice => choice.DisplayName, StringComparer.CurrentCultureIgnoreCase)
             .ToList();
+    }
+
+    /// <summary>Stamps the usage position onto the rows it names. An executable the user demonstrably
+    /// opens this extension with but that neither source produced still gets a row: dropping it would
+    /// mean the strongest signal is the one signal the list cannot show.</summary>
+    private static void ApplyUsageRanks(Dictionary<string, AppChoice> merged, IReadOnlyList<string> usageHistory)
+    {
+        for (var rank = 0; rank < usageHistory.Count; rank++)
+        {
+            var path = usageHistory[rank];
+            if (string.IsNullOrWhiteSpace(path) || ProcessLauncher.IsRunlyExecutable(path))
+            {
+                continue;
+            }
+
+            var key = Key(path, path);
+            if (merged.TryGetValue(key, out var existing))
+            {
+                merged[key] = existing with { UsageRank = Math.Min(existing.UsageRank, rank) };
+                continue;
+            }
+
+            merged[key] = new AppChoice(
+                Path.GetFileNameWithoutExtension(path), path, path, false, false, rank);
+        }
     }
 
     /// <summary>Identity of a row: the resolved full path, falling back to the display name when a source
@@ -282,7 +341,37 @@ internal sealed class ChooseApplicationDialog : NeonForm
 
         _emptyLabel.Visible = matches.Length == 0;
         _list.Visible = matches.Length > 0;
-        if (matches.Length > 0) _list.SelectedIndex = 0;
+        if (matches.Length > 0)
+        {
+            _list.SelectedIndex = 0;
+            _list.TopIndex = 0;
+        }
+
+        RefreshSourceLabel();
+    }
+
+    /// <summary>Names where the highlighted row's ranking came from, so the user can see that the
+    /// machine's own history was read rather than guess at it.</summary>
+    private void RefreshSourceLabel()
+    {
+        _sourceLabel.Text = _list.SelectedItem is not AppChoice choice
+            ? string.Empty
+            : Strings.Get(SourceKey(choice));
+    }
+
+    private static string SourceKey(AppChoice choice)
+    {
+        if (choice.UsageRank != int.MaxValue)
+        {
+            return "chooseApp.sourceUsage";
+        }
+
+        if (choice.Recommended)
+        {
+            return "chooseApp.sourceWindows";
+        }
+
+        return choice.Suggested ? "chooseApp.sourceCatalog" : "chooseApp.sourceNone";
     }
 
     private void SelectCurrent(string? currentPath)
@@ -386,7 +475,7 @@ internal sealed class ChooseApplicationDialog : NeonForm
 
         g.SmoothingMode = previous;
 
-        TextRenderer.DrawText(g, Strings.Get("chooseApp.suggested"), Palette.H3, bounds, Palette.NeonPink,
+        TextRenderer.DrawText(g, Strings.Get("chooseApp.suggested"), Palette.H3, bounds, Palette.PinkText,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
     }
 

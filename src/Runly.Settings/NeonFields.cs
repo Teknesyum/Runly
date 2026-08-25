@@ -18,6 +18,7 @@ internal static class NeonField
 {
     private const int WmNcCalcSize = 0x0083;
     private const int WmNcPaint = 0x0085;
+    private const int WmPaint = 0x000F;
     private const int WmSetFocus = 0x0007;
     private const int WmKillFocus = 0x0008;
     private const int WmSize = 0x0005;
@@ -69,7 +70,11 @@ internal static class NeonField
             case WmNcCalcSize when m.WParam != 0:
                 Reserve(m.LParam);
                 break;
+            // WM_PAINT is in the list because WM_NCPAINT is not reliably delivered for every field: the
+            // editor box shipped without a visible frame for exactly this reason, and it only became
+            // obvious once the field fill stopped being lighter than the surface behind it.
             case WmNcPaint:
+            case WmPaint:
             case WmSetFocus:
             case WmKillFocus:
             case WmSize:

@@ -126,22 +126,30 @@ internal sealed class NeonMessageDialog : NeonForm
         return new Size(width, Math.Clamp(textHeight + chromeHeight, Metrics.Px(270), Metrics.Px(490)));
     }
 
-    private static string CaptionFor(MessageBoxIcon icon) => icon switch
+    private static string CaptionFor(MessageBoxIcon icon) => Strings.Get(icon switch
     {
-        MessageBoxIcon.Error => "HATA",
-        MessageBoxIcon.Warning => "DİKKAT",
-        MessageBoxIcon.Question => "ONAY",
-        _ => "BİLGİ",
-    };
+        MessageBoxIcon.Error => "error",
+        MessageBoxIcon.Warning => "warning",
+        MessageBoxIcon.Question => "confirmation",
+        _ => "information",
+    });
 
-    private static (string Text, DialogResult Result)[] ButtonDefinitions(MessageBoxButtons buttons) => buttons switch
+    private static (string Text, DialogResult Result)[] ButtonDefinitions(MessageBoxButtons buttons)
     {
-        MessageBoxButtons.YesNo => [("Evet", DialogResult.Yes), ("Hayır", DialogResult.No)],
-        MessageBoxButtons.YesNoCancel => [("Evet", DialogResult.Yes), ("Hayır", DialogResult.No), ("Vazgeç", DialogResult.Cancel)],
-        MessageBoxButtons.OKCancel => [("Tamam", DialogResult.OK), ("Vazgeç", DialogResult.Cancel)],
-        MessageBoxButtons.RetryCancel => [("Yeniden dene", DialogResult.Retry), ("Vazgeç", DialogResult.Cancel)],
-        _ => [("Tamam", DialogResult.OK)],
-    };
+        var yes = Strings.Get("yes");
+        var no = Strings.Get("no");
+        var ok = Strings.Get("ok");
+        var cancel = Strings.Get("cancel");
+
+        return buttons switch
+        {
+            MessageBoxButtons.YesNo => [(yes, DialogResult.Yes), (no, DialogResult.No)],
+            MessageBoxButtons.YesNoCancel => [(yes, DialogResult.Yes), (no, DialogResult.No), (cancel, DialogResult.Cancel)],
+            MessageBoxButtons.OKCancel => [(ok, DialogResult.OK), (cancel, DialogResult.Cancel)],
+            MessageBoxButtons.RetryCancel => [(Strings.Get("retry"), DialogResult.Retry), (cancel, DialogResult.Cancel)],
+            _ => [(ok, DialogResult.OK)],
+        };
+    }
 
     private static int DefaultIndex(MessageBoxDefaultButton button, int count) =>
         Math.Min(button switch
@@ -166,10 +174,14 @@ internal sealed class NeonMessageDialog : NeonForm
         {
             e.Graphics.Clear(BackColor);
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            // The badge glyph is read like text, so every branch takes a text-role colour: the pink fill
+            // hex is 6.44:1 and the purple one 4.57:1. Warning is amber rather than pink — an alert and a
+            // "look at this" accent must not arrive in the same colour.
             var color = _kind switch
             {
-                MessageBoxIcon.Error or MessageBoxIcon.Warning => Palette.NeonPink,
-                MessageBoxIcon.Question => Palette.NeonPurple,
+                MessageBoxIcon.Error => Palette.PinkText,
+                MessageBoxIcon.Warning => Palette.Warning,
+                MessageBoxIcon.Question => Palette.PurpleText,
                 _ => Palette.NeonBlue,
             };
             var inset = Metrics.Px(2);

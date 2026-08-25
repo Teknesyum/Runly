@@ -31,7 +31,10 @@ internal sealed class BindingProgressRing : Control
         var ring = Metrics.Px(RingGrid);
         var circle = new Rectangle(Metrics.Px(10), Metrics.Px(9), ring, ring);
         var stroke = ring * 7f / RingGrid;
-        using var track = new Pen(Palette.FieldBg, stroke);
+        // The track used to be the field fill, which was the one colour in the palette lighter than the
+        // surface; now that fields are surface-coloured it would be invisible. A progress track draws no
+        // boundary, so it takes the decorative rung rather than a border weight.
+        using var track = new Pen(Color.FromArgb(NeonTheme.DecorativeAlpha, Palette.NeonBlue), stroke);
         using var progress = new Pen(Palette.NeonBlue, stroke) { StartCap = LineCap.Round, EndCap = LineCap.Round };
         e.Graphics.DrawEllipse(track, circle);
         if (_total > 0) e.Graphics.DrawArc(progress, circle, -90, 360f * _bound / _total);
