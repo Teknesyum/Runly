@@ -32,3 +32,22 @@ jobs:
 
       - name: Verify formatting
         run: dotnet format --verify-no-changes
+
+  readme:
+    name: README translations stay in step
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Structural drift only: the two files must carry the same heading levels in the same
+      # order. This says nothing about whether the prose behind a heading was translated.
+      - name: Compare heading structure
+        run: |
+          levels() { grep -E '^#{1,6} ' "$1" | sed -E 's/^(#+) .*/\1/'; }
+          if ! diff <(levels README.md) <(levels README.tr.md); then
+            echo "::error file=README.tr.md::README.md and README.tr.md no longer share the same heading structure."
+            exit 1
+          fi
+          echo "Heading structure matches: $(levels README.md | wc -l) headings."

@@ -1,5 +1,7 @@
 # Runly
 
+**English** | [Türkçe](README.tr.md)
+
 ![Runly Settings v0.1.3](docs/screenshots/runly-settings-v0.1.3.png)
 
 Runly is a Windows file-association hub: run scripts safely or open documents in an explicitly selected application, with searchable categories and bulk assignment.
