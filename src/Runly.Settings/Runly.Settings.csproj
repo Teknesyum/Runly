@@ -22,6 +22,8 @@
     <EmbeddedResource Include="locale\tr.json" LogicalName="Runly.Settings.locale.tr.json" />
     <EmbeddedResource Include="locale\en.json" LogicalName="Runly.Settings.locale.en.json" />
     <EmbeddedResource Include="Catalog\catalog.json" LogicalName="Runly.Settings.catalog.json" />
+    <EmbeddedResource Include="..\..\assets\fonts\AtkinsonHyperlegibleNext-Regular.ttf" LogicalName="Runly.Settings.fonts.AtkinsonHyperlegibleNext-Regular.ttf" />
+    <EmbeddedResource Include="..\..\assets\fonts\AtkinsonHyperlegibleNext-Bold.ttf" LogicalName="Runly.Settings.fonts.AtkinsonHyperlegibleNext-Bold.ttf" />
     <EmbeddedResource Include="..\..\assets\category-*.ico" LogicalName="Runly.Settings.assets.%(Filename)%(Extension)" />
   </ItemGroup>
 

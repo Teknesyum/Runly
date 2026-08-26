@@ -302,3 +302,72 @@ internal sealed class NeonChipColumn : DataGridViewColumn
         return copy;
     }
 }
+
+/// <summary>
+/// The one clickable cell on this grid. <see cref="DataGridViewButtonCell"/> hands its surface to the
+/// visual-styles button renderer, which ignores <see cref="DataGridViewCellStyle.BackColor"/> and comes
+/// back as a white Win32 button in the middle of a dark table; the surface is drawn here instead.
+/// </summary>
+internal sealed class NeonActionCell : DataGridViewButtonCell
+{
+    protected override void Paint(
+        Graphics graphics,
+        Rectangle clipBounds,
+        Rectangle cellBounds,
+        int rowIndex,
+        DataGridViewElementStates cellState,
+        object? value,
+        object? formattedValue,
+        string? errorText,
+        DataGridViewCellStyle cellStyle,
+        DataGridViewAdvancedBorderStyle advancedBorderStyle,
+        DataGridViewPaintParts paintParts)
+    {
+        base.Paint(graphics, clipBounds, cellBounds, rowIndex, cellState, value, formattedValue, errorText,
+            cellStyle, advancedBorderStyle,
+            paintParts & (DataGridViewPaintParts.Background | DataGridViewPaintParts.SelectionBackground |
+                          DataGridViewPaintParts.Border));
+
+        if ((paintParts & DataGridViewPaintParts.ContentForeground) == 0 ||
+            cellBounds.Width <= 0 || cellBounds.Height <= 0)
+        {
+            return;
+        }
+
+        var font = cellStyle.Font ?? DataGridView?.Font ?? Palette.MonoBody;
+        var text = formattedValue?.ToString() ?? string.Empty;
+        var textSize = TextRenderer.MeasureText(graphics, text, font, Size.Empty, TextFormatFlags.NoPadding);
+
+        var height = Math.Min(cellBounds.Height - Metrics.Px(6), Metrics.Line(font) + Metrics.Px(8));
+        var width = Math.Min(cellBounds.Width - Metrics.Px(8), textSize.Width + Metrics.Px(16));
+        if (height <= 0 || width <= 0)
+        {
+            return;
+        }
+
+        var pill = new Rectangle(
+            cellBounds.X + ((cellBounds.Width - width) / 2),
+            cellBounds.Y + ((cellBounds.Height - height) / 2),
+            width,
+            height);
+
+        var accent = Palette.Warning;
+        using var path = NeonTheme.RoundedRect(pill, NeonTheme.CornerRadius);
+        using (var fill = new SolidBrush(Color.FromArgb(NeonTheme.FillAlpha, accent)))
+        {
+            graphics.FillPath(fill, path);
+        }
+
+        using (var border = new Pen(Color.FromArgb(NeonTheme.OutlineAlpha, accent), Metrics.Scale))
+        {
+            graphics.DrawPath(border, path);
+        }
+
+        var previous = graphics.SmoothingMode;
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        TextRenderer.DrawText(graphics, text, font, pill, accent,
+            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis |
+            TextFormatFlags.NoPadding);
+        graphics.SmoothingMode = previous;
+    }
+}

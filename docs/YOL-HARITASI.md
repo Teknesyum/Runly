@@ -67,8 +67,12 @@ Bu Y3'ten sonra gelmeli — Y3 launcher penceresine yeni içerik ekliyor.
 - `NeonTheme.DisabledOutline` gri yerine neon mavi gösteriyor
 - Uygulama seçicide yinelenen `notepad` satırları ve `Administrative Tools` satırı
 - Onay kutusu işaret yarıçapı `Px(3)`
-- Gömülü `Atkinson Hyperlegible Next` `.ttf` — indirme izni bekliyor, o gelene kadar
-  zincir Segoe UI'ya düşüyor
+
+**Yapıldı (2026-08-26):** gömülü `Atkinson Hyperlegible Next` (Regular + Bold, upstream
+`7925f50`, OFL). GDI ve GDI+ font-linking ölçüldü — fontun taşımadığı üç işaret (✓ ⚠ →)
+sistem yedeğinden geliyor, `.notdef` kutusu yok; kanıt `docs/reports/font-fallback-testi.png`.
+Aynı turda `NeonActionCell` eklendi: "Varsayılan yap" hücresi görsel stil düğmesi olarak
+beyaz çiziliyordu, artık amber neon hap.
 
 ## Sonraya
 

@@ -1067,9 +1067,9 @@ internal sealed partial class MainForm : NeonForm
 
         if (status.Bound == BindingState.NeedsUserChoice)
         {
-            if (row.Cells[ColStatus] is not DataGridViewButtonCell)
+            if (row.Cells[ColStatus] is not NeonActionCell)
             {
-                row.Cells[ColStatus] = new DataGridViewButtonCell();
+                row.Cells[ColStatus] = new NeonActionCell();
             }
 
             row.Cells[ColStatus].Value = Strings.Get("askWindows");
@@ -1230,7 +1230,7 @@ internal sealed partial class MainForm : NeonForm
             return;
         }
 
-        if (_grid.Rows[e.RowIndex].Cells[ColStatus] is not DataGridViewButtonCell)
+        if (_grid.Rows[e.RowIndex].Cells[ColStatus] is not NeonActionCell)
         {
             return;
         }
