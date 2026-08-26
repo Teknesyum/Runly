@@ -1,6 +1,6 @@
 # Runly
 
-**English** | [Türkçe](README.tr.md)
+[![Türkçe](https://img.shields.io/badge/README-T%C3%BCrk%C3%A7e-00e5ff?style=for-the-badge&labelColor=0d0d0f)](README.tr.md)
 
 ![Runly Settings v0.1.3](docs/screenshots/runly-settings-v0.1.3.png)
 

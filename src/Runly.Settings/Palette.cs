@@ -64,6 +64,10 @@ internal static class Palette
     public const string GitHubUrl = "https://github.com/Teknesyum";
     public const string SponsorUrl = "https://github.com/sponsors/Teknesyum";
 
+    public const string ReadmeUrlEn = "https://github.com/Teknesyum/Runly#readme";
+
+    public const string ReadmeUrlTr = "https://github.com/Teknesyum/Runly/blob/main/README.tr.md";
+
     // ---- Font chain ----------------------------------------------------------------------------
     // The standard names one chain for every stack: sans 'Atkinson Hyperlegible Next' → 'Segoe UI',
     // mono 'Cascadia Mono' → 'Consolas'. The head of the chain is meant to be *embedded*, not assumed

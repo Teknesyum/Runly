@@ -109,6 +109,14 @@ try {
     Write-Host "Runly installed successfully." -ForegroundColor Green
     Write-Host "Desktop shortcut: $shortcutPath" -ForegroundColor Green
 
+    # The repository front page is always English. The machine has already stated its language, so
+    # the guide offered here follows it instead of asking the reader to find the other file.
+    if ((Get-UICulture).TwoLetterISOLanguageName -eq "tr") {
+        Write-Host "Kilavuz: https://github.com/Teknesyum/Runly/blob/main/README.tr.md" -ForegroundColor Green
+    } else {
+        Write-Host "Guide: https://github.com/Teknesyum/Runly#readme" -ForegroundColor Green
+    }
+
     if (-not $SkipLaunch) {
         Start-Process -FilePath $settingsExe
         Write-Host "Runly Settings opened. Choose the script extensions you want to enable." -ForegroundColor Cyan

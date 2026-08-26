@@ -165,6 +165,7 @@ internal sealed partial class MainForm : NeonForm
     private readonly CaptionItem _captionVersion;
     private readonly CaptionItem _captionLanguage;
     private readonly CaptionItem _captionSponsor;
+    private readonly CaptionItem _captionHelp;
 
     /// <summary>Builds the whole window from code; see SPEC 10 for the layout this follows.</summary>
     public MainForm(
@@ -468,6 +469,18 @@ internal sealed partial class MainForm : NeonForm
             Accent = Palette.PinkText,
             Click = () => OpenUrl(Palette.SponsorUrl),
         };
+        // The repository front page is always English -- GitHub has no language negotiation. The user
+        // has already stated a language here, so this link honours it and the question does not have
+        // to be asked again on the web page.
+        _captionHelp = new CaptionItem
+        {
+            Text = Strings.Get("caption.help"),
+            Style = CaptionItemStyle.Link,
+            Font = Palette.Body,
+            Color = Palette.NeonBlue,
+            Accent = Palette.PinkText,
+            Click = () => OpenUrl(Strings.Language == "tr" ? Palette.ReadmeUrlTr : Palette.ReadmeUrlEn),
+        };
         var captionSignature = new CaptionItem
         {
             Text = "Teknesyum",
@@ -477,7 +490,7 @@ internal sealed partial class MainForm : NeonForm
             Accent = Palette.NeonBlue,
             Click = () => OpenUrl(Palette.GitHubUrl),
         };
-        SetCaptionItems(captionSignature, _captionSponsor, _captionLanguage, _captionVersion, _captionStatus);
+        SetCaptionItems(captionSignature, _captionSponsor, _captionHelp, _captionLanguage, _captionVersion, _captionStatus);
 
         FormClosing += OnFormClosing;
         Activated += (_, _) => RefreshStatusOnly(force: false);
@@ -2308,6 +2321,7 @@ internal sealed partial class MainForm : NeonForm
         _searchBox.PlaceholderText = Strings.Get("catalog.searchPlaceholder");
         _captionLanguage.Text = Strings.Language == "tr" ? "TR | en" : "tr | EN";
         _captionSponsor.Text = Strings.Get("caption.sponsor");
+        _captionHelp.Text = Strings.Get("caption.help");
         RefreshExtensionGrid();
         RefreshTrustedFilesLabel();
         RefreshStatusStrip();
