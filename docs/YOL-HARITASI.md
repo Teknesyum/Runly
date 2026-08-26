@@ -33,6 +33,12 @@ değiştir?" der; bağlama yine kullanıcı onayıyla olur, kayıt defterine yaz
 Kabul: sinyali olan uzantı Ayarlar ilk açılışta dolu gelir; sinyalsiz uzantı bugünkü
 boş hâlinde kalır; hiçbir öneri onaysız bağlanmaz.
 
+**Yapıldı (2026-08-26, `59682c6`):** boş işleyici hücresi artık makinenin kendi
+geçmişinin işaret ettiği uygulamayı adıyla gösteriyor; Etkin kutusu onay anıdır.
+Hücre 13 karakter genişliğinde ve büyütülemiyor (sütun en küçük genişlikleri toplamı
+ızgarayı zaten aşıyor), o yüzden açıklama Ayrıntılar paneline taşındı. Kayıt defteri
+okuması 412 uzantı için bir kez +32 ms, sonraki yenilemelerde +1 ms.
+
 ### Y2 · Sıralamayı AOT katmanına taşı *(Y3'ün ön koşulu)*
 
 `UsageHistory`'nin saf kısmı ve aday birleştirme `Runly.Core`'a iner; kayıt defteri
@@ -63,10 +69,13 @@ Bu Y3'ten sonra gelmeli — Y3 launcher penceresine yeni içerik ekliyor.
 ### Y5 · Kalan kusurlar *(tek tur, birlikte)*
 
 - %125 / %150 DPI kontrolü (kullanıcı erteledi, sistem ayarı gerektiriyor)
-- `caption.sponsor` Türkçede "Buy me a coffee" yazıyor; standart "Destek" istiyor
 - `NeonTheme.DisabledOutline` gri yerine neon mavi gösteriyor
-- Uygulama seçicide yinelenen `notepad` satırları ve `Administrative Tools` satırı
 - Onay kutusu işaret yarıçapı `Px(3)`
+
+**Yapıldı (2026-08-26):** `caption.sponsor` Türkçede artık `Destek` (§4). Uygulama
+seçicideki `Administrative Tools` ve `Lua documentation` satırlarının kaynağı bulundu —
+argüman taşıyan Başlat menüsü kısayolları uygulama sanılıyordu, artık atlanıyor; kalan
+iki `notepad` gerçek ve farklı (paketli / System32), diyalog ikisinin de yolunu yazıyor.
 
 **Yapıldı (2026-08-26):** gömülü `Atkinson Hyperlegible Next` (Regular + Bold, upstream
 `7925f50`, OFL). GDI ve GDI+ font-linking ölçüldü — fontun taşımadığı üç işaret (✓ ⚠ →)
