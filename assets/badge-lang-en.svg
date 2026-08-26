@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 199 48" width="199" height="48" role="img" aria-label="README in English">
+  <defs>
+    <filter id="lg" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect x="1" y="1" width="197" height="46" rx="14" fill="#0a0a0c" stroke="#00e5ff" stroke-width="2"/>
+  <g filter="url(#lg)" transform="translate(16 12)">
+    <circle cx="12" cy="12" r="10" fill="none" stroke="#00e5ff" stroke-width="2"/>
+    <ellipse cx="12" cy="12" rx="4.4" ry="10" fill="none" stroke="#00e5ff" stroke-width="2"/>
+    <path d="M2.4 8.6 H21.6 M2.4 15.4 H21.6" stroke="#00e5ff" stroke-width="2"/>
+  </g>
+  <g font-family="Segoe UI, system-ui, sans-serif" font-size="18" font-weight="700">
+    <text x="50" y="30" fill="#ffffff" textLength="57" lengthAdjust="spacingAndGlyphs">README</text>
+    <text x="117" y="30" fill="#00e5ff" textLength="66" lengthAdjust="spacingAndGlyphs">English</text>
+  </g>
+</svg>
