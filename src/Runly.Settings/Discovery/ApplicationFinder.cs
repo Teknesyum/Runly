@@ -59,8 +59,17 @@ internal sealed class ApplicationFinder
             var options = new EnumerationOptions { RecurseSubdirectories = true, IgnoreInaccessible = true };
             foreach (var shortcut in Directory.EnumerateFiles(root, "*.lnk", options))
             {
+                // A shortcut that carries arguments is not the application, it is the application doing one
+                // specific thing: 'Administrative Tools' is control.exe opening a panel and 'Lua
+                // documentation' is notepad.exe opening one text file. Listing either as a file handler
+                // drops the arguments and offers the user something that was never on the menu.
                 var target = ShortcutTargetReader.TryRead(shortcut);
-                Add(found, target, Path.GetFileNameWithoutExtension(shortcut), "Start menu");
+                if (target is null || !string.IsNullOrWhiteSpace(target.Value.Arguments))
+                {
+                    continue;
+                }
+
+                Add(found, target.Value.Path, Path.GetFileNameWithoutExtension(shortcut), "Start menu");
             }
         }
     }

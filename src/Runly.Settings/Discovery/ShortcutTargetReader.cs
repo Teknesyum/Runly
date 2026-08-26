@@ -3,9 +3,11 @@ using System.Text;
 
 namespace Runly.Settings.Discovery;
 
+internal readonly record struct ShortcutTarget(string Path, string Arguments);
+
 internal static class ShortcutTargetReader
 {
-    public static string? TryRead(string shortcutPath)
+    public static ShortcutTarget? TryRead(string shortcutPath)
     {
         try
         {
@@ -13,7 +15,14 @@ internal static class ShortcutTargetReader
             ((IPersistFile)link).Load(shortcutPath, 0);
             var path = new StringBuilder(32768);
             link.GetPath(path, path.Capacity, IntPtr.Zero, 0);
-            return path.Length == 0 ? null : path.ToString();
+            if (path.Length == 0)
+            {
+                return null;
+            }
+
+            var arguments = new StringBuilder(32768);
+            link.GetArguments(arguments, arguments.Capacity);
+            return new ShortcutTarget(path.ToString(), arguments.ToString());
         }
         catch (COMException) { return null; }
     }
@@ -24,7 +33,16 @@ internal static class ShortcutTargetReader
     [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("000214F9-0000-0000-C000-000000000046")]
     private interface IShellLinkW
     {
+        // GetArguments is the eighth entry of the vtable, so every slot before it has to be declared even
+        // though it is never called. Removing one silently shifts the call onto the wrong function.
         void GetPath([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder file, int maximum, IntPtr findData, uint flags);
+        void GetIdList(out IntPtr idList);
+        void SetIdList(IntPtr idList);
+        void GetDescription([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder name, int maximum);
+        void SetDescription([MarshalAs(UnmanagedType.LPWStr)] string name);
+        void GetWorkingDirectory([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder directory, int maximum);
+        void SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string directory);
+        void GetArguments([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder arguments, int maximum);
     }
 
     [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("0000010b-0000-0000-C000-000000000046")]

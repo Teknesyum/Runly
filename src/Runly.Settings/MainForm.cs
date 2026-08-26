@@ -111,6 +111,11 @@ internal sealed partial class MainForm : NeonForm
     private bool _autoRefreshInFlight;
     private DateTime _lastAutoRefresh = DateTime.MinValue;
 
+    /// <summary>Suggested handler per extension. <see cref="UsageHistory.Rank"/> opens registry keys,
+    /// which a 408-row refresh cannot afford once per row per refresh; the grid asks this cache and the
+    /// cache asks the registry at most once per extension.</summary>
+    private readonly Dictionary<string, string?> _suggestedHandlers = new(StringComparer.OrdinalIgnoreCase);
+
     /// <summary>B6: the config file's timestamp when this window last read or wrote it. A newer stamp
     /// on disk means someone edited the file behind our back, and saving would silently revert them.</summary>
     private DateTime _configStamp = DateTime.MinValue;
@@ -785,6 +790,22 @@ internal sealed partial class MainForm : NeonForm
         return entry is null ? new ExtensionMapping { Category = "special" } : CatalogDefault(entry);
     }
 
+    private string? SuggestedHandler(string extension, string? currentHandler)
+    {
+        if (!string.IsNullOrWhiteSpace(currentHandler))
+        {
+            return null;
+        }
+
+        if (!_suggestedHandlers.TryGetValue(extension, out var suggestion))
+        {
+            suggestion = HandlerSuggestion.Pick(extension, null, UsageHistory.Rank(extension, _config.Extensions));
+            _suggestedHandlers[extension] = suggestion;
+        }
+
+        return suggestion;
+    }
+
     private IEnumerable<string> VisibleExtensions()
     {
         var category = _categoryList.SelectedItem as string;
@@ -884,7 +905,10 @@ internal sealed partial class MainForm : NeonForm
                 row.Cells[ColInterpreter].Value = string.IsNullOrWhiteSpace(handler) ? null : handler;
                 if (string.IsNullOrWhiteSpace(handler))
                 {
-                    row.Cells[ColInterpreter].Style.NullValue = Strings.Get("handler.choosePrompt");
+                    var suggested = SuggestedHandler(status.Extension, handler);
+                    row.Cells[ColInterpreter].Style.NullValue = suggested is null
+                        ? Strings.Get("handler.choosePrompt")
+                        : Strings.Get("handler.suggested").Replace("{app}", Path.GetFileName(suggested), StringComparison.Ordinal);
                     row.Cells[ColInterpreter].Style.ForeColor = Palette.TextDim;
                 }
                 row.Cells[ColArgs].Value = mapping.Args;
@@ -1134,6 +1158,17 @@ internal sealed partial class MainForm : NeonForm
         var kind = row.Cells[ColKind].Value is true ? HandlerKind.Open : HandlerKind.Run;
         var handler = row.Cells[ColInterpreter].Value as string ?? (kind == HandlerKind.Run ? mapping.Interpreter : mapping.OpenWith ?? string.Empty);
         var args = row.Cells[ColArgs].Value as string ?? mapping.Args;
+
+        // Ticking Etkin is the approval: the suggestion the cell was only hinting at becomes the value
+        // here and nowhere else. Unticking does not take it back — the handler is visible now, and a
+        // silent revert would be the surprising half of the pair.
+        if (e.ColumnIndex == ColEnabled && enabled && string.IsNullOrWhiteSpace(handler) &&
+            SuggestedHandler(status.Extension, handler) is { } suggested)
+        {
+            handler = suggested;
+            AdoptSuggestedHandler(row, suggested);
+        }
+
         var catalogTypeName = ExtensionCatalog.Entries.FirstOrDefault(entry =>
             string.Equals(entry.Extension, status.Extension, StringComparison.OrdinalIgnoreCase))?.DisplayName.Tr;
 
@@ -1148,6 +1183,22 @@ internal sealed partial class MainForm : NeonForm
         };
         MarkDirty();
         UpdateSingleRowStatus(e.RowIndex, status.Extension);
+    }
+
+    private void AdoptSuggestedHandler(DataGridViewRow row, string handler)
+    {
+        var suppressed = _suppressGridEvents;
+        _suppressGridEvents = true;
+        try
+        {
+            row.Cells[ColInterpreter].Style.NullValue = null;
+            row.Cells[ColInterpreter].Style.ForeColor = Color.Empty;
+            row.Cells[ColInterpreter].Value = handler;
+        }
+        finally
+        {
+            _suppressGridEvents = suppressed;
+        }
     }
 
     private void SetAllExtensionsEnabled()
@@ -1569,7 +1620,13 @@ internal sealed partial class MainForm : NeonForm
         var selectedMapping = EffectiveMapping(status.Extension);
         if (selectedMapping.Kind == HandlerKind.Open && string.IsNullOrWhiteSpace(selectedMapping.OpenWith))
         {
-            body = Strings.Get("handler.notSelectedDetail")
+            // The cell is thirteen characters wide, so the suggestion can only fit the application name
+            // there. The sentence that says where it came from and how to accept it belongs here, where
+            // there is room for it.
+            var suggestion = SuggestedHandler(status.Extension, selectedMapping.OpenWith);
+            body = (suggestion is null
+                    ? Strings.Get("handler.notSelectedDetail")
+                    : Strings.Get("handler.suggestedDetail").Replace("{app}", Path.GetFileName(suggestion), StringComparison.Ordinal))
                 .Replace("{extension}", status.Extension, StringComparison.Ordinal)
                 .Replace("{button}", Strings.Get("catalog.chooseApp"), StringComparison.Ordinal);
             _detailAskButton.Visible = false;

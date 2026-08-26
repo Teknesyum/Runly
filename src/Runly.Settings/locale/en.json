@@ -87,6 +87,8 @@
   "select.notFound": "{extension} was not found in the list.",
   "handler.notSelected": "No application is selected for this extension.",
   "handler.choosePrompt": "Double-click",
+  "handler.suggested": "{app}",
+  "handler.suggestedDetail": "Runly suggests {app} — you last opened this extension with it. Tick Enabled to accept, or press {button} to change it.",
   "handler.notSelectedDetail": "No application has been chosen for `{extension}` yet.\n\nDouble-click the row or use the **{button}** button.\n\nAfter choosing, press **Install / Update** to bind it.",
   "catalog.searchLabel": "Search extension",
   "catalog.searchClear": "Clear",

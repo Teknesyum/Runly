@@ -87,6 +87,8 @@
   "select.notFound": "{extension} listede bulunamadı.",
   "handler.notSelected": "Bu uzantı için uygulama seçilmedi.",
   "handler.choosePrompt": "Çift tıklayın",
+  "handler.suggested": "{app}",
+  "handler.suggestedDetail": "Runly {app} öneriyor — bu uzantıyı en son bununla açmışsınız. Kabul etmek için Etkin kutusunu işaretleyin, değiştirmek için {button} deyin.",
   "handler.notSelectedDetail": "`{extension}` için henüz bir uygulama seçilmedi.\n\nSatıra çift tıklayın ya da **{button}** düğmesini kullanın.\n\nSeçtikten sonra bağlamak için **Kur / Güncelle** düğmesine basın.",
   "catalog.searchLabel": "Uzantı ara",
   "catalog.searchClear": "Temizle",
