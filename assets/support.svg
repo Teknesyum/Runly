@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 220" width="1200" height="220" role="img" aria-label="Support Teknesyum — built in spare time, free, AGPL-3.0">
+  <defs>
+    <linearGradient id="neon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00f3ff"/>
+      <stop offset="55%" stop-color="#b026ff"/>
+      <stop offset="100%" stop-color="#ff00ea"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff00ea" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#00f3ff" stop-opacity="0.15"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="220" rx="24" fill="#000000"/>
+  <rect x="1" y="1" width="1198" height="218" rx="24" fill="none" stroke="url(#neon)" stroke-width="2" opacity="0.55"/>
+
+  <g transform="translate(70 46) scale(5)" filter="url(#glow)" fill="#ff00ea">
+    <path d="M12 21.5 C3.5 14.5 1.5 9 5.5 6 C8.6 3.7 10.9 5.6 12 7.3 C13.1 5.6 15.4 3.7 18.5 6 C22.5 9 20.5 14.5 12 21.5 Z"/>
+  </g>
+
+  <g font-family="Segoe UI, system-ui, sans-serif">
+    <text x="220" y="86" font-size="42" font-weight="700" fill="#ffffff" letter-spacing="1">Support Teknesyum</text>
+    <text x="222" y="126" font-size="22" fill="#00f3ff" letter-spacing="2">BUILT IN SPARE TIME · FREE · AGPL-3.0</text>
+    <g font-family="Consolas, 'Cascadia Mono', monospace" font-size="20">
+      <text x="222" y="170" fill="#b026ff">github.com/sponsors/Teknesyum</text>
+    </g>
+  </g>
+  <rect x="32" y="204" width="1136" height="4" rx="2" fill="url(#edge)"/>
+</svg>

@@ -123,8 +123,12 @@ Copyright (C) 2026 Teknesyum
 
 ## Destek
 
-Bu uygulama boş zamanlarda yazılıyor ve ücretsiz.
+<div align="center" role="region" aria-label="Support Teknesyum" style="border:2px solid #00f3ff;border-radius:24px;background:#000000;padding:24px">
 
-<a href="https://github.com/sponsors/Teknesyum"><img src="https://img.shields.io/badge/Bana_bir_kahve_ısmarla-b026ff?style=for-the-badge&logo=githubsponsors&logoColor=b026ff&labelColor=0d0d0f" alt="Sponsor" /></a>
+<a href="https://github.com/sponsors/Teknesyum"><img src="assets/support.svg" alt="Support Teknesyum — built in spare time, free, AGPL-3.0" width="100%" style="max-width:1200px;height:auto"></a>
 
-**[github.com/Teknesyum](https://github.com/Teknesyum)** · [AGPL-3.0-or-later](LICENSE)
+<a href="https://github.com/sponsors/Teknesyum"><img src="assets/badge-sponsor.svg" alt="Support Teknesyum" height="38"></a>
+&nbsp;
+<a href="LICENSE"><img src="assets/badge-license.svg" alt="License AGPL-3.0" height="38"></a>
+
+</div>
