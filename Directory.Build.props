@@ -10,7 +10,7 @@
     <Deterministic>true</Deterministic>
     <IsPackable>false</IsPackable>
     <Product>Runly</Product>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <NeutralLanguage>tr-TR</NeutralLanguage>
     <Copyright>Copyright (C) 2026 Teknesyum</Copyright>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>

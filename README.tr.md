@@ -95,7 +95,7 @@ Derleme test takımını çalıştırır, NativeAOT başlatıcıyı ve kendi ken
 
 Betik çalıştırmak dosyaları değiştirebilir, program başlatabilir ve kullanıcı verisine erişebilir. Yalnızca güvendiğiniz betikleri çalıştırın. Runly güvenlik denetimleri ve açık onaylar ekler, ama kötü niyetli kodu güvenli hâle getiremez.
 
-Güvenlik açıklarını herkese açık bir istismar raporu açmak yerine depo sahibine özel olarak bildirin.
+Güvenlik açıklarını herkese açık bir istismar raporu açmak yerine [GitHub özel güvenlik açığı bildirimi](https://github.com/Teknesyum/Runly/security/advisories/new) üzerinden özel olarak bildirin. Desteklenen sürüm ve açıklama takvimi için [SECURITY.md](SECURITY.md) dosyasına bakın.
 
 ### İlk açılışta SmartScreen
 
@@ -104,12 +104,12 @@ Runly kod imzalı değildir, bu yüzden Windows ilk çalıştırmada **"Windows 
 İndirmeyi önce doğrulamak isterseniz özetini sürüm sayfasında yayımlanan SHA-256 ile karşılaştırın:
 
 ```powershell
-Get-FileHash .\Runly-v0.2.0-win-x64.zip -Algorithm SHA256
+Get-FileHash .\Runly-v0.2.1-win-x64.zip -Algorithm SHA256
 ```
 
 ## Sürüm
 
-Şu anki kaynak sürümü: **v0.2.0**
+Şu anki kaynak sürümü: **v0.2.1**
 
 ---
 
@@ -123,9 +123,9 @@ Copyright (C) 2026 Teknesyum
 
 ## Destek
 
-<div align="center" role="region" aria-label="Support Teknesyum" style="border:2px solid #00f3ff;border-radius:24px;background:#000000;padding:24px">
+<div align="center" role="region" aria-label="Support Teknesyum">
 
-<a href="https://github.com/sponsors/Teknesyum"><img src="assets/support.svg" alt="Support Teknesyum — built in spare time, free, AGPL-3.0" width="100%" style="max-width:1200px;height:auto"></a>
+<a href="https://github.com/sponsors/Teknesyum"><img src="assets/support.svg" alt="Support Teknesyum — built in spare time, free, AGPL-3.0" width="100%"></a>
 
 <a href="https://github.com/sponsors/Teknesyum"><img src="assets/badge-sponsor.svg" alt="Support Teknesyum" height="38"></a>
 &nbsp;

@@ -7,6 +7,8 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.1] — 2026-09-08
+
 ### Fixed
 
 - **Window frame.** The settings window now strips WS_CAPTION, WS_DLGFRAME and WS_BORDER
