@@ -7,3 +7,7 @@ Merkezi GitHub denetimi tarafından yapılan değişiklikler:
 - README Support bloğundaki inline `style` öznitelikleri kaldırıldı; GitHub zaten görmezden geliyordu.
 - Wiki kapatıldı; kullanılmıyordu.
 - Onay bekleyen: README ekran görüntüsü hâlâ v0.1.3, 0.2.1 arayüzüyle yenilenmeli.
+
+## Kalan (kullanıcı onayı gerekir)
+
+- docs/screenshots/runly-settings-v0.1.3.png → 0.2.1 arayüzüyle yenile (README hâlâ eski görseli gösteriyor).
