@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>Runly.UiAudit</RootNamespace>
+    <AssemblyName>Runly.UiAudit</AssemblyName>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Runly.Core\Runly.Core.csproj" />
+    <ProjectReference Include="..\..\src\Runly.Settings\Runly.Settings.csproj" />
+  </ItemGroup>
+
+</Project>

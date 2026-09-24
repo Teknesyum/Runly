@@ -17,7 +17,9 @@ internal static class NeonWindowChrome
     internal const uint ColorNeonBlue = 0xFFF300; // #00F3FF primary
     internal const uint ColorNeonPurple = 0xFF26B0; // #B026FF secondary button border/text
     internal const uint ColorNeonPink = 0xEA00FF; // #FF00EA close glyph
-    internal const uint ColorTextDim = 0xAFA39C; // #9CA3AF label text
+    internal const uint ColorText = 0xFFFFFF;
+    internal const uint ColorPurpleText = 0xFF7EC6;
+    internal const uint ColorBg = 0x000000;
 
     internal const int DwmwaUseImmersiveDarkMode = 20;
     internal const int CornerRadius = 12; // token: buton/kart radius
@@ -187,7 +189,7 @@ internal static class NeonWindowChrome
         NativeMethods.DeleteObject(pen);
 
         NativeMethods.SetBkMode(hdc, NativeMethods.TransparentBkMode);
-        NativeMethods.SetTextColor(hdc, primary ? ColorSurface : accent);
+        NativeMethods.SetTextColor(hdc, primary ? ColorBg : ColorPurpleText);
 
         var textRect = rect;
         NativeMethods.DrawTextW(hdc, text, text.Length, ref textRect,

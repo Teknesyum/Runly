@@ -1,0 +1,4 @@
+docs/CLAUDE-HANDOFF.md:22  forms/unmeasured-label  Unmeasured number: carry the (default, unmeasured) label.
+docs/taramalar/01-dosya-iliskilendirme.md:134  forms/unmeasured-label  Unmeasured number: carry the (default, unmeasured) label.
+src/Runly.Settings/NeonControls.cs:395  okunurluk/pair-contrast  bg Palette.NeonPurple @30 (#b026ff 12%) on fg Palette.PurpleText (#c67eff) — 6.9:1, below 7:1
+235 files · 3 open · 0 fixed · 1 error(s) · 0 ignored

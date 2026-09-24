@@ -255,7 +255,7 @@ internal static unsafe class ArgumentPromptDialog
 
             case NativeMethods.WmCtlColorStatic:
                 NativeMethods.SetBkMode(wParam, NativeMethods.TransparentBkMode);
-                NativeMethods.SetTextColor(wParam, NeonWindowChrome.ColorTextDim);
+                NativeMethods.SetTextColor(wParam, NeonWindowChrome.ColorText);
                 return s_backgroundBrush;
 
             case NativeMethods.WmCtlColorEdit:

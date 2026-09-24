@@ -376,12 +376,6 @@ internal sealed class NeonButton : Button
             using var fill = new SolidBrush(Color.FromArgb(fillAlpha, accent));
             g.FillPath(fill, path);
         }
-        else if (_hover)
-        {
-            using var fill = new SolidBrush(Color.FromArgb(30, accent));
-            g.FillPath(fill, path);
-        }
-
         using (var glow = new Pen(Color.FromArgb(_hover ? 200 : 130, accent), (_hover ? 2f : 1.5f) * Metrics.Scale))
         {
             g.DrawPath(glow, path);
@@ -617,7 +611,7 @@ internal sealed class NeonComboBox : ComboBox
         var inset = Metrics.Px(4);
         TextRenderer.DrawText(e.Graphics, GetItemText(Items[e.Index]), Font,
             new Rectangle(e.Bounds.Left + inset, e.Bounds.Top, e.Bounds.Width - (inset * 2), e.Bounds.Height),
-            selected ? Palette.NeonBlue : Palette.TextBody,
+            Palette.TextBody,
             TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
     }
 

@@ -51,10 +51,6 @@ internal abstract class NeonToggleCell : DataGridViewTextBoxCell, INeonToggleCel
 
     protected static Color Accent(bool on) => on ? Palette.NeonPurple : Palette.NeonBlue;
 
-    /// <summary>The caption colour that goes with <see cref="Accent"/>. Purple splits into a fill hex and
-    /// a text hex; blue does not need to, one value clears both thresholds.</summary>
-    protected static Color AccentText(bool on) => on ? Palette.PurpleText : Palette.NeonBlue;
-
     protected int FillAlpha() => _pressed ? NeonTheme.PressedAlpha : _hover ? NeonTheme.HoverAlpha : NeonTheme.FillAlpha;
 
     protected abstract void PaintGlyph(Graphics graphics, Rectangle cellBounds, bool on, DataGridViewCellStyle cellStyle);
@@ -246,26 +242,24 @@ internal sealed class NeonChipCell : NeonToggleCell
 
         if (!ReadOnly)
         {
-            using var fill = new SolidBrush(Color.FromArgb(FillAlpha(), accent));
-            graphics.FillPath(fill, path);
-
             // The inner stroke is the inset glow the theme puts on an outlined box; without it the chip
             // reads as a flat outline instead of a lit one.
             var inner = Rectangle.Inflate(chip, -Metrics.Px(1), -Metrics.Px(1));
             if (inner is { Width: > 0, Height: > 0 })
             {
                 using var innerPath = NeonTheme.RoundedRect(inner, Radius);
-                using var glow = new Pen(Color.FromArgb(NeonTheme.FillAlpha, accent), Metrics.Scale);
+                using var glow = new Pen(Color.FromArgb(FillAlpha(), accent), Metrics.Scale);
                 graphics.DrawPath(glow, innerPath);
             }
         }
 
-        using (var border = new Pen(Color.FromArgb(ReadOnly ? NeonTheme.FillAlpha : NeonTheme.OutlineAlpha, accent), Metrics.Scale))
+        var borderAlpha = ReadOnly ? NeonTheme.FillAlpha : FillAlpha() > NeonTheme.FillAlpha ? 255 : NeonTheme.OutlineAlpha;
+        using (var border = new Pen(Color.FromArgb(borderAlpha, accent), Metrics.Scale))
         {
             graphics.DrawPath(border, path);
         }
 
-        TextRenderer.DrawText(graphics, text, font, chip, ReadOnly ? NeonTheme.DisabledOutline : AccentText(on),
+        TextRenderer.DrawText(graphics, text, font, chip, ReadOnly ? NeonTheme.DisabledOutline : Palette.TextBody,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding);
 
         PaintFocusRing(graphics, chip, Radius);
@@ -353,11 +347,6 @@ internal sealed class NeonActionCell : DataGridViewButtonCell
 
         var accent = Palette.Warning;
         using var path = NeonTheme.RoundedRect(pill, NeonTheme.CornerRadius);
-        using (var fill = new SolidBrush(Color.FromArgb(NeonTheme.FillAlpha, accent)))
-        {
-            graphics.FillPath(fill, path);
-        }
-
         using (var border = new Pen(Color.FromArgb(NeonTheme.OutlineAlpha, accent), Metrics.Scale))
         {
             graphics.DrawPath(border, path);
@@ -365,7 +354,8 @@ internal sealed class NeonActionCell : DataGridViewButtonCell
 
         var previous = graphics.SmoothingMode;
         graphics.SmoothingMode = SmoothingMode.AntiAlias;
-        TextRenderer.DrawText(graphics, text, font, pill, accent,
+        var ink = (cellState & DataGridViewElementStates.Selected) != 0 ? Palette.TextBody : accent;
+        TextRenderer.DrawText(graphics, text, font, pill, ink,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis |
             TextFormatFlags.NoPadding);
         graphics.SmoothingMode = previous;

@@ -33,7 +33,7 @@ internal sealed class UninstallConfirmDialog : NeonForm
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-        var contentWidth = ClientSize.Width - Padding.Horizontal;
+        var contentWidth = DisplayRectangle.Width - Padding.Horizontal;
 
         var question = new Label
         {
@@ -83,6 +83,8 @@ internal sealed class UninstallConfirmDialog : NeonForm
         layout.Controls.Add(buttonPanel, 0, 3);
 
         Controls.Add(layout);
+        var needed = layout.GetPreferredSize(new Size(contentWidth, 0)).Height + Padding.Vertical;
+        ClientSize = new Size(ClientSize.Width, Math.Max(ClientSize.Height, ClientSize.Height - DisplayRectangle.Height + needed));
         AcceptButton = removeButton;
         CancelButton = cancelButton;
     }

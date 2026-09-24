@@ -186,9 +186,7 @@ internal sealed class NeonMessageDialog : NeonForm
             };
             var inset = Metrics.Px(2);
             var diameter = Math.Max(1, Math.Min(Width, Height) - (inset * 2) - 1);
-            using var glow = new SolidBrush(Color.FromArgb(32, color));
             using var ring = new Pen(color, 2f * Metrics.Scale);
-            e.Graphics.FillEllipse(glow, inset, inset, diameter, diameter);
             e.Graphics.DrawEllipse(ring, inset, inset, diameter, diameter);
             var glyph = _kind switch
             {

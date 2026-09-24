@@ -571,7 +571,7 @@ internal class NeonForm : Form
             using var fill = new SolidBrush(Color.FromArgb(35, accent));
             g.FillRectangle(fill, bounds);
         }
-        TextRenderer.DrawText(g, glyph, Palette.CaptionGlyph, bounds, hover ? accent : Palette.TextStrong,
+        TextRenderer.DrawText(g, glyph, Palette.CaptionGlyph, bounds, Palette.TextStrong,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
     }
 
