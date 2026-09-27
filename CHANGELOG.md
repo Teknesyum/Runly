@@ -7,6 +7,8 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-09-27
+
 ### Added
 
 - **Video hand-off to VidShrink.** When VidShrink is installed, a plain open of a video file (an
@@ -14,6 +16,14 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   the `video` category) is passed straight to VidShrink with no dialog, and Runly exits. The
   executable is read from the `Teknesyum.VidShrink.Video` open command, never a fixed path. Without
   VidShrink, or if it fails to start, the old behaviour runs unchanged.
+
+### Fixed
+
+- **Release publish no longer fails on a pre-existing release.** The v0.3.0 Release run failed
+  because a release for tag `v0.3.0` already existed when `gh release create` ran (`a release
+  with the same tag name already exists`). The publish step now checks for an existing release
+  first and uploads the built assets in place with `gh release upload --clobber` instead of
+  erroring out.
 
 ## [0.3.0] — 2026-09-27
 

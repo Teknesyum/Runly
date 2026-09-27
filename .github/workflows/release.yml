@@ -56,6 +56,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          $tag = $env:GITHUB_REF_NAME
           $zip = "Runly-v${{ steps.version.outputs.version }}-win-x64.zip"
           $hash = "$zip.sha256"
           foreach ($file in @($zip, $hash)) {
@@ -64,4 +65,13 @@ jobs:
                   exit 1
               }
           }
-          gh release create $env:GITHUB_REF_NAME --title "Runly $env:GITHUB_REF_NAME" --generate-notes $zip $hash
+          # A release for this tag can already exist (created outside this run, or a retried
+          # run that got this far before). `gh release create` fails hard on that instead of
+          # updating it, so check first and fall back to uploading in place.
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+              Write-Host "Release $tag already exists; uploading assets in place."
+              gh release upload $tag $zip $hash --clobber
+          } else {
+              gh release create $tag --title "Runly $tag" --generate-notes $zip $hash
+          }
