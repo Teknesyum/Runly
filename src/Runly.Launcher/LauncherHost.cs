@@ -57,6 +57,12 @@ internal static class LauncherHost
 
         s_logger.Info($"Başlatıldı: verb={request.Verb} script=\"{request.ScriptPath}\" args={request.ScriptArgs.Length}");
 
+        var handoff = new VidShrinkHandoff(new Runly.Core.Shell.Win32RegistryAccessor(), File.Exists, Environment.ProcessPath);
+        if (handoff.TryHandOff(request, config, VidShrinkHandoff.TryStart, s_logger))
+        {
+            return ExitCode.Success;
+        }
+
         var motwService = new MotwService(s_logger);
         var inspector = new ScriptInspector(motwService);
         var pathSearcher = new PathSearcher(logger: s_logger);
