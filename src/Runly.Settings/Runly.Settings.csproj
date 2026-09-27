@@ -21,10 +21,16 @@
     <EmbeddedResource Include="..\..\assets\runly.ico" LogicalName="Runly.Settings.runly.ico" />
     <EmbeddedResource Include="locale\tr.json" LogicalName="Runly.Settings.locale.tr.json" />
     <EmbeddedResource Include="locale\en.json" LogicalName="Runly.Settings.locale.en.json" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)../../teknesyum-ui\winforms\labels.tr.json" LogicalName="Runly.Settings.labels.tr.json" WithCulture="false" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)../../teknesyum-ui\winforms\labels.en.json" LogicalName="Runly.Settings.labels.en.json" WithCulture="false" />
     <EmbeddedResource Include="Catalog\catalog.json" LogicalName="Runly.Settings.catalog.json" />
     <EmbeddedResource Include="..\..\assets\fonts\AtkinsonHyperlegibleNext-Regular.ttf" LogicalName="Runly.Settings.fonts.AtkinsonHyperlegibleNext-Regular.ttf" />
     <EmbeddedResource Include="..\..\assets\fonts\AtkinsonHyperlegibleNext-Bold.ttf" LogicalName="Runly.Settings.fonts.AtkinsonHyperlegibleNext-Bold.ttf" />
     <EmbeddedResource Include="..\..\assets\category-*.ico" LogicalName="Runly.Settings.assets.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Runly.Core.Theme" />
   </ItemGroup>
 
 </Project>

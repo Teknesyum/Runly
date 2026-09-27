@@ -18,6 +18,9 @@ public sealed record InstallResult
     /// <summary>Turkish, user-visible log of what was done, one line per action.</summary>
     public IReadOnlyList<string> Actions { get; init; } = [];
 
+    /// <summary>Whether the context-menu cleanup changed the blocked-handler list, which Explorer only reads at start.</summary>
+    public bool ExplorerRestartNeeded { get; init; }
+
     /// <summary>Turkish error message when <see cref="Success"/> is <see langword="false"/>.</summary>
     public string? ErrorMessage { get; init; }
 }

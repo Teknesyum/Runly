@@ -53,33 +53,30 @@ internal static class NeonTheme
     /// <summary>Outline of a control that is interactive but currently off. Deliberately not
     /// <see cref="Palette.TextLabel"/>: grey means "cannot be clicked" everywhere else in this theme, so
     /// an unchecked box drawn grey reads as a disabled one.</summary>
-    public static readonly Color IdleOutline = Color.FromArgb(BorderAlpha, Palette.NeonBlue);
+    public static readonly Color IdleOutline = Color.FromArgb(TeknesyumTokens.BorderStrongAlpha, Palette.Renk1);
 
     /// <summary>The one grey in the theme, and the only thing allowed to use it.</summary>
     public static readonly Color DisabledOutline = Palette.TextLabel;
 
     // The opacity ladder every neon surface uses: rest, hover, pressed, outline. Values outside it make
     // two controls that should look identical drift apart.
-    public const int FillAlpha = 26;
-    public const int HoverAlpha = 51;
-    public const int PressedAlpha = 77;
-    public const int OutlineAlpha = 77;
+    public const int FillAlpha = TeknesyumTokens.Tone10Alpha;
+    public const int HoverAlpha = TeknesyumTokens.Tone20Alpha;
+    public const int PressedAlpha = TeknesyumTokens.Tone30Alpha;
+    public const int OutlineAlpha = TeknesyumTokens.Tone30Alpha;
 
-    /// <summary>The /50 rung: the default border. Measured — neon-blue/30 composites to #00494D on black
-    /// and sits at 2.06:1, under the 3:1 floor for a non-text boundary; /50 gives #007A80 and 4.07:1.
-    /// A panel is separated from the ground by its border alone (the two fills differ by 1.06:1), so this
-    /// number is the panel's visibility, not a taste setting.</summary>
-    public const int BorderAlpha = 128;
+    /// <summary>The default border: token derived.border over surface, 3.44:1 on black.</summary>
+    public const int BorderAlpha = TeknesyumTokens.BorderAlpha;
 
     /// <summary>The /30 rung, for lines that draw no boundary and carry no information — a progress
     /// track, a rule, a separator. Below the 3:1 floor on purpose: the floor applies to borders that say
     /// "this far and no further", not to decoration.</summary>
-    public const int DecorativeAlpha = 77;
+    public const int DecorativeAlpha = TeknesyumTokens.BorderDecorativeAlpha;
 
     /// <summary>The single corner radius: box, panel, card, button, cell and chip all take it. The old
     /// 16/12/8/6 ladder was never measured and is gone; a softer corner is a circle, not a bigger radius.
     /// The window's own corner is the one exception and lives in <see cref="Metrics.WindowCornerRadius"/>.</summary>
-    public static int CornerRadius => Metrics.Px(6);
+    public static int CornerRadius => Metrics.Px(TeknesyumTokens.ShapeR);
 
     // uxtheme.dll ordinal 135 = SetPreferredAppMode. Undocumented but the only way to make Win32
     // scrollbars dark; without it a white scrollbar sits inside every grid and list box and breaks
@@ -280,7 +277,7 @@ internal sealed class NeonToolTip : ToolTip
 
     private static Font Face => Palette.Body;
 
-    private static int Inset => Metrics.Px(10);
+    private static int Inset => Metrics.Px(TeknesyumTokens.Space2);
 
     public NeonToolTip()
     {
@@ -306,14 +303,14 @@ internal sealed class NeonToolTip : ToolTip
         g.SmoothingMode = SmoothingMode.AntiAlias;
 
         var card = new Rectangle(0, 0, Math.Max(1, e.Bounds.Width - 1), Math.Max(1, e.Bounds.Height - 1));
-        using var path = NeonTheme.RoundedRect(card, Metrics.Px(6));
+        using var path = NeonTheme.RoundedRect(card, Metrics.Px(TeknesyumTokens.Space2));
 
         using (var fill = new SolidBrush(Palette.FieldBg))
         {
             g.FillPath(fill, path);
         }
 
-        using (var border = new Pen(Color.FromArgb(NeonTheme.OutlineAlpha, Palette.NeonBlue), Metrics.Scale))
+        using (var border = new Pen(Color.FromArgb(NeonTheme.OutlineAlpha, Palette.Renk1), Metrics.Scale))
         {
             g.DrawPath(border, path);
         }
@@ -345,7 +342,7 @@ internal sealed class NeonButton : Button
         Cursor = Cursors.Hand;
         Height = Metrics.ButtonHeight;
         MinimumSize = new Size(0, Metrics.ButtonMinHeight);
-        Padding = new Padding(Metrics.Px(14), Metrics.Px(4), Metrics.Px(14), Metrics.Px(4));
+        Padding = new Padding(Metrics.Px(TeknesyumTokens.Space3), Metrics.Px(TeknesyumTokens.Space1), Metrics.Px(TeknesyumTokens.Space3), Metrics.Px(TeknesyumTokens.Space1));
         MouseEnter += (_, _) => { _hover = true; Invalidate(); };
         MouseLeave += (_, _) => { _hover = false; Invalidate(); };
         GotFocus += (_, _) => Invalidate();
@@ -356,8 +353,8 @@ internal sealed class NeonButton : Button
     {
         var text = TextRenderer.MeasureText(Text, Font, Size.Empty, TextFormatFlags.NoPadding);
         return new Size(
-            text.Width + Padding.Horizontal + Metrics.Px(6),
-            Math.Max(Metrics.ButtonHeight, text.Height + Padding.Vertical + Metrics.Px(4)));
+            text.Width + Padding.Horizontal + Metrics.Px(TeknesyumTokens.Space2),
+            Math.Max(Metrics.ButtonHeight, text.Height + Padding.Vertical + Metrics.Px(TeknesyumTokens.Space1)));
     }
 
     protected override void OnPaint(PaintEventArgs pevent)
@@ -365,34 +362,33 @@ internal sealed class NeonButton : Button
         var g = pevent.Graphics;
         NeonBackground.Clear(g, this, BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
-        var accent = Primary ? Palette.NeonBlue : Palette.NeonPurple;
+        var accent = Primary ? Palette.Renk1 : Palette.Renk3;
         var bounds = new Rectangle(1, 1, Math.Max(1, Width - 2), Math.Max(1, Height - 2));
 
         using var path = NeonTheme.RoundedRect(bounds, NeonTheme.CornerRadius);
 
         if (Primary)
         {
-            var fillAlpha = _hover ? 230 : 190;
-            using var fill = new SolidBrush(Color.FromArgb(fillAlpha, accent));
+            using var fill = new SolidBrush(accent);
             g.FillPath(fill, path);
         }
-        using (var glow = new Pen(Color.FromArgb(_hover ? 200 : 130, accent), (_hover ? 2f : 1.5f) * Metrics.Scale))
+        using (var border = new Pen(Color.FromArgb(_hover ? 255 : TeknesyumTokens.BorderStrongAlpha, accent), (_hover ? TeknesyumTokens.ShapeFocusW : TeknesyumTokens.ShapeBorderW) * Metrics.Scale))
         {
-            g.DrawPath(glow, path);
+            g.DrawPath(border, path);
         }
 
         PaintFocusRing(g, bounds);
 
-        // Filled buttons take black text: white on neon blue is 1.38:1. Outlined ones take the text role
+        // Filled buttons take black text: white on renk-1 is 2.12:1. Outlined ones take the text role
         // of their accent — the purple fill hex is 4.57:1 and cannot carry a caption.
-        var textColor = Primary ? Palette.AppBg : Palette.PurpleText;
+        var textColor = Primary ? Palette.AppBg : Palette.Renk3Text;
         TextRenderer.DrawText(g, Text, Font, bounds, textColor,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
     }
 
     /// <summary>Keyboard focus, drawn as the standard's two layers: an opaque black band between the ring
-    /// and whatever the button is filled with, and the 2 DIP neon-blue ring itself. A single-colour ring
-    /// measures 1.00:1 against a neon-blue filled button — it is simply invisible. Drawn inside the
+    /// and whatever the button is filled with, and the 2 DIP renk-1 ring itself. A single-colour ring
+    /// measures 1.00:1 against a renk-1 filled button — it is simply invisible. Drawn inside the
     /// button because an owner-drawn control cannot paint past its own bounds; <see cref="Control.ShowFocusCues"/>
     /// is what keeps it off mouse clicks, matching <c>:focus-visible</c>.</summary>
     private void PaintFocusRing(Graphics g, Rectangle bounds)
@@ -411,7 +407,7 @@ internal sealed class NeonButton : Button
         }
 
         using (var ringPath = NeonTheme.RoundedRect(ring, Math.Max(1, NeonTheme.CornerRadius - stroke)))
-        using (var pen = new Pen(Palette.NeonBlue, stroke))
+        using (var pen = new Pen(Palette.Renk1, stroke))
         {
             g.DrawPath(pen, ringPath);
         }
@@ -437,7 +433,7 @@ internal sealed class NeonGroupPanel : Panel
         DoubleBuffered = true;
         BackColor = Palette.Surface;
         ForeColor = Palette.TextBody;
-        Padding = new Padding(Metrics.Px(24), Metrics.GroupTitleBand, Metrics.Px(24), Metrics.Px(24));
+        Padding = new Padding(Metrics.Px(TeknesyumTokens.Space5), Metrics.GroupTitleBand, Metrics.Px(TeknesyumTokens.Space5), Metrics.Px(TeknesyumTokens.Space5));
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -453,15 +449,15 @@ internal sealed class NeonGroupPanel : Panel
             g.FillPath(fill, path);
         }
 
-        using (var border = new Pen(Color.FromArgb(NeonTheme.BorderAlpha, Palette.NeonBlue), Metrics.Scale))
+        using (var border = new Pen(Color.FromArgb(NeonTheme.BorderAlpha, Palette.Renk1), Metrics.Scale))
         {
             g.DrawPath(border, path);
         }
 
-        var inset = Metrics.Px(24);
+        var inset = Metrics.Px(TeknesyumTokens.Space5);
         TextRenderer.DrawText(g, Title, Palette.H3,
-            new Rectangle(inset, Metrics.Px(10), Width - (inset * 2), Metrics.Line(Palette.H3)),
-            Palette.NeonBlue, TextFormatFlags.Left | TextFormatFlags.NoPadding);
+            new Rectangle(inset, Metrics.Px(TeknesyumTokens.Space2), Width - (inset * 2), Metrics.Line(Palette.H3)),
+            Palette.Renk1, TextFormatFlags.Left | TextFormatFlags.NoPadding);
     }
 }
 
@@ -486,7 +482,7 @@ internal sealed class NeonRadioButton : RadioButton
     public override Size GetPreferredSize(Size proposedSize)
     {
         var textSize = TextRenderer.MeasureText(Text, Font);
-        var glyph = Metrics.Px(GlyphGrid) + Metrics.Px(8);
+        var glyph = Metrics.Px(GlyphGrid) + Metrics.Px(TeknesyumTokens.Space2);
         return new Size(glyph + textSize.Width + Metrics.Px(2), Math.Max(Metrics.Line(Font), textSize.Height));
     }
 
@@ -498,7 +494,7 @@ internal sealed class NeonRadioButton : RadioButton
         var d = Metrics.Px(GlyphGrid);
         var circle = new Rectangle(0, (Height - d) / 2, d, d);
 
-        using (var ring = new Pen(Checked ? Palette.NeonBlue : NeonTheme.IdleOutline, 1.5f * Metrics.Scale))
+        using (var ring = new Pen(Checked ? Palette.Renk1 : NeonTheme.IdleOutline, 1.5f * Metrics.Scale))
         {
             g.DrawEllipse(ring, circle);
         }
@@ -506,11 +502,11 @@ internal sealed class NeonRadioButton : RadioButton
         if (Checked)
         {
             var inset = d * 3 / GlyphGrid;
-            using var dot = new SolidBrush(Palette.NeonBlue);
+            using var dot = new SolidBrush(Palette.Renk1);
             g.FillEllipse(dot, circle.X + inset, circle.Y + inset, d - (inset * 2), d - (inset * 2));
         }
 
-        var gap = Metrics.Px(8);
+        var gap = Metrics.Px(TeknesyumTokens.Space2);
         var textBounds = new Rectangle(d + gap, 0, Width - d - gap, Height);
         TextRenderer.DrawText(g, Text, Font, textBounds, ForeColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
     }
@@ -533,7 +529,7 @@ internal sealed class NeonCheckBox : CheckBox
     public override Size GetPreferredSize(Size proposedSize)
     {
         var textSize = TextRenderer.MeasureText(Text, Font);
-        var glyph = Metrics.Px(NeonRadioButton.GlyphGrid) + Metrics.Px(8);
+        var glyph = Metrics.Px(NeonRadioButton.GlyphGrid) + Metrics.Px(TeknesyumTokens.Space2);
         return new Size(glyph + textSize.Width + Metrics.Px(2), Math.Max(Metrics.Line(Font), textSize.Height));
     }
 
@@ -544,9 +540,9 @@ internal sealed class NeonCheckBox : CheckBox
         g.SmoothingMode = SmoothingMode.AntiAlias;
         var d = Metrics.Px(NeonRadioButton.GlyphGrid);
         var box = new Rectangle(0, (Height - d) / 2, d, d);
-        NeonTheme.DrawCheckGlyph(g, box, Checked, Palette.NeonBlue, Checked ? Palette.NeonBlue : NeonTheme.IdleOutline);
+        NeonTheme.DrawCheckGlyph(g, box, Checked, Palette.Renk1, Checked ? Palette.Renk1 : NeonTheme.IdleOutline);
 
-        var gap = Metrics.Px(8);
+        var gap = Metrics.Px(TeknesyumTokens.Space2);
         var textBounds = new Rectangle(d + gap, 0, Width - d - gap, Height);
         TextRenderer.DrawText(g, Text, Font, textBounds, ForeColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
     }
@@ -608,7 +604,7 @@ internal sealed class NeonComboBox : ComboBox
         using var background = new SolidBrush(selected ? Palette.SelectedFill : Palette.FieldBg);
         e.Graphics.FillRectangle(background, e.Bounds);
 
-        var inset = Metrics.Px(4);
+        var inset = Metrics.Px(TeknesyumTokens.Space1);
         TextRenderer.DrawText(e.Graphics, GetItemText(Items[e.Index]), Font,
             new Rectangle(e.Bounds.Left + inset, e.Bounds.Top, e.Bounds.Width - (inset * 2), e.Bounds.Height),
             Palette.TextBody,
@@ -641,8 +637,8 @@ internal sealed class NeonComboBox : ComboBox
             g.FillRectangle(fill, 0, 0, Width, Height);
         }
 
-        var button = new Rectangle(Width - Metrics.Px(24), 0, Metrics.Px(24), Height);
-        var inset = Metrics.Px(8);
+        var button = new Rectangle(Width - Metrics.Px(TeknesyumTokens.Space5), 0, Metrics.Px(TeknesyumTokens.Space5), Height);
+        var inset = Metrics.Px(TeknesyumTokens.Space2);
         var caption = SelectedIndex >= 0 ? GetItemText(Items[SelectedIndex]) : string.Empty;
         TextRenderer.DrawText(g, caption, Font,
             new Rectangle(inset, 0, Math.Max(0, button.X - inset), Height), ForeColor,
@@ -656,13 +652,13 @@ internal sealed class NeonComboBox : ComboBox
             new Point(centre.X, centre.Y + (d * 2 / 12)),
             new Point(centre.X + (d * 3 / 12), centre.Y - (d * 1 / 12)),
         ];
-        using (var arrow = new Pen(Palette.NeonBlue, 1.5f * Metrics.Scale))
+        using (var arrow = new Pen(Palette.Renk1, 1.5f * Metrics.Scale))
         {
             g.DrawLines(arrow, chevron);
         }
 
         var stroke = Focused ? Math.Max(1, Metrics.Px(2)) : Math.Max(1, Metrics.Px(1));
-        using var border = new Pen(Focused ? Palette.NeonBlue : NeonTheme.IdleOutline, stroke);
+        using var border = new Pen(Focused ? Palette.Renk1 : NeonTheme.IdleOutline, stroke);
         var edge = stroke / 2f;
         g.DrawRectangle(border, edge, edge, Width - stroke, Height - stroke);
     });

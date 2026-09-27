@@ -29,7 +29,7 @@ internal static class ConsoleWaiter
             elapsed.TotalSeconds);
 
         // Teknesyum neon: console is limited to the 16 ConHost colours, so success/error map to
-        // Cyan/Magenta (the closest matches to neon-blue/neon-pink) instead of the old green/red.
+        // Cyan/Magenta (the closest matches to renk-1/renk-2) instead of the old green/red.
         WriteColoured(line, exitCode == ExitCode.Success ? ConsoleColor.Cyan : ConsoleColor.Magenta);
 
         if (Console.IsInputRedirected)

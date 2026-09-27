@@ -7,6 +7,91 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-09-27
+
+### Changed
+
+- **Teknesyum "benim" layout.** Every colour, radius, border width, type step, spacing step and
+  icon size is generated at build time from `teknesyum-ui/theme.tokens.json`
+  (`src/Runly.Core/Theme/gen-tokens.ps1`); the hand-written `TeknesyumTokens.cs` is gone. The
+  palette is now renk-1 #4DA6FF, renk-2 #DE7EF1, renk-3 #B68FFF with a 3 px corner and no glow.
+  Settings, the launcher, `install.ps1` and `make-icons.ps1` all read the same file.
+- **Shared chrome copy.** The brand, support, site, update and sync labels come from
+  `teknesyum-ui/winforms/labels.*.json`. The product name in window titles has one source,
+  `RunlyRegistryLayout.ApplicationName`, and the Settings title is locale `app.title`.
+- **Install window size.** The installer window is sized from `metric.installer-w/h` (720×540)
+  and wraps long log lines, so a full error message stays readable.
+- **Icon.** `runly.ico` and the category icons are recoloured from the tokens.
+
+### Added
+
+- **Install window.** `install.ps1` now opens the teknesyum-ui install panel: five steps with
+  ✓ and !, a gradient progress bar that never stops or goes back, a fading log, the install
+  folder with Değiştir, and Kur / Yeniden dene / Programı aç. `-Silent` (`RUNLY_OTOMATIK=1`)
+  keeps the console path, `-Rehearsal` (`RUNLY_PROVA=1`) installs into a temporary folder. The
+  package is verified against its `.sha256` before it is unpacked, and when the GitHub API is
+  rate-limited the installer finds the release through its `releases/latest` redirect.
+- **Update badge and panel.** Settings checks for a newer release on start. A yellow
+  "Güncelleme" badge downloads it at low priority, turns green when it is ready, and a second
+  click swaps the files (`.old` rename) and restarts Settings. The panel shows the same stages
+  with İndir, İndir ve yükle, İptal and Yükle.
+- **Two-colour title.** "Runly" is drawn in blue and the window name in pink on every Settings
+  window.
+
+- **Context-menu cleanup.** A "Sağ menü…" button lists the entries other programs add to the
+  right-click menu of Runly's script types and hides the checked ones. Editor duplicates that
+  stay off other files (VS Code's static verb, Python's "Edit in IDLE", PowerShell ISE's "Edit")
+  are hidden by default;
+  entries that would vanish from every file (Notepad++, Windows Notepad) are opt-in. Static verbs
+  are narrowed with an HKCU `AppliesTo` overlay, packaged handlers go on the per-user blocked
+  list, and a ledger under `Software\Runly\MenuCleanup` lets Uninstall put everything back.
+
+- **Context-menu preview.** The "Sağ menü…" button now opens a preview: pick a script type and see
+  the menu Runly will produce for it, toggle every entry it can reach, and choose per type whether
+  a double-click runs elevated. Entries Runly cannot switch off keep their place with an "Open its
+  settings" button to the owning program, so the preview never hides what the menu holds.
+- **Entries removable from every file type.** A static verb can now be dropped from all files, not
+  only Runly's types: the HKCU copy gets `ProgrammaticAccessOnly` and the change is written to the
+  `MenuCleanup\Verbs` ledger, so Uninstall puts it back.
+- **Classic shell extensions are scanned too.** `*\shellex\ContextMenuHandlers` and
+  `AllFilesystemObjects\shellex\ContextMenuHandlers` are read alongside the packaged handlers.
+  Windows' own entries (Open With, Send To, Sharing, pinning, Copy as path, Encryption) are never
+  offered. When Defender's real-time protection is off, its scan entry is marked as recommended to
+  hide, with a line saying why.
+- **Locked script files.** When a script cannot be read because another process holds it, Runly asks
+  the Restart Manager who that is and offers to end those processes and retry, instead of sending
+  the user to File Locksmith.
+
+### Removed
+
+- **"Runly ile yönetici olarak çalıştır"** is no longer a menu verb. Elevation is a setting now: a
+  global switch in the behaviour panel, overridable per file type in the context-menu preview. The
+  UAC prompt still appears on every elevated run.
+- **"Runly ile argümanlarla çalıştır…"** is no longer in the context menu. `--verb prompt-args`
+  still works from the command line. Install now rewrites each ProgID's `shell` tree from
+  scratch, so verbs an older version wrote do not linger.
+- **Bindings of disabled extensions.** Switching a mapping off in the settings now also unbinds it:
+  install deletes its ProgID, its `OpenWithProgids` entry and any default that still pointed at
+  Runly. A disabled extension used to keep opening with a launcher whose interpreter was off, and
+  the context-menu cleanup skipped that type because it only covers what Runly actually runs.
+
+### Changed
+
+- **Context menu.** The edit verb now names the editor it opens — "Runly: Düzenle (Notepad++)" — so
+  it is neither confused with Windows' own "Edit" nor a mystery about where the file will land.
+- **Editor picker.** The editor command gets a "Choose…" button that opens the application
+  picker instead of requiring a typed command.
+
+### Fixed
+
+- **Editor chosen as interpreter.** Picking a known editor (Notepad++, VS Code, …) for a Run
+  mapping now offers to set it as the editor instead, so double-click keeps running the script.
+- **Raw label keys.** `labels.tr.json` was built into a `tr` satellite assembly, so Settings
+  showed keys such as `sig.brand`; the label files are now embedded in the main assembly.
+- **Rehearsal target.** `-Rehearsal` always installs into the temporary `Runly-prova` folder.
+  An `-InstallPath` given with it is ignored and says so, and Değiştir is hidden, so a rehearsal
+  run from an admin shell can no longer write into a real folder such as `System32`.
+
 ## [0.2.1] — 2026-09-08
 
 ### Fixed
@@ -103,5 +188,7 @@ First public release.
 - A NativeAOT launcher that resolves the interpreter and starts the process.
 - A settings window in the Teknesyum neon theme, with registry backup, restore and uninstall.
 
-[Unreleased]: https://github.com/Teknesyum/Runly/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Teknesyum/Runly/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Teknesyum/Runly/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/Teknesyum/Runly/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Teknesyum/Runly/releases/tag/v0.2.0

@@ -1,4 +1,4 @@
-﻿using Runly.Core.Defaults;
+using Runly.Core.Defaults;
 using Runly.Core.Models;
 
 namespace Runly.Settings.Dialogs;
@@ -19,7 +19,12 @@ internal sealed class AddExtensionDialog : NeonForm
         MaximizeBox = false;
         ShowIcon = false;
         ShowInTaskbar = false;
-        ClientSize = new Size(Metrics.Px(360), Metrics.Px(170));
+        var fieldRow = Metrics.TextBoxHeight + Metrics.Px(2);
+        var helpRow = Metrics.Row(Palette.Help, 6);
+        var buttonRow = Metrics.ButtonHeight + Metrics.Px(TeknesyumTokens.Space3);
+        ClientSize = new Size(
+            Metrics.Px(420),
+            Metrics.CaptionHeight + Metrics.ResizeBorder + Metrics.Px(TeknesyumTokens.Space5) + (3 * fieldRow) + helpRow + buttonRow);
         AutoScaleMode = AutoScaleMode.Dpi;
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
@@ -29,20 +34,21 @@ internal sealed class AddExtensionDialog : NeonForm
         {
             Dock = DockStyle.Fill,
             ColumnCount = 2,
-            RowCount = 4,
-            Padding = new Padding(Metrics.Px(12)),
+            RowCount = 5,
+            Padding = new Padding(Metrics.Px(TeknesyumTokens.Space3)),
             BackColor = Color.Transparent,
         };
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Metrics.Px(100)));
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         for (var i = 0; i < 3; i++)
         {
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, Metrics.TextBoxHeight + Metrics.Px(2)));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, fieldRow));
         }
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, helpRow));
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
-        _extensionBox = new NeonTextBox { Dock = DockStyle.Fill, PlaceholderText = ".rb" };
-        _interpreterBox = new NeonTextBox { Dock = DockStyle.Fill, PlaceholderText = "ruby" };
+        _extensionBox = new NeonTextBox { Dock = DockStyle.Fill };
+        _interpreterBox = new NeonTextBox { Dock = DockStyle.Fill };
         _argsBox = new NeonTextBox { Dock = DockStyle.Fill, Text = DefaultConfig.ScriptThenArgs };
 
         layout.Controls.Add(new Label { Text = "Uzantı:", ForeColor = Palette.TextDim, Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft }, 0, 0);
@@ -51,12 +57,13 @@ internal sealed class AddExtensionDialog : NeonForm
         layout.Controls.Add(_interpreterBox, 1, 1);
         layout.Controls.Add(new Label { Text = "Argümanlar:", ForeColor = Palette.TextDim, Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft }, 0, 2);
         layout.Controls.Add(_argsBox, 1, 2);
+        layout.Controls.Add(new Label { Text = "Örnek: uzantı .rb, yorumlayıcı ruby", ForeColor = Palette.TextDim, Font = Palette.Help, Dock = DockStyle.Fill, TextAlign = ContentAlignment.TopLeft, AutoEllipsis = true }, 1, 3);
 
         var buttonPanel = new FlowLayoutPanel
         {
             Dock = DockStyle.Fill,
             FlowDirection = FlowDirection.RightToLeft,
-            Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
+            WrapContents = false,
             BackColor = Color.Transparent,
         };
 
@@ -66,7 +73,8 @@ internal sealed class AddExtensionDialog : NeonForm
 
         buttonPanel.Controls.Add(cancelButton);
         buttonPanel.Controls.Add(okButton);
-        layout.Controls.Add(buttonPanel, 1, 3);
+        layout.Controls.Add(buttonPanel, 0, 4);
+        layout.SetColumnSpan(buttonPanel, 2);
 
         Controls.Add(layout);
         AcceptButton = okButton;
@@ -88,7 +96,7 @@ internal sealed class AddExtensionDialog : NeonForm
 
         if (extension.Length <= 1)
         {
-            NeonMessageBox.Show(this, "Geçerli bir uzantı girin (örnek: .rb).", "Runly Ayarları",
+            NeonMessageBox.Show(this, "Geçerli bir uzantı girin (örnek: .rb).", Strings.Get("app.title"),
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }

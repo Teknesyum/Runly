@@ -47,7 +47,7 @@ public sealed partial class LocaleCatalogTests
         [
             "catalog.searchLabel", "catalog.searchClear", "catalog.searchResults", "catalog.searchNoResults",
             "catalog.chooseApp", "chooseApp.title", "chooseApp.prompt", "chooseApp.promptRun",
-            "chooseApp.searchPlaceholder", "chooseApp.suggested", "chooseApp.browse", "chooseApp.select",
+            "chooseApp.searchLabel", "chooseApp.searchHelp", "chooseApp.suggested", "chooseApp.browse", "chooseApp.select",
             "chooseApp.empty", "chooseApp.filter", "chooseApp.pickOne", "chooseApp.noRow", "chooseApp.assigned",
             "handler.choosePrompt", "handler.notSelectedDetail", "bind.openFileTypePage",
             "bind.needsInstall", "bind.notRegistered", "install.launcherMissing",

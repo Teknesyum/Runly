@@ -31,6 +31,11 @@ public sealed record ExtensionMapping
     [JsonPropertyName("args")]
     public string Args { get; init; } = string.Empty;
 
+    /// <summary>Elevation override for this extension; <see langword="null"/> follows <c>RunlyConfig.RunAsAdmin</c> (K31).</summary>
+    [JsonPropertyName("runAsAdmin")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? RunAsAdmin { get; init; }
+
     /// <summary>Whether this extension takes part in installation and launching.</summary>
     [JsonPropertyName("enabled")]
     public bool Enabled { get; init; }

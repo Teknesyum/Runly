@@ -49,7 +49,7 @@ internal abstract class NeonToggleCell : DataGridViewTextBoxCell, INeonToggleCel
         Value = Value is not true;
     }
 
-    protected static Color Accent(bool on) => on ? Palette.NeonPurple : Palette.NeonBlue;
+    protected static Color Accent(bool on) => on ? Palette.Renk3 : Palette.Renk1;
 
     protected int FillAlpha() => _pressed ? NeonTheme.PressedAlpha : _hover ? NeonTheme.HoverAlpha : NeonTheme.FillAlpha;
 
@@ -86,7 +86,7 @@ internal abstract class NeonToggleCell : DataGridViewTextBoxCell, INeonToggleCel
     /// highlight says which extension is selected, this says which cell Space and Enter will flip.
     ///
     /// <para>Two layers, per the standard: an opaque black band against whatever the glyph is filled with,
-    /// then the 2 DIP neon-blue ring outside it. A one-colour ring measures 1.00:1 over a neon fill of the
+    /// then the 2 DIP renk-1 ring outside it. A one-colour ring measures 1.00:1 over a neon fill of the
     /// same colour and 1.38:1 as white over blue — both invisible. No transparent gap is left between the
     /// layers, or the fill touches the ring and the ring disappears again.</para></summary>
     protected void PaintFocusRing(Graphics graphics, Rectangle glyph, int radius)
@@ -107,7 +107,7 @@ internal abstract class NeonToggleCell : DataGridViewTextBoxCell, INeonToggleCel
 
         var ring = Rectangle.Inflate(glyph, stroke * 2, stroke * 2);
         using (var path = NeonTheme.RoundedRect(ring, radius + (stroke * 2)))
-        using (var pen = new Pen(Palette.NeonBlue, stroke))
+        using (var pen = new Pen(Palette.Renk1, stroke))
         {
             graphics.DrawPath(pen, path);
         }
@@ -176,7 +176,7 @@ internal sealed class NeonCheckCell : NeonToggleCell
 {
     protected override void PaintGlyph(Graphics graphics, Rectangle cellBounds, bool on, DataGridViewCellStyle cellStyle)
     {
-        var side = Math.Min(Metrics.Px(20), Math.Min(cellBounds.Width, cellBounds.Height) - Metrics.Px(4));
+        var side = Math.Min(Metrics.Px(TeknesyumTokens.Space4), Math.Min(cellBounds.Width, cellBounds.Height) - Metrics.Px(TeknesyumTokens.Space1));
         if (side <= 0)
         {
             return;
@@ -196,12 +196,12 @@ internal sealed class NeonCheckCell : NeonToggleCell
 
         if (!on)
         {
-            using var hover = new SolidBrush(Color.FromArgb(FillAlpha(), Palette.NeonBlue));
+            using var hover = new SolidBrush(Color.FromArgb(FillAlpha(), Palette.Renk1));
             using var path = NeonTheme.RoundedRect(box, Metrics.Px(3));
             graphics.FillPath(hover, path);
         }
 
-        NeonTheme.DrawCheckGlyph(graphics, box, on, Palette.NeonBlue, on ? Palette.NeonBlue : NeonTheme.IdleOutline);
+        NeonTheme.DrawCheckGlyph(graphics, box, on, Palette.Renk1, on ? Palette.Renk1 : NeonTheme.IdleOutline);
         PaintFocusRing(graphics, box, Metrics.Px(3));
     }
 }
@@ -224,8 +224,8 @@ internal sealed class NeonChipCell : NeonToggleCell
         var text = Strings.Get(on ? column.OnTextKey : column.OffTextKey);
         var textSize = TextRenderer.MeasureText(graphics, text, font, Size.Empty, TextFormatFlags.NoPadding);
 
-        var height = Math.Min(cellBounds.Height - Metrics.Px(6), Metrics.Line(font) + Metrics.Px(8));
-        var width = Math.Min(cellBounds.Width - Metrics.Px(8), textSize.Width + Metrics.Px(16));
+        var height = Math.Min(cellBounds.Height - Metrics.Px(TeknesyumTokens.Space2), Metrics.Line(font) + Metrics.Px(TeknesyumTokens.Space2));
+        var width = Math.Min(cellBounds.Width - Metrics.Px(TeknesyumTokens.Space2), textSize.Width + Metrics.Px(TeknesyumTokens.Space4));
         if (height <= 0 || width <= 0)
         {
             return;
@@ -332,8 +332,8 @@ internal sealed class NeonActionCell : DataGridViewButtonCell
         var text = formattedValue?.ToString() ?? string.Empty;
         var textSize = TextRenderer.MeasureText(graphics, text, font, Size.Empty, TextFormatFlags.NoPadding);
 
-        var height = Math.Min(cellBounds.Height - Metrics.Px(6), Metrics.Line(font) + Metrics.Px(8));
-        var width = Math.Min(cellBounds.Width - Metrics.Px(8), textSize.Width + Metrics.Px(16));
+        var height = Math.Min(cellBounds.Height - Metrics.Px(TeknesyumTokens.Space2), Metrics.Line(font) + Metrics.Px(TeknesyumTokens.Space2));
+        var width = Math.Min(cellBounds.Width - Metrics.Px(TeknesyumTokens.Space2), textSize.Width + Metrics.Px(TeknesyumTokens.Space4));
         if (height <= 0 || width <= 0)
         {
             return;

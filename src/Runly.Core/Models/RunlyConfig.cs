@@ -29,9 +29,23 @@ public sealed record RunlyConfig
     [JsonPropertyName("editorCommand")]
     public string EditorCommand { get; init; } = string.Empty;
 
+    /// <summary>Whether a double-click runs scripts elevated; an extension may override it (K31).</summary>
+    [JsonPropertyName("runAsAdmin")]
+    public bool RunAsAdmin { get; init; }
+
     /// <summary>Whether file logging is enabled.</summary>
     [JsonPropertyName("logEnabled")]
     public bool LogEnabled { get; init; } = true;
+
+    /// <summary>Other programs' context-menu entries to hide on Runly's types; <see langword="null"/> hides the recommended ones.</summary>
+    [JsonPropertyName("hiddenMenuItems")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? HiddenMenuItems { get; init; }
+
+    /// <summary>Hidden entries the user wants gone from every file type, not only Runly's (K32).</summary>
+    [JsonPropertyName("hiddenEverywhere")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? HiddenEverywhere { get; init; }
 
     /// <summary>Extension mappings keyed by lower-case extension including the leading dot (for example <c>.js</c>).</summary>
     [JsonPropertyName("extensions")]

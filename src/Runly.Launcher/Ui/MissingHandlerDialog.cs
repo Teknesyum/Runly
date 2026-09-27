@@ -25,7 +25,7 @@ internal static unsafe class MissingHandlerDialog
     private static nint s_sansFont;
     private static bool s_openSettings;
     private static bool s_closing;
-    private static string s_caption = "Runly";
+    private static string s_caption = Runly.Core.Shell.RunlyRegistryLayout.ApplicationName;
 
     /// <summary>Shows the question; <see langword="true"/> means the user chose "Ayarları aç".</summary>
     internal static bool? Show(string title, string message, string fileName, ILogger logger)
@@ -42,9 +42,9 @@ internal static unsafe class MissingHandlerDialog
         s_cancelHandle = 0;
         s_openSettings = false;
         s_closing = false;
-        s_caption = $"Runly — {title}";
+        s_caption = $"{Runly.Core.Shell.RunlyRegistryLayout.ApplicationName} — {title}";
 
-        s_backgroundBrush = NativeMethods.CreateSolidBrush(NeonWindowChrome.ColorSurface);
+        s_backgroundBrush = NativeMethods.CreateSolidBrush(NeonWindowChrome.ColorBg);
 
         var window = NativeMethods.CreateWindowExW(
             NativeMethods.WsExDlgModalFrame | NativeMethods.WsExControlParent,
@@ -119,7 +119,7 @@ internal static unsafe class MissingHandlerDialog
                 WndProc = (nint)(delegate* unmanaged<nint, uint, nint, nint, nint>)&WindowProc,
                 Instance = instance,
                 Cursor = NeonWindowChrome.LoadArrowCursor(),
-                Background = NativeMethods.CreateSolidBrush(NeonWindowChrome.ColorSurface),
+                Background = NativeMethods.CreateSolidBrush(NeonWindowChrome.ColorBg),
                 ClassName = classNamePointer,
             };
 

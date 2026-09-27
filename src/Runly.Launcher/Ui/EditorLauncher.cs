@@ -41,7 +41,7 @@ internal static class EditorLauncher
     {
         if (!string.IsNullOrWhiteSpace(editorCommand))
         {
-            yield return editorCommand.Trim();
+            yield return editorCommand.Trim().Trim('"');
         }
 
         yield return FallbackEditor;

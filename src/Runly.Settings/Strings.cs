@@ -36,7 +36,7 @@ internal static class Strings
 
     public static void Apply(Control root)
     {
-        // A RichTextBox holds rendered runs (bold, mono, neon-pink code spans), not a translatable
+        // A RichTextBox holds rendered runs (bold, mono, renk-2 code spans), not a translatable
         // caption. Assigning .Text here would flatten every run back to plain body text.
         if (root is RichTextBox)
         {
@@ -70,6 +70,18 @@ internal static class Strings
             if (stream is null) continue;
             var parsed = JsonSerializer.Deserialize<Dictionary<string, string>>(stream);
             if (parsed is not null) catalogs[code] = new Dictionary<string, string>(parsed, StringComparer.Ordinal);
+        }
+
+        foreach (var (code, catalog) in catalogs)
+        {
+            using var stream = assembly.GetManifestResourceStream($"Runly.Settings.labels.{code}.json");
+            if (stream is null) continue;
+            var labels = JsonSerializer.Deserialize<Dictionary<string, string>>(stream);
+            if (labels is null) continue;
+            foreach (var (key, value) in labels)
+            {
+                if (key != "app.title") catalog[key] = value;
+            }
         }
 
         if (!catalogs.ContainsKey(SourceLanguage))

@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Runly.Core.Theme;
 using System.Runtime.Versioning;
 
 namespace Runly.Launcher.Ui;
@@ -12,19 +13,19 @@ namespace Runly.Launcher.Ui;
 internal static class NeonWindowChrome
 {
     // ---- Teknesyum neon palette, as Win32 COLORREF (0x00BBGGRR) ---------------------------------
-    internal const uint ColorSurface = 0x0A0908; // #08090A panel/window background
-    internal const uint ColorEditBg = 0x141210; // slightly lifted surface for the input field
-    internal const uint ColorNeonBlue = 0xFFF300; // #00F3FF primary
-    internal const uint ColorNeonPurple = 0xFF26B0; // #B026FF secondary button border/text
-    internal const uint ColorNeonPink = 0xEA00FF; // #FF00EA close glyph
-    internal const uint ColorText = 0xFFFFFF;
-    internal const uint ColorPurpleText = 0xFF7EC6;
-    internal const uint ColorBg = 0x000000;
+    internal const uint ColorSurface = TeknesyumTokens.SurfaceRef;
+    internal const uint ColorEditBg = ColorSurface;
+    internal const uint ColorRenk1 = TeknesyumTokens.Renk1Ref;
+    internal const uint ColorRenk3 = TeknesyumTokens.Renk3Ref;
+    internal const uint ColorRenk2 = TeknesyumTokens.Renk2Ref;
+    internal const uint ColorText = TeknesyumTokens.TextRef;
+    internal const uint ColorRenk3Text = TeknesyumTokens.Renk3TextRef;
+    internal const uint ColorBg = TeknesyumTokens.BgRef;
 
     internal const int DwmwaUseImmersiveDarkMode = 20;
-    internal const int CornerRadius = 12; // token: buton/kart radius
-    internal const int WindowCornerRadius = 16; // token: kutu radius
-    internal const int CaptionHeight = 36;
+    internal const int CornerRadius = TeknesyumTokens.ShapeR;
+    internal const int WindowCornerRadius = TeknesyumTokens.ShapeRWindow;
+    internal const int CaptionHeight = TeknesyumTokens.TitlebarHMax;
     internal const int CaptionButtonWidth = 44;
     internal const int ResizeBorder = 7;
 
@@ -56,19 +57,21 @@ internal static class NeonWindowChrome
     internal static nint LoadArrowCursor() => NativeMethods.LoadCursorW(0, IdcArrow);
 
     /// <summary>
-    /// Tries "Inter" first (Teknesyum's sans token), falls back to "Segoe UI" — Inter is not installed on
-    /// this machine and R5 forbids installing fonts, so the fallback chain has to be verified at runtime.
-    /// GDI silently substitutes an unavailable face, so the only reliable check is to select the font into
-    /// a DC and read back what it actually picked.
+    /// Walks the token sans chain and returns the first face GDI actually selects; GDI silently
+    /// substitutes an unavailable face, so each candidate is read back from a DC.
     /// </summary>
     internal static nint ResolveSansFont(int height)
     {
-        return TryCreateFont("Inter", height) is { } inter and not 0
-            ? inter
-            : TryCreateFont("Segoe UI", height) is { } segoe and not 0
-                ? segoe
-                : NativeMethods.CreateFontW(-height, 0, 0, 0, NativeMethods.FwNormal, 0, 0, 0,
-                    NativeMethods.DefaultCharset, 0, 0, NativeMethods.ClearTypeQuality, 0, "Segoe UI");
+        foreach (var family in TeknesyumTokens.SansChain)
+        {
+            if (TryCreateFont(family, height) is { } font and not 0)
+            {
+                return font;
+            }
+        }
+
+        return NativeMethods.CreateFontW(-height, 0, 0, 0, NativeMethods.FwNormal, 0, 0, 0,
+            NativeMethods.DefaultCharset, 0, 0, NativeMethods.ClearTypeQuality, 0, TeknesyumTokens.SansChain[^1]);
     }
 
     private static nint TryCreateFont(string family, int height)
@@ -172,7 +175,7 @@ internal static class NeonWindowChrome
 
     internal static void DrawNeonButton(nint hdc, in NativeMethods.Rect rect, string text, bool primary, bool focused)
     {
-        var accent = primary ? ColorNeonBlue : ColorNeonPurple;
+        var accent = primary ? ColorRenk1 : ColorRenk3;
 
         // Glow approximation: a dimmer, wider ring drawn first so the accent-coloured edge appears to bleed.
         var glowPen = NativeMethods.CreatePen(0, focused ? 3 : 2, accent);
@@ -189,7 +192,7 @@ internal static class NeonWindowChrome
         NativeMethods.DeleteObject(pen);
 
         NativeMethods.SetBkMode(hdc, NativeMethods.TransparentBkMode);
-        NativeMethods.SetTextColor(hdc, primary ? ColorBg : ColorPurpleText);
+        NativeMethods.SetTextColor(hdc, primary ? ColorBg : ColorRenk3Text);
 
         var textRect = rect;
         NativeMethods.DrawTextW(hdc, text, text.Length, ref textRect,
@@ -207,7 +210,7 @@ internal static class NeonWindowChrome
         var caption = new NativeMethods.Rect { Left = 0, Top = 0, Right = client.Right, Bottom = CaptionHeight };
         NativeMethods.FillRect(hdc, in caption, backgroundBrush);
         NativeMethods.SetBkMode(hdc, NativeMethods.TransparentBkMode);
-        NativeMethods.SetTextColor(hdc, ColorNeonBlue);
+        NativeMethods.SetTextColor(hdc, ColorRenk1);
         var titleRect = new NativeMethods.Rect
         {
             Left = CaptionButtonWidth - 8,
@@ -220,15 +223,15 @@ internal static class NeonWindowChrome
 
         if (captionButtons >= 3)
         {
-            DrawCaptionGlyph(hdc, client.Right - (3 * CaptionButtonWidth), "−", ColorNeonBlue);
+            DrawCaptionGlyph(hdc, client.Right - (3 * CaptionButtonWidth), "−", ColorRenk1);
         }
 
         if (captionButtons >= 2)
         {
-            DrawCaptionGlyph(hdc, client.Right - (2 * CaptionButtonWidth), "□", ColorNeonBlue);
+            DrawCaptionGlyph(hdc, client.Right - (2 * CaptionButtonWidth), "□", ColorRenk1);
         }
 
-        DrawCaptionGlyph(hdc, client.Right - CaptionButtonWidth, "×", ColorNeonPink);
+        DrawCaptionGlyph(hdc, client.Right - CaptionButtonWidth, "×", ColorRenk2);
 
         if (previousFont != 0)
         {

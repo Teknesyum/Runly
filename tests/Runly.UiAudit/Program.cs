@@ -18,22 +18,30 @@ internal static class Program
     private const BindingFlags Any = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
     private static readonly List<Finding> s_findings = new();
+    private static readonly List<string> s_log = new();
     private static readonly Dictionary<int, string> s_tokens = new();
     private static bool s_suppressGrid;
     private static string s_outDir = ".";
     private static string s_tag = "olcum";
+    private static int s_scale = 100;
 
     [STAThread]
     private static int Main(string[] args)
     {
         s_outDir = Path.GetFullPath(args.Length > 0 ? args[0] : ".");
         s_tag = args.Length > 1 ? args[1] : "olcum";
-        var only = args.Length > 2 ? args[2] : null;
+        var only = args.Length > 2 && args[2] != "*" ? args[2] : null;
+        s_scale = args.Length > 3 ? int.Parse(args[3], CultureInfo.InvariantCulture) : 100;
         Directory.CreateDirectory(s_outDir);
 
         NeonTheme.EnableDarkMode();
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
+        if (s_scale != 100)
+        {
+            ApplyScale(s_scale);
+        }
+
         LoadTokens();
 
         var screens = new List<(string Name, Func<Form?> Build)>
@@ -46,7 +54,16 @@ internal static class Program
             ("sonuc-uyari", () => Create("Runly.Settings.Dialogs.ResultDialog", "Kurulum", true, new List<string> { ".py bağlandı" }, null, "Gezgin yeniden başlatılmalı.")),
             ("sonuc-hata", () => Create("Runly.Settings.Dialogs.ResultDialog", "Kurulum", false, new List<string>(), "Kayıt defterine yazılamadı.", null)),
             ("mesaj", () => Create("Runly.Settings.NeonMessageDialog", "Seçili uzantı silinsin mi?", "Runly", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)),
-            ("uygulama-sec", BuildChooseApplication),
+            ("uygulama-sec", () => BuildChooseApplication(true)),
+            ("uygulama-sec-bos", () => BuildChooseApplication(false)),
+            ("sag-menu", () => BuildContextMenu(true)),
+            ("sag-menu-bos", () => BuildContextMenu(false)),
+            ("guncelleme-var", () => BuildUpdatePanel(UpdateStage.Available, 0, null)),
+            ("guncelleme-iniyor", () => BuildUpdatePanel(UpdateStage.Downloading, 42, null)),
+            ("guncelleme-hazir", () => BuildUpdatePanel(UpdateStage.Ready, 100, null)),
+            ("guncelleme-yenileniyor", () => BuildUpdatePanel(UpdateStage.Restarting, 100, null)),
+            ("guncelleme-hata", () => BuildUpdatePanel(UpdateStage.Failed, 0, "sha256 uyuşmadı.")),
+            ("ana-guncelleme", BuildMainFormWithBadge),
         };
 
         Form? current = null;
@@ -66,7 +83,7 @@ internal static class Program
         var watchdog = new Thread(() => { Thread.Sleep(TimeSpan.FromMinutes(15)); Environment.Exit(3); }) { IsBackground = true };
         watchdog.Start();
 
-        using var log = new StreamWriter(Path.Combine(s_outDir, $"olcum-{s_tag}.log"), false, new UTF8Encoding(false)) { AutoFlush = true };
+        using var log = new StreamWriter(Path.Combine(s_outDir, $"olcum-{s_tag}-{s_scale}.log"), false, new UTF8Encoding(false)) { AutoFlush = true };
         foreach (var (name, build) in screens)
         {
             if (only is not null && only != name)
@@ -97,7 +114,12 @@ internal static class Program
 
         WriteReport();
         var failures = s_findings.Count(f => f.Ratio < f.Threshold && f.State != "edilgen");
-        log.WriteLine($"ölçüm {s_findings.Count} · eşik altı {failures}");
+        foreach (var line in s_log)
+        {
+            log.WriteLine(line);
+        }
+
+        log.WriteLine($"ölçüm {s_findings.Count} · eşik altı {failures} · kararsız kare {s_log.Count}");
         Console.WriteLine($"ölçüm {s_findings.Count} · eşik altı {failures} · {s_outDir}");
         return failures == 0 ? 0 : 1;
     }
@@ -148,7 +170,7 @@ internal static class Program
         Pump();
         using (var shot = Capture(form))
         {
-            shot.Save(Path.Combine(s_outDir, $"{name}-100-{s_tag}.png"), ImageFormat.Png);
+            shot.Save(Path.Combine(s_outDir, $"{name}-{s_scale}-{s_tag}.png"), ImageFormat.Png);
         }
     }
 
@@ -255,20 +277,41 @@ internal static class Program
 
     private static void MeasureByDiff(string screen, Form form, string element, string state, Rectangle region, Action hide, Action show)
     {
-        using var withText = Capture(form);
-        hide();
-        Pump();
-        using var without = Capture(form);
-        show();
-        Pump();
+        Bitmap? withText = null;
+        Bitmap? without = null;
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            withText?.Dispose();
+            without?.Dispose();
+            withText = SettledCapture(form);
+            hide();
+            without = SettledCapture(form);
+            show();
+            using var again = SettledCapture(form);
+            if (Same(withText, again, region))
+            {
+                break;
+            }
 
-        var result = Analyse(withText, without, region, chip: false);
+            s_log.Add($"{screen} / {element} / {state}: kararsız kare, yeniden ({attempt + 1})");
+        }
+
+        using var shotA = withText!;
+        using var shotB = without!;
+        var result = Analyse(shotA, shotB, region, chip: false);
         if (result is null)
         {
             return;
         }
 
         var (fg, bg, ratio) = result.Value;
+        if (Environment.GetEnvironmentVariable("UIAUDIT_DUMP") is { Length: > 0 } dump && ratio < TextThreshold)
+        {
+            var stem = Path.Combine(dump, $"{screen}-{s_scale}-{state}-{s_findings.Count}");
+            var clip = Rectangle.Intersect(region, new Rectangle(0, 0, shotA.Width, shotA.Height));
+            using (var a = shotA.Clone(clip, shotA.PixelFormat)) { a.Save(stem + "-a.png", ImageFormat.Png); }
+            using (var b = shotB.Clone(clip, shotB.PixelFormat)) { b.Save(stem + "-b.png", ImageFormat.Png); }
+        }
         var threshold = element.StartsWith("başlık düğmesi", StringComparison.Ordinal) ? IconThreshold : TextThreshold;
         Add(screen, element, state, fg, bg, ratio, threshold, "yazı", region);
     }
@@ -512,7 +555,7 @@ internal static class Program
     private static void WriteReport()
     {
         var md = new StringBuilder();
-        md.AppendLine($"# Canlı Kontrast Ölçümü — {s_tag}");
+        md.AppendLine($"# Canlı Kontrast Ölçümü — {s_tag}, %{s_scale}");
         md.AppendLine();
         md.AppendLine("Kaynak: `tests/Runly.UiAudit` (PrintWindow ile kendi penceresinden piksel örnekleme; yazılı ve yazısız iki kare farkı).");
         md.AppendLine();
@@ -524,14 +567,14 @@ internal static class Program
                 $"| {f.Screen} | {f.Element.Replace("|", "/", StringComparison.Ordinal)} | {f.State} | {f.Kind} | {f.Fg}{TokenName(f.Fg)} | {f.Bg}{TokenName(f.Bg)} | {f.Ratio:0.00}:1 | {f.Threshold:0}:1 | {(f.Ratio >= f.Threshold ? "geçti" : f.State == "edilgen" ? "muaf" : "**KALDI**")} |"));
         }
 
-        File.WriteAllText(Path.Combine(s_outDir, $"olcum-{s_tag}.md"), md.ToString(), new UTF8Encoding(false));
+        File.WriteAllText(Path.Combine(s_outDir, $"olcum-{s_tag}-{s_scale}.md"), md.ToString(), new UTF8Encoding(false));
         var csv = new StringBuilder("ekran;oge;durum;tur;on;zemin;oran;esik\n");
         foreach (var f in s_findings)
         {
             csv.AppendLine(string.Create(CultureInfo.InvariantCulture, $"{f.Screen};{f.Element.Replace(";", ",", StringComparison.Ordinal)};{f.State};{f.Kind};{f.Fg};{f.Bg};{f.Ratio:0.00};{f.Threshold:0}"));
         }
 
-        File.WriteAllText(Path.Combine(s_outDir, $"olcum-{s_tag}.csv"), csv.ToString(), new UTF8Encoding(false));
+        File.WriteAllText(Path.Combine(s_outDir, $"olcum-{s_tag}-{s_scale}.csv"), csv.ToString(), new UTF8Encoding(false));
     }
 
     private static string TokenName(string hex)
@@ -571,7 +614,92 @@ internal static class Program
         return (Form)Resolve(type, known)!;
     }
 
-    private static Form? BuildChooseApplication()
+    private static UpdateController PreviewUpdates(UpdateStage stage, double percent, string? error)
+    {
+        var release = new ReleaseInfo(new Version(0, 3, 0, 0), "v0.3.0", "Runly-v0.3.0-win-x64.zip",
+            new Uri("https://example.test/r.zip"), null);
+        var controller = new UpdateController(new UpdateService(new HttpClient()), new Version(0, 2, 1), Path.GetTempPath(), null);
+        controller.Preview(stage, release, percent, error);
+        return controller;
+    }
+
+    private static Form BuildUpdatePanel(UpdateStage stage, double percent, string? error) =>
+        new Runly.Settings.Dialogs.UpdatePanel(PreviewUpdates(stage, percent, error));
+
+    private static Form? BuildMainFormWithBadge()
+    {
+        if (BuildMainForm() is not MainForm form)
+        {
+            return null;
+        }
+
+        form.AttachUpdates(PreviewUpdates(UpdateStage.Available, 0, null));
+        return form;
+    }
+
+    private static Form? BuildContextMenu(bool filled)
+    {
+        var config = filled ? Runly.Core.Defaults.DefaultConfig.Create() : new RunlyConfig();
+        var items = new List<Runly.Core.Shell.ContextMenuItem>();
+        if (filled)
+        {
+            items.Add(new() { Id = "static:*\\shell\\VSCode", Label = "Code İle Aç", Method = Runly.Core.Shell.MenuHideMethod.AppliesTo, Source = "Visual Studio Code", Extensions = [".js", ".ps1", ".py"], IsEditor = true, Recommended = true, Hidden = true });
+            items.Add(new() { Id = "group:idle", Label = "Edit in IDLE", Method = Runly.Core.Shell.MenuHideMethod.AppliesTo, Source = "Python", Extensions = [".py", ".pyw"], IsEditor = true, Recommended = true });
+            items.Add(new() { Id = "group:notepad++", Label = "Edit with Notepad++", Method = Runly.Core.Shell.MenuHideMethod.Blocked, Source = "Notepad++", IsEditor = true });
+            items.Add(new() { Id = "group:defender", Label = "Microsoft Defender ile tara", Method = Runly.Core.Shell.MenuHideMethod.Blocked, Source = "Windows", Recommended = true, Note = "Defender'ın gerçek zamanlı koruması kapalı; bu girdi iş görmüyor." });
+            items.Add(new() { Id = "clsid:{EE15C2BD-CECB-49F8-A113-CA1BFC528F5B}", Label = "DriveFS ContextMenu Handler", Method = Runly.Core.Shell.MenuHideMethod.Blocked, Source = "Google Drive", Manageable = false, ConfigureTarget = "ms-settings:appsfeatures" });
+        }
+
+        var selected = items.Where(i => i.Hidden).Select(i => i.Id).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var everywhere = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        return Create("Runly.Settings.Dialogs.ContextMenuDialog", items, selected, everywhere, config);
+    }
+
+    private static void ApplyScale(int percent)
+    {
+        var factor = percent / 100f;
+        var palette = typeof(Palette);
+        System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(palette.TypeHandle);
+        foreach (var field in palette.GetFields(Any).Where(f => f.IsStatic && f.FieldType == typeof(Font)))
+        {
+            var font = (Font)field.GetValue(null)!;
+            SetStatic(field, new Font(font.FontFamily, font.Size * factor, font.Style, font.Unit));
+        }
+
+        var metrics = typeof(Metrics);
+        metrics.GetField("s_dpi", Any)!.SetValue(null, (int)Math.Round(96 * factor));
+        metrics.GetField("s_dpiKnown", Any)!.SetValue(null, true);
+        metrics.GetMethod("Prepare", Any)!.Invoke(null, null);
+        metrics.GetField("s_measurementRatio", Any)!.SetValue(null, 1f);
+        ((System.Collections.IDictionary)metrics.GetField("LineHeights", Any)!.GetValue(null)!).Clear();
+
+        void Set(string name, int value) => metrics.GetField(name, Any)!.SetValue(null, value);
+        Set("s_buttonHeight", Metrics.Row(Palette.Body, 13));
+        Set("s_buttonMinHeight", Metrics.Row(Palette.Body, 11));
+        var captionItem = Math.Max(Metrics.Px(24), Metrics.Row(Palette.Body, 10));
+        Set("s_captionItemHeight", captionItem);
+        Set("s_captionHeight", Math.Max(Math.Max(Metrics.Line(Palette.Body), Metrics.Line(Palette.CaptionGlyph)), captionItem) + Metrics.Px(14));
+        Set("s_sectionLabelHeight", Metrics.Row(Palette.LabelFont, 8));
+        Set("s_textBoxHeight", Metrics.Row(Palette.MonoBody, 13));
+        Set("s_groupTitleBand", Metrics.Row(Palette.H3, 15));
+        Set("s_gridRowHeight", Metrics.Row(Palette.MonoBody, 16));
+        Set("s_gridHeaderHeight", Metrics.Row(Palette.H3, 16));
+        Set("s_categoryRowHeight", Math.Max(Metrics.Px(20), Metrics.Line(Palette.Body)) + Metrics.Px(14));
+        Set("s_radioRowHeight", Metrics.Row(Palette.Body, 13));
+    }
+
+    private static void SetStatic(FieldInfo field, object value)
+    {
+        var method = new System.Reflection.Emit.DynamicMethod("set_" + field.Name, null, [typeof(object)], field.DeclaringType!, true);
+        var il = method.GetILGenerator();
+        il.Emit(System.Reflection.Emit.OpCodes.Ldarg_0);
+        il.Emit(System.Reflection.Emit.OpCodes.Castclass, field.FieldType);
+        il.Emit(System.Reflection.Emit.OpCodes.Stsfld, field);
+        il.Emit(System.Reflection.Emit.OpCodes.Ret);
+        ((Action<object>)method.CreateDelegate(typeof(Action<object>)))(value);
+    }
+
+    private static Form? BuildChooseApplication(bool filled)
     {
         var type = typeof(Palette).Assembly.GetType("Runly.Settings.Dialogs.ChooseApplicationDialog");
         var appType = typeof(Palette).Assembly.GetType("Runly.Settings.Discovery.InstalledApplication");
@@ -582,14 +710,17 @@ internal static class Program
 
         var listType = typeof(List<>).MakeGenericType(appType);
         var apps = (System.Collections.IList)Activator.CreateInstance(listType)!;
-        apps.Add(Activator.CreateInstance(appType, "code.exe", "Visual Studio Code", @"C:\Program Files\Microsoft VS Code\Code.exe", "uiaudit"));
-        apps.Add(Activator.CreateInstance(appType, "notepad.exe", "Not Defteri", @"C:\Windows\System32\notepad.exe", "uiaudit"));
+        if (filled)
+        {
+            apps.Add(Activator.CreateInstance(appType, "code.exe", "Visual Studio Code", @"C:\Program Files\Microsoft VS Code\Code.exe", "uiaudit"));
+            apps.Add(Activator.CreateInstance(appType, "notepad.exe", "Not Defteri", @"C:\Windows\System32\notepad.exe", "uiaudit"));
+        }
         var ctor = type.GetConstructors(Any).OrderByDescending(c => c.GetParameters().Length).First();
         var values = ctor.GetParameters().Select(p => p.Name switch
         {
             "extension" => ".py",
             "applications" => apps,
-            "suggestedExecutables" => new List<string> { "code.exe" },
+            "suggestedExecutables" => filled ? new List<string> { "code.exe" } : new List<string>(),
             "currentPath" => null,
             "usageHistory" => new List<string>(),
             _ when p.ParameterType.IsEnum => Enum.GetValues(p.ParameterType).GetValue(0),
@@ -768,6 +899,30 @@ internal static class Program
         var origin = form.PointToScreen(Point.Empty);
         client.Offset(origin.X - form.Left, origin.Y - form.Top);
         return client;
+    }
+
+    private static Bitmap SettledCapture(Form form)
+    {
+        Pump();
+        form.Refresh();
+        Pump();
+        return Capture(form);
+    }
+
+    private static bool Same(Bitmap a, Bitmap b, Rectangle region)
+    {
+        var x = Pixels(a, region);
+        var y = Pixels(b, region);
+        var changed = 0;
+        for (var i = 0; i < x.Count && i < y.Count; i++)
+        {
+            if (x[i].ToArgb() != y[i].ToArgb())
+            {
+                changed++;
+            }
+        }
+
+        return changed <= 2;
     }
 
     private static Bitmap Capture(Form form)

@@ -69,7 +69,7 @@ public sealed class ShellRegistrarTests : IDisposable
     }
 
     [Fact]
-    public void Install_writes_the_whole_ProgID_tree_with_all_four_verbs()
+    public void Install_writes_the_whole_ProgID_tree_with_two_verbs()
     {
         SeedTargetMachineInterpreters();
         NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
@@ -83,16 +83,94 @@ public sealed class ShellRegistrarTests : IDisposable
 
         Assert.Equal("\"C:\\Program Files\\Runly\\RunlyConsole.exe\" \"%1\" %*",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\open\command", "")!.AsString());
-        Assert.Equal("\"C:\\Program Files\\Runly\\RunlyConsole.exe\" --verb runas \"%1\" %*",
-            _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\runas\command", "")!.AsString());
+        // K31: elevation is a setting now, so there is no second verb for it.
+        Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, progId + @"\shell\runas"));
         // "Düzenle" hands the file to the editor and returns, so it uses the GUI binary even on a Run
         // mapping; the console binary would flash a black window for a verb that never writes to it.
         Assert.Equal("\"C:\\Program Files\\Runly\\Runly.exe\" --verb edit \"%1\"",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\edit\command", "")!.AsString());
-        Assert.Equal("\"C:\\Program Files\\Runly\\RunlyConsole.exe\" --verb prompt-args \"%1\"",
-            _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\runlyargs\command", "")!.AsString());
-        Assert.Equal("Runly ile argümanlarla çalıştır…",
-            _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\runlyargs", "MUIVerb")!.AsString());
+        Assert.Equal("Runly: Düzenle (Code)",
+            _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\edit", "MUIVerb")!.AsString());
+        Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, progId + @"\shell\runlyargs"));
+    }
+
+    [Fact]
+    public void The_admin_setting_decides_the_double_click_command()
+    {
+        SeedTargetMachineInterpreters();
+        var config = TargetMachineConfig() with { RunAsAdmin = true };
+        config.Extensions[".py"] = config.Extensions[".py"] with { RunAsAdmin = false };
+
+        NewRegistrar().Install(config, ExePath, ConsoleExePath);
+
+        Assert.Equal("\"C:\\Program Files\\Runly\\RunlyConsole.exe\" --verb runas \"%1\" %*", _registry
+            .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Runly.Script.js\shell\open\command", "")!.AsString());
+        Assert.Equal("Runly ile yönetici olarak çalıştır", _registry
+            .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Runly.Script.js\shell\open", "MUIVerb")!.AsString());
+
+        Assert.Equal("\"C:\\Program Files\\Runly\\RunlyConsole.exe\" \"%1\" %*", _registry
+            .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Runly.Script.py\shell\open\command", "")!.AsString());
+    }
+
+    [Fact]
+    public void The_edit_verb_names_the_editor()
+    {
+        SeedTargetMachineInterpreters();
+        var config = TargetMachineConfig() with { EditorCommand = @"C:\Program Files\Notepad++\notepad++.exe" };
+
+        NewRegistrar().Install(config, ExePath, ConsoleExePath);
+
+        Assert.Equal("Runly: Düzenle (Notepad++)", _registry
+            .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Runly.Script.js\shell\edit", "MUIVerb")!.AsString());
+    }
+
+    [Fact]
+    public void Uninstall_puts_back_the_menu_entries_install_hid()
+    {
+        SeedTargetMachineInterpreters();
+        _registry.Seed(RegistryRoot.ClassesRoot, @"*\shell\VSCode\command", "", "\"C:\\VS Code\\Code.exe\" \"%1\"");
+        var cleaner = new ContextMenuCleaner(_registry, new ContextMenuScanner(_registry, _ => null, _ => null));
+        var registrar = new ShellRegistrar(_registry, _paths, new RegistryBackup(_registry, _backupDir), _notifier, _handlers, cleaner);
+
+        Assert.True(registrar.Install(TargetMachineConfig(), ExePath, ConsoleExePath).Success);
+        Assert.NotNull(_registry.GetValue(RegistryRoot.CurrentUser, @"Software\Classes\*\shell\VSCode", "AppliesTo"));
+
+        Assert.True(registrar.Uninstall().Success);
+        Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, @"Software\Classes\*\shell\VSCode"));
+        Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, ContextMenuCleaner.LedgerKey));
+    }
+
+    [Fact]
+    public void Reinstall_drops_verbs_an_older_version_left_behind()
+    {
+        SeedTargetMachineInterpreters();
+        const string progId = @"Software\Classes\Runly.Script.js";
+        _registry.Seed(RegistryRoot.CurrentUser, progId + @"\shell\runlyargs", "MUIVerb", "Runly ile argümanlarla çalıştır…");
+        _registry.Seed(RegistryRoot.CurrentUser, progId + @"\shell\runlyargs\command", "", "old");
+
+        NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
+
+        Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, progId + @"\shell\runlyargs"));
+        Assert.True(_registry.KeyExists(RegistryRoot.CurrentUser, progId + @"\shell\edit\command"));
+    }
+
+    [Fact]
+    public void Install_unbinds_an_extension_that_was_switched_off()
+    {
+        SeedTargetMachineInterpreters();
+        const string progId = @"Software\Classes\Runly.Script.pl";
+        _registry.Seed(RegistryRoot.CurrentUser, progId + @"\shell\open\command", "", "old");
+        _registry.Seed(RegistryRoot.CurrentUser, progId + @"\shell\runlyargs\command", "", "old");
+        _registry.Seed(RegistryRoot.CurrentUser, @"Software\Classes\.pl", "", "Runly.Script.pl");
+        _registry.Seed(RegistryRoot.CurrentUser, @"Software\Classes\.pl\OpenWithProgids", "Runly.Script.pl", "");
+        var config = TargetMachineConfig();
+        config.Extensions[".pl"] = new() { Interpreter = "perl", Enabled = false };
+
+        NewRegistrar().Install(config, ExePath, ConsoleExePath);
+
+        Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, progId));
+        Assert.Null(_registry.GetValue(RegistryRoot.CurrentUser, @"Software\Classes\.pl", ""));
+        Assert.Null(_registry.GetValue(RegistryRoot.CurrentUser, @"Software\Classes\.pl\OpenWithProgids", "Runly.Script.pl"));
     }
 
     [Fact]

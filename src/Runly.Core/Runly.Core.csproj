@@ -11,4 +11,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
+  <Import Project="Theme\TeknesyumTokens.targets" />
+
 </Project>

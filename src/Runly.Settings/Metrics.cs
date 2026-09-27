@@ -306,19 +306,19 @@ internal static class Metrics
 
         s_buttonHeight = Row(Palette.Body, 13);
         s_buttonMinHeight = Row(Palette.Body, 11);
-        s_captionItemHeight = Math.Max(Px(24), Row(Palette.Body, 10));
-        s_captionHeight = Math.Max(Math.Max(Line(Palette.Body), Line(Palette.CaptionGlyph)), s_captionItemHeight) + Px(14);
+        s_captionItemHeight = Math.Max(Px(TeknesyumTokens.TargetMin), Line(Palette.Body) + Px(TeknesyumTokens.Space1));
+        s_captionHeight = Math.Max(Px(TeknesyumTokens.TitlebarHMax), Math.Max(Math.Max(Line(Palette.Body), Line(Palette.CaptionGlyph)), s_captionItemHeight) + Px(TeknesyumTokens.Space1));
         s_sectionLabelHeight = Row(Palette.LabelFont, 8);
         s_textBoxHeight = Row(Palette.MonoBody, 13);
         s_groupTitleBand = Row(Palette.H3, 15);
         s_gridRowHeight = Row(Palette.MonoBody, 16);
         s_gridHeaderHeight = Row(Palette.H3, 16);
-        s_categoryIconSize = Px(20);
-        s_categoryRowHeight = Math.Max(s_categoryIconSize, Line(Palette.Body)) + Px(14);
+        s_categoryIconSize = Px(TeknesyumTokens.Icon3);
+        s_categoryRowHeight = Math.Max(s_categoryIconSize, Line(Palette.Body)) + Px(TeknesyumTokens.Space3);
         s_radioRowHeight = Row(Palette.Body, 13);
         s_captionButtonWidth = Px(52);
-        s_captionIconSize = Px(16);
-        s_windowCornerRadius = Px(12);
+        s_captionIconSize = Px(TeknesyumTokens.Icon2);
+        s_windowCornerRadius = Px(TeknesyumTokens.ShapeRWindow);
         s_resizeBorder = Px(7);
     }
 }

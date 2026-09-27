@@ -16,17 +16,17 @@ namespace Runly.Settings;
 /// yüksekliklerini de taşır.
 internal static class Palette
 {
-    public static readonly Color NeonBlue = ColorTranslator.FromHtml(TeknesyumTokens.NeonBlue);
-    public static readonly Color NeonPink = ColorTranslator.FromHtml(TeknesyumTokens.NeonPink);
-    public static readonly Color NeonPurple = ColorTranslator.FromHtml(TeknesyumTokens.NeonPurple);
+    public static readonly Color Renk1 = ColorTranslator.FromHtml(TeknesyumTokens.Renk1);
+    public static readonly Color Renk2 = ColorTranslator.FromHtml(TeknesyumTokens.Renk2);
+    public static readonly Color Renk3 = ColorTranslator.FromHtml(TeknesyumTokens.Renk3);
     public static readonly Color Success = ColorTranslator.FromHtml(TeknesyumTokens.Success);
 
     /// <summary>Pembenin metin rolü. Dolgu hex'i siyah üstünde 6.44:1 verir, yani okunan hiçbir şeyde
     /// kullanılamaz; bu 7.72:1.</summary>
-    public static readonly Color PinkText = ColorTranslator.FromHtml(TeknesyumTokens.PinkText);
+    public static readonly Color Renk2Text = ColorTranslator.FromHtml(TeknesyumTokens.Renk2Text);
 
     /// <summary>Morun metin rolü. Dolgu hex'i 4.57:1, bu 7.83:1.</summary>
-    public static readonly Color PurpleText = ColorTranslator.FromHtml(TeknesyumTokens.PurpleText);
+    public static readonly Color Renk3Text = ColorTranslator.FromHtml(TeknesyumTokens.Renk3Text);
 
     /// <summary>Yalnız uyarı yüzeyi: metin, çerçeve, ikon. Dolgu ve buton yok — amber dolgu üstünde
     /// beyaz metin 1.67:1'e düşer.</summary>
@@ -39,10 +39,10 @@ internal static class Palette
     /// değil çerçevesiyle ayrılır, o yüzden yüzey rengiyle aynıdır.</summary>
     public static readonly Color FieldBg = Surface;
 
-    /// <summary>Seçili satır ve seçili liste öğesi: neon-blue /30, opak karıştırılmış.</summary>
+    /// <summary>Seçili satır ve seçili liste öğesi: renk-1 /30, opak karıştırılmış.</summary>
     public static readonly Color SelectedFill = ColorTranslator.FromHtml(TeknesyumTokens.SelectedFill);
 
-    /// <summary>Izgara ayraç çizgisi: neon-blue /10, opak karıştırılmış. Dekoratif — eşik yok.</summary>
+    /// <summary>Izgara ayraç çizgisi: renk-1 /10, opak karıştırılmış. Dekoratif — eşik yok.</summary>
     public static readonly Color GridLine = ColorTranslator.FromHtml(TeknesyumTokens.GridLine);
 
     // Everything meant to be read is pure white. The old ramp (#D1D5DB → #4B5563) dimmed secondary
@@ -56,7 +56,7 @@ internal static class Palette
     public static readonly Color TextHint = TextStrong;
 
     /// <summary>Labels and section headings: bold, tracked, neon — never a dimmed grey.</summary>
-    public static readonly Color TextLabel = NeonBlue;
+    public static readonly Color TextLabel = Renk1;
 
     /// <summary>The one grey in the theme. Placeholder and genuinely inactive content only.</summary>
     public static readonly Color Disabled = ColorTranslator.FromHtml(TeknesyumTokens.Disabled);
@@ -78,24 +78,23 @@ internal static class Palette
 
     private static readonly InstalledFontCollection s_installed = new();
 
-    public static readonly FontFamily SansFamily = ResolveFamily("Atkinson Hyperlegible Next", "Segoe UI");
-    public static readonly FontFamily MonoFamily = ResolveFamily("Cascadia Mono", "Consolas");
+    public static readonly FontFamily SansFamily = ResolveFamily(TeknesyumTokens.SansChain);
+    public static readonly FontFamily MonoFamily = ResolveFamily(TeknesyumTokens.MonoChain);
 
-    // Scale is the standard's five steps — 14 / 16 / 20 / 24 / 30 design pixels. At 96 dpi a point is
-    // 4/3 of a pixel, so the sizes below are that scale in points: 10.5 / 12 / 15 / 18 / 22.5. Nothing
-    // sits between two steps and nothing drops under 14px. WinForms has no 600 weight (FontStyle knows
-    // only Regular and Bold) and no letter spacing, so headings stay Bold and the whole hierarchy is
-    // carried by size: 24 → 20 → 16 → 14.
-    public static readonly Font H2 = new(SansFamily, 18f, FontStyle.Bold);
-    public static readonly Font H3 = new(SansFamily, 15f, FontStyle.Bold);
-    public static readonly Font LabelFont = new(SansFamily, 10.5f, FontStyle.Bold);
-    public static readonly Font Body = new(SansFamily, 12f);
-    public static readonly Font Help = new(SansFamily, 10.5f);
-    public static readonly Font Mono = new(MonoFamily, 12f, FontStyle.Bold);
-    public static readonly Font MonoBody = new(MonoFamily, 10.5f);
-    public static readonly Font Hero = new(MonoFamily, 22.5f, FontStyle.Bold);
+    // The token type scale is in design pixels; at 96 dpi a point is 4/3 of a pixel. WinForms has no 600
+    // weight and no letter spacing, so headings stay Bold and the hierarchy is carried by size.
+    private static float Pt(int designPixels) => designPixels * 0.75f;
+
+    public static readonly Font H2 = new(SansFamily, Pt(TeknesyumTokens.Fs4), FontStyle.Bold);
+    public static readonly Font H3 = new(SansFamily, Pt(TeknesyumTokens.Fs3), FontStyle.Bold);
+    public static readonly Font LabelFont = new(SansFamily, Pt(TeknesyumTokens.Fs1), FontStyle.Bold);
+    public static readonly Font Body = new(SansFamily, Pt(TeknesyumTokens.Fs2));
+    public static readonly Font Help = new(SansFamily, Pt(TeknesyumTokens.Fs1));
+    public static readonly Font Mono = new(MonoFamily, Pt(TeknesyumTokens.Fs2), FontStyle.Bold);
+    public static readonly Font MonoBody = new(MonoFamily, Pt(TeknesyumTokens.Fs1));
+    public static readonly Font Hero = new(MonoFamily, Pt(TeknesyumTokens.Fs5), FontStyle.Bold);
     /// Caption glyphs are strokes, not letters: below ~12pt they anti-alias into grey mush.
-    public static readonly Font CaptionGlyph = new(SansFamily, 12f);
+    public static readonly Font CaptionGlyph = new(SansFamily, Pt(TeknesyumTokens.Fs2));
 
     private static PrivateFontCollection LoadEmbeddedFonts()
     {

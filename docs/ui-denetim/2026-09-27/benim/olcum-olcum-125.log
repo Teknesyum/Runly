@@ -1,0 +1,220 @@
+ana: 1850x1250 dpi=96 metrics=120
+  07:58:15.369 tablo  34
+  07:58:18.265 NeonGroupPanel Ayrıntılar
+  07:58:19.168 Label Bir satır seçtiğinizde ayrıntılar burada…
+  07:58:20.104 Label Uzantı ara
+  07:58:21.035 NeonButton Temizle
+  07:58:25.575 Label Örnek: .md, markdown ya da notepad
+  07:58:26.432 NeonButton Kategoriyi bu uygulamayla aç
+  07:58:30.939 NeonButton Tümünü seç
+  07:58:35.351 NeonButton Uzantı ekle
+  07:58:39.756 NeonButton Seçili uzantıyı sil
+  07:58:44.162 NeonButton Profili dışa aktar
+  07:58:48.592 NeonButton Profili içe aktar
+  07:58:52.979 NeonButton Uygulama seç…
+  07:58:57.357 NeonGroupPanel Güvenlik
+  07:58:58.322 NeonRadioButton Her seferinde sor
+  07:59:00.109 NeonRadioButton İlk seferde sor, sonra güven
+  07:59:01.843 NeonRadioButton Hiç sorma
+  07:59:03.568 Label Güvenilen klasörler
+  07:59:04.460 NeonButton Ekle
+  07:59:08.872 NeonButton Çıkar
+  07:59:13.272 Label Güvenilen dosyalar: 0 adet
+  07:59:14.172 NeonButton Tümünü temizle
+  07:59:18.660 NeonGroupPanel Davranış
+  07:59:19.614 Label Pencereyi açık tut
+  07:59:20.491 NeonRadioButton Her zaman
+  07:59:22.249 NeonRadioButton Sadece hata olursa
+  07:59:24.035 NeonRadioButton Hiçbir zaman
+  07:59:25.765 Label Düzenleyici komutu
+  07:59:26.609 NeonTextBox code
+  07:59:28.446 NeonButton Seç…
+  07:59:32.825 NeonButton Test et
+  07:59:37.202 NeonCheckBox Günlük tut
+  07:59:38.964 NeonCheckBox Betikleri yönetici olarak çalıştır
+  07:59:40.768 NeonButton Günlük klasörünü aç
+  07:59:45.907 NeonButton Kapat
+  07:59:50.373 NeonButton Yenile
+  07:59:54.808 NeonButton Kaydet
+  07:59:59.202 NeonButton Sağ menü…
+  08:00:03.637 NeonButton Yedekten geri yükle
+  08:00:08.086 NeonButton Kaldır
+  08:00:12.477 NeonButton Kur / Güncelle
+uzanti-ekle: 525x313 dpi=96 metrics=120
+  08:00:18.991 Label Uzantı:
+  08:00:19.582 Label Yorumlayıcı:
+  08:00:20.146 Label Argümanlar:
+  08:00:20.736 NeonTextBox "{script}" {args}
+  08:00:21.952 Label Örnek: uzantı .rb, yorumlayıcı ruby
+  08:00:22.518 NeonButton Vazgeç
+  08:00:25.500 NeonButton Ekle
+kaldir-onay: 525x371 dpi=96 metrics=120
+  08:00:30.397 Label Runly'yi sistemden kaldırmak istediğiniz…
+  08:00:30.940 NeonCheckBox Yedeği de geri yükle
+  08:00:32.062 Label Kapalı bırakırsanız bu uzantılar ilişkis…
+  08:00:32.623 NeonButton Vazgeç
+  08:00:35.574 NeonButton Kaldır
+yedek-geri: 650x400 dpi=96 metrics=120
+  08:00:40.332 NeonButton Vazgeç
+  08:00:43.329 NeonButton Geri yükle
+sonuc-basari: 675x450 dpi=96 metrics=120
+  08:00:48.422 NeonTextBox .py bağlandı  .ps1 bağlandı
+  08:00:49.717 Label ✅ İşlem tamamlandı.
+  08:00:50.296 NeonButton Kapat
+sonuc-uyari: 675x450 dpi=96 metrics=120
+  08:00:55.362 NeonTextBox .py bağlandı
+  08:00:56.590 Label ⚠ Gezgin yeniden başlatılmalı.
+  08:00:57.167 NeonButton Kapat
+sonuc-hata: 675x450 dpi=96 metrics=120
+  08:01:02.146 NeonTextBox     Hata: Kayıt defterine yazılamadı.
+  08:01:03.389 Label ❌ İşlem başarısız oldu.
+  08:01:03.964 NeonButton Kapat
+mesaj: 538x338 dpi=96 metrics=120
+  08:01:08.850 NeonGroupPanel Dikkat
+  08:01:09.397 Label Seçili uzantı silinsin mi?
+  08:01:09.957 NeonButton Hayır
+  08:01:12.864 NeonButton Evet
+uygulama-sec: 750x700 dpi=96 metrics=120
+  08:01:18.244 Label .py dosyaları hangi yorumlayıcıyla çalış…
+  08:01:18.917 Label Uygulama ara
+  08:01:19.545 Label Örnek: notepad
+  08:01:20.167 Label Windows bu uygulamayı öneriyor.
+  08:01:20.836 NeonButton Seç
+  08:01:24.685 NeonButton Vazgeç
+  08:01:28.558 NeonButton Gözat…
+uygulama-sec-bos: 750x700 dpi=96 metrics=120
+  08:01:34.245 Label .py dosyaları hangi yorumlayıcıyla çalış…
+  08:01:35.010 Label Uygulama ara
+  08:01:35.679 Label Örnek: notepad
+  08:01:36.288 Label Windows bu uygulamayı öneriyor.
+  08:01:36.941 NeonButton Seç
+  08:01:40.878 NeonButton Vazgeç
+  08:01:44.163 NeonButton Gözat…
+sag-menu: 900x775 dpi=96 metrics=120
+  08:01:49.651 Label Seçtiğin türde sağ tık menüsünün nasıl g…
+  08:01:50.288 Label Dosya türü
+  08:01:50.926 NeonComboBox .cjs
+  08:01:52.360 Label Yönetici olarak çalıştır
+  08:01:53.042 NeonComboBox Genel ayara uy (Hayır)
+  08:01:54.508 Label Runly ile çalıştır
+  08:01:55.163 Label Runly: Düzenle (Code)
+  08:01:55.849 Label Edit with Notepad++
+  08:01:56.592 Label Microsoft Defender ile tara
+  08:01:57.235 Label DriveFS ContextMenu Handler
+  08:01:57.935 NeonCheckBox Code İle Aç
+  08:01:59.236 Label Yalnız Runly türlerinde (.js, .ps1, .py)…
+  08:01:59.873 NeonCheckBox Her dosya türünden kaldır
+  08:02:01.183 NeonCheckBox Edit in IDLE
+  08:02:02.550 Label Yalnız Runly türlerinde (.py, .pyw) · Ru…
+  08:02:03.165 NeonCheckBox Her dosya türünden kaldır
+  08:02:03.789 NeonCheckBox Edit with Notepad++
+  08:02:05.099 Label Tüm dosyalarda — Explorer yeniden başlar…
+  08:02:05.706 NeonCheckBox Microsoft Defender ile tara
+  08:02:06.969 Label Tüm dosyalarda — Explorer yeniden başlar…
+  08:02:07.063 Label DriveFS ContextMenu Handler
+  08:02:07.171 Label Tüm dosyalarda — Explorer yeniden başlar…
+  08:02:07.278 NeonButton Ayarına git
+  08:02:07.851 Label Listede olmayanlar (WinRAR, 7-Zip, Defen…
+  08:02:08.474 NeonButton Vazgeç
+  08:02:11.700 NeonButton Uygula
+  08:02:14.938 NeonButton Önerilene dön
+  08:02:18.343 NeonButton Yüklü uygulamalar…
+sag-menu-bos: 900x775 dpi=96 metrics=120
+  08:02:23.797 Label Seçtiğin türde sağ tık menüsünün nasıl g…
+  08:02:24.437 Label Dosya türü
+  08:02:25.108 Label Yönetici olarak çalıştır
+  08:02:25.777 NeonComboBox Genel ayara uy (Hayır)
+  08:02:26.447 Label Runly ile çalışan dosya türü yok; önce a…
+  08:02:27.192 Label Runly türlerinde gizlenebilecek başka öğ…
+  08:02:27.800 Label Listede olmayanlar (WinRAR, 7-Zip, Defen…
+  08:02:28.438 NeonButton Vazgeç
+  08:02:32.196 NeonButton Uygula
+  08:02:35.431 NeonButton Önerilene dön
+  08:02:38.748 NeonButton Yüklü uygulamalar…
+guncelleme-var: 550x308 dpi=96 metrics=120
+  08:02:44.589 Label Yeni sürüm yayımlandı, indirmek ister mi…
+  08:02:45.149 Label Yeni sürüm
+  08:02:45.758 Label v0.3.0
+  08:02:46.351 NeonButton Kapat
+  08:02:49.239 NeonButton İndir
+  08:02:52.160 NeonButton İndir ve yükle
+guncelleme-iniyor: 550x308 dpi=96 metrics=120
+  08:02:57.211 Label Yeni sürüm iniyor, çalışmana devam edebi…
+  08:02:57.766 Label Yeni sürüm
+  08:02:58.310 Label v0.3.0
+  08:02:58.915 Label %42
+  08:02:59.491 NeonButton Kapat
+  08:03:02.770 NeonButton İptal
+guncelleme-hazir: 550x308 dpi=96 metrics=120
+  08:03:07.864 Label Yeni sürüm indi, yüklemeye hazır.
+  08:03:08.408 Label Yeni sürüm
+  08:03:08.982 Label v0.3.0
+  08:03:09.512 Label %100
+  08:03:10.089 NeonButton Kapat
+  08:03:13.226 NeonButton Yükle
+guncelleme-yenileniyor: 550x308 dpi=96 metrics=120
+  08:03:18.231 Label Yeni sürüm geldi, program yenileniyor…
+  08:03:18.803 Label Yeni sürüm
+  08:03:19.348 Label v0.3.0
+  08:03:19.910 Label %100
+guncelleme-hata: 550x308 dpi=96 metrics=120
+  08:03:22.404 Label Güncelleme yarıda kaldı: sha256 uyuşmadı…
+  08:03:23.022 Label Yeni sürüm
+  08:03:23.581 Label v0.3.0
+  08:03:24.111 NeonButton Kapat
+  08:03:27.427 NeonButton İndir
+  08:03:30.385 NeonButton İndir ve yükle
+ana-guncelleme: 1850x1250 dpi=96 metrics=120
+  08:03:37.005 tablo  34
+  08:03:39.760 NeonGroupPanel Ayrıntılar
+  08:03:40.628 Label Bir satır seçtiğinizde ayrıntılar burada…
+  08:03:41.486 Label Uzantı ara
+  08:03:42.341 NeonButton Temizle
+  08:03:46.625 Label Örnek: .md, markdown ya da notepad
+  08:03:47.527 NeonButton Kategoriyi bu uygulamayla aç
+  08:03:51.769 NeonButton Tümünü seç
+  08:03:56.174 NeonButton Uzantı ekle
+  08:04:00.441 NeonButton Seçili uzantıyı sil
+  08:04:04.648 NeonButton Profili dışa aktar
+  08:04:09.045 NeonButton Profili içe aktar
+  08:04:13.355 NeonButton Uygulama seç…
+  08:04:17.696 NeonGroupPanel Güvenlik
+  08:04:18.709 NeonRadioButton Her seferinde sor
+  08:04:20.401 NeonRadioButton İlk seferde sor, sonra güven
+  08:04:22.114 NeonRadioButton Hiç sorma
+  08:04:23.937 Label Güvenilen klasörler
+  08:04:24.808 NeonButton Ekle
+  08:04:29.118 NeonButton Çıkar
+  08:04:33.548 Label Güvenilen dosyalar: 0 adet
+  08:04:34.403 NeonButton Tümünü temizle
+  08:04:38.949 NeonGroupPanel Davranış
+  08:04:39.927 Label Pencereyi açık tut
+  08:04:40.869 NeonRadioButton Her zaman
+  08:04:43.128 NeonRadioButton Sadece hata olursa
+  08:04:45.374 NeonRadioButton Hiçbir zaman
+  08:04:47.196 Label Düzenleyici komutu
+  08:04:48.153 NeonTextBox code
+  08:04:51.554 NeonButton Seç…
+  08:04:56.192 NeonButton Test et
+  08:05:00.783 NeonCheckBox Günlük tut
+  08:05:02.561 NeonCheckBox Betikleri yönetici olarak çalıştır
+  08:05:04.307 NeonButton Günlük klasörünü aç
+  08:05:08.768 NeonButton Kapat
+  08:05:14.074 NeonButton Yenile
+  08:05:18.617 NeonButton Kaydet
+  08:05:23.040 NeonButton Sağ menü…
+  08:05:27.555 NeonButton Yedekten geri yükle
+  08:05:32.934 NeonButton Kaldır
+  08:05:39.475 NeonButton Kur / Güncelle
+ana / NeonButton: Günlük klasörünü aç / edilgen: kararsız kare, yeniden (1)
+uygulama-sec / NeonButton: Seç / hover: kararsız kare, yeniden (1)
+uygulama-sec / NeonButton: Vazgeç / odak: kararsız kare, yeniden (1)
+uygulama-sec-bos / NeonButton: Seç / edilgen: kararsız kare, yeniden (1)
+sag-menu-bos / NeonButton: Vazgeç / hover: kararsız kare, yeniden (1)
+sag-menu-bos / NeonButton: Yüklü uygulamalar… / odak: kararsız kare, yeniden (1)
+guncelleme-iniyor / NeonButton: Kapat / hover: kararsız kare, yeniden (1)
+guncelleme-hata / NeonButton: Kapat / dinlenik: kararsız kare, yeniden (1)
+ana-guncelleme / NeonButton: Kapat / basılı: kararsız kare, yeniden (1)
+ana-guncelleme / NeonButton: Yedekten geri yükle / edilgen: kararsız kare, yeniden (1)
+ana-guncelleme / NeonButton: Kaldır / dinlenik: kararsız kare, yeniden (1)
+ölçüm 650 · eşik altı 0 · kararsız kare 11

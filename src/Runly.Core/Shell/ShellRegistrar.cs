@@ -16,6 +16,7 @@ public sealed class ShellRegistrar : IShellRegistrar
     private readonly IShellNotifier _notifier;
     private readonly UserChoiceInspector _userChoice;
     private readonly IEffectiveHandlerQuery _effectiveHandler;
+    private readonly ContextMenuCleaner? _menuCleaner;
 
     /// <summary>Creates a registrar over explicit collaborators; this is the constructor tests use.</summary>
     public ShellRegistrar(
@@ -23,8 +24,10 @@ public sealed class ShellRegistrar : IShellRegistrar
         IPathSearcher pathSearcher,
         RegistryBackup backup,
         IShellNotifier notifier,
-        IEffectiveHandlerQuery? effectiveHandler = null)
+        IEffectiveHandlerQuery? effectiveHandler = null,
+        ContextMenuCleaner? menuCleaner = null)
     {
+        _menuCleaner = menuCleaner;
         ArgumentNullException.ThrowIfNull(registry);
         ArgumentNullException.ThrowIfNull(pathSearcher);
         ArgumentNullException.ThrowIfNull(backup);
@@ -40,13 +43,14 @@ public sealed class ShellRegistrar : IShellRegistrar
 
     /// <summary>Creates a registrar wired to the real registry, the real backup folder and Explorer.</summary>
     [SupportedOSPlatform("windows")]
-    public ShellRegistrar(IPathSearcher pathSearcher)
+    public ShellRegistrar(IPathSearcher pathSearcher, ContextMenuCleaner? menuCleaner = null)
         : this(
             new Win32RegistryAccessor(),
             pathSearcher,
             new RegistryBackup(new Win32RegistryAccessor()),
             new Win32ShellNotifier(),
-            new Win32EffectiveHandlerQuery())
+            new Win32EffectiveHandlerQuery(),
+            menuCleaner)
     {
     }
 
@@ -71,6 +75,7 @@ public sealed class ShellRegistrar : IShellRegistrar
 
             // 1. Work out which extensions can actually be installed.
             var candidates = new List<(string Extension, ExtensionMapping Mapping, string InterpreterPath)>();
+            var disabled = new List<string>();
 
             foreach (var (rawExtension, mapping) in config.Extensions.OrderBy(e => e.Key, StringComparer.OrdinalIgnoreCase))
             {
@@ -79,6 +84,7 @@ public sealed class ShellRegistrar : IShellRegistrar
                 if (!mapping.Enabled)
                 {
                     skipped.Add(new SkippedExtension { Extension = extension, Reason = "Ayarlarda kapalı." });
+                    disabled.Add(extension);
                     continue;
                 }
 
@@ -115,7 +121,7 @@ public sealed class ShellRegistrar : IShellRegistrar
                 RunlyRegistryLayout.VendorKey,
                 RunlyRegistryLayout.RegisteredApplicationsKey,
             };
-            foreach (var (extension, _, _) in candidates)
+            foreach (var extension in candidates.Select(c => c.Extension).Concat(disabled))
             {
                 backupKeys.Add(RunlyRegistryLayout.ProgIdKey(extension));
                 backupKeys.Add(RunlyRegistryLayout.ExtensionKey(extension));
@@ -142,7 +148,7 @@ public sealed class ShellRegistrar : IShellRegistrar
                 var progId = RunlyRegistryLayout.ProgIdFor(extension);
 
                 // 3. The ProgID tree with all four verbs.
-                WriteProgId(extension, mapping, installDir, command, consoleCommand);
+                WriteProgId(extension, mapping, installDir, command, consoleCommand, config);
 
                 // 5. OpenWithProgids is always written: it is what puts Runly in the "Open with" list.
                 _registry.SetValue(
@@ -192,6 +198,55 @@ public sealed class ShellRegistrar : IShellRegistrar
                 });
             }
 
+            // K30: a mapping switched off in the settings must not stay bound to Runly. An earlier install may
+            // have written the ProgID, and leaving it behind means the extension still opens with a launcher
+            // whose interpreter the user just disabled — and it keeps the context-menu cleanup off that type,
+            // because the cleanup only covers the extensions Runly actually runs.
+            foreach (var extension in disabled)
+            {
+                var progId = RunlyRegistryLayout.ProgIdFor(extension);
+                if (!_registry.KeyExists(RegistryRoot.CurrentUser, RunlyRegistryLayout.ProgIdKey(extension)))
+                {
+                    continue;
+                }
+
+                TryReleaseUserChoice(extension);
+                _registry.DeleteKeyTree(RegistryRoot.CurrentUser, RunlyRegistryLayout.ProgIdKey(extension));
+                _registry.DeleteValue(RegistryRoot.CurrentUser, RunlyRegistryLayout.OpenWithProgidsKey(extension), progId);
+
+                var current = _registry
+                    .GetValue(RegistryRoot.CurrentUser, RunlyRegistryLayout.ExtensionKey(extension), RegistryValueEntry.DefaultValueName)
+                    ?.AsString();
+
+                if (RunlyRegistryLayout.IsRunlyProgId(current))
+                {
+                    _registry.DeleteValue(
+                        RegistryRoot.CurrentUser, RunlyRegistryLayout.ExtensionKey(extension), RegistryValueEntry.DefaultValueName);
+                }
+
+                actions.Add($"{extension} ayarlarda kapalı, Runly bağlantısı kaldırıldı.");
+            }
+
+            foreach (var extension in config.Extensions.Keys)
+            {
+                _registry.DeleteKeyTree(RegistryRoot.CurrentUser, RunlyRegistryLayout.ProgIdKey(extension) + @"\shell\runlyargs");
+            }
+
+            var restartNeeded = false;
+            if (_menuCleaner is not null)
+            {
+                try
+                {
+                    var cleanup = _menuCleaner.Apply(config);
+                    actions.AddRange(cleanup.Actions);
+                    restartNeeded = cleanup.ExplorerRestartNeeded;
+                }
+                catch (Exception ex)
+                {
+                    actions.Add($"Sağ menü sadeleştirilemedi: {ex.Message}");
+                }
+            }
+
             // 7. Let Explorer refresh its icons and menus.
             _notifier.AssociationsChanged();
             actions.Add("Explorer'a dosya ilişkilerinin değiştiği bildirildi.");
@@ -203,6 +258,7 @@ public sealed class ShellRegistrar : IShellRegistrar
                 Extensions = statuses,
                 Skipped = skipped,
                 Actions = actions,
+                ExplorerRestartNeeded = restartNeeded,
             };
         }
         catch (Exception ex) when (ex is not ArgumentException)
@@ -282,6 +338,15 @@ public sealed class ShellRegistrar : IShellRegistrar
                 actions.Add($"{progId} anahtarı silindi.");
             }
 
+            // The cleanup ledger lives under VendorKey, so it has to be replayed before that key goes.
+            var restartNeeded = false;
+            if (_menuCleaner is not null)
+            {
+                var cleanup = _menuCleaner.Revert();
+                actions.AddRange(cleanup.Actions);
+                restartNeeded = cleanup.ExplorerRestartNeeded;
+            }
+
             // K29: both launcher binaries are cleared. Install only writes the GUI Applications key, but
             // Windows creates the console one as soon as the user picks RunlyConsole.exe from "Open with",
             // and a half-cleaned uninstall that leaves a key pointing at a deleted exe is exactly B2/K24.
@@ -333,6 +398,7 @@ public sealed class ShellRegistrar : IShellRegistrar
                 RestoredBackupPath = restoredPath,
                 Actions = actions,
                 AffectedUserChoices = affected,
+                ExplorerRestartNeeded = restartNeeded,
             };
         }
         catch (Exception ex)
@@ -483,7 +549,8 @@ public sealed class ShellRegistrar : IShellRegistrar
         return RunlyRegistryLayout.IsLauncherFileName(Path.GetFileName(handlerPath));
     }
 
-    private void WriteProgId(string extension, ExtensionMapping mapping, string installDir, string command, string consoleCommand)
+    private void WriteProgId(
+        string extension, ExtensionMapping mapping, string installDir, string command, string consoleCommand, RunlyConfig config)
     {
         var key = RunlyRegistryLayout.ProgIdKey(extension);
 
@@ -492,6 +559,8 @@ public sealed class ShellRegistrar : IShellRegistrar
 
         _registry.SetValue(RegistryRoot.CurrentUser, key + @"\DefaultIcon",
             RegistryValueEntry.FromString(RegistryValueEntry.DefaultValueName, RunlyRegistryLayout.IconValue(installDir, mapping.Icon, mapping.Category)));
+
+        _registry.DeleteKeyTree(RegistryRoot.CurrentUser, key + @"\shell");
 
         // K29: the double-click command is chosen by Kind, and it is the only reason two binaries exist.
         // An Open mapping hands the file to a desktop application, so a console-subsystem launcher would
@@ -503,13 +572,18 @@ public sealed class ShellRegistrar : IShellRegistrar
             return;
         }
 
-        WriteVerb(key, "open", "Runly ile çalıştır", consoleCommand + " \"%1\" %*");
-        WriteVerb(key, "runas", "Yönetici olarak çalıştır (Runly)", consoleCommand + " --verb runas \"%1\" %*");
+        // K31: elevation is a setting, not a second verb. Two entries that differ only by a shield
+        // doubled the menu for a choice the user makes once; the effective value goes into the one
+        // command the double-click already runs.
+        var elevated = mapping.RunAsAdmin ?? config.RunAsAdmin;
+        var runVerb = elevated ? " --verb runas" : string.Empty;
+        var runLabel = elevated ? "Runly ile yönetici olarak çalıştır" : "Runly ile çalıştır";
+
+        WriteVerb(key, "open", runLabel, consoleCommand + runVerb + " \"%1\" %*");
         // "Düzenle" is the one Run-side verb that never needs a console: it hands the file to the
         // configured editor and returns without waiting, so the console binary would flash a black
         // window for nothing — the same defect K29 removed from double-click.
-        WriteVerb(key, "edit", "Düzenle", command + " --verb edit \"%1\"");
-        WriteVerb(key, "runlyargs", "Runly ile argümanlarla çalıştır…", consoleCommand + " --verb prompt-args \"%1\"");
+        WriteVerb(key, "edit", EditorName.EditVerbLabel(config.EditorCommand), command + " --verb edit \"%1\"");
     }
 
     private void WriteVerb(string progIdKey, string verb, string muiVerb, string commandLine)

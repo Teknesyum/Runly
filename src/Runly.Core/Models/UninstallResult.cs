@@ -24,6 +24,9 @@ public sealed record UninstallResult
     /// <summary>Whether any extension is left pointing at a ProgID that no longer exists.</summary>
     public bool HasOrphanedUserChoices => AffectedUserChoices.Any(o => !o.Removed);
 
+    /// <summary>Whether reverting the context-menu cleanup changed the blocked-handler list.</summary>
+    public bool ExplorerRestartNeeded { get; init; }
+
     /// <summary>Turkish error message when <see cref="Success"/> is <see langword="false"/>.</summary>
     public string? ErrorMessage { get; init; }
 }

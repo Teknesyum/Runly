@@ -7,13 +7,13 @@ namespace Teknesyum.Theme;
 /// Teknesyum Neon — WinForms/console palette. Do not change these values.
 public static class Palette
 {
-    public static readonly Color NeonBlue   = ColorTranslator.FromHtml("#00F3FF");
-    public static readonly Color NeonPink   = ColorTranslator.FromHtml("#FF00EA");
-    public static readonly Color NeonPurple = ColorTranslator.FromHtml("#B026FF");
-    public static readonly Color Success    = ColorTranslator.FromHtml("#34D399");
+    public static readonly Color Renk1      = ColorTranslator.FromHtml("#4DA6FF");
+    public static readonly Color Renk2      = ColorTranslator.FromHtml("#DE7EF1");
+    public static readonly Color Renk3      = ColorTranslator.FromHtml("#B68FFF");
+    public static readonly Color Success    = ColorTranslator.FromHtml("#66F09A");
 
-    public static readonly Color PinkText   = ColorTranslator.FromHtml("#FF54EB");
-    public static readonly Color PurpleText = ColorTranslator.FromHtml("#C67EFF");
+    public static readonly Color Renk2Text  = ColorTranslator.FromHtml("#FA8CFF");
+    public static readonly Color Renk3Text  = ColorTranslator.FromHtml("#AC7FFF");
 
     // --- semantic role layer (SKILL §2) ---
     //
@@ -27,24 +27,24 @@ public static class Palette
     //
     // `Success` is defined above and is already a role field; no second name was
     // given. `Info` IS DELIBERATELY ABSENT: there is no info box today, and an
-    // unused token is debt. If one opens it binds to blue, and an info fill is
+    // unused token is debt. If one opens it binds to renk-1, and an info fill is
     // never used on the same screen as a primary button.
-    public static readonly Color Danger     = NeonPink;
+    public static readonly Color Danger     = Renk2;
 
-    /// The TEXT role of danger. The fill hex `#FF00EA` gives 6.11:1 as text, below
-    /// §2's 7:1 threshold; error text writes this rather than the fill field (7.33:1).
-    public static readonly Color DangerText = PinkText;
+    /// The TEXT role of danger. The fill renk-2 falls below §2's 7:1 threshold as text;
+    /// error text writes this rather than the fill field.
+    public static readonly Color DangerText = Renk2Text;
 
     /// `warning #FBBF24` — WARNING SURFACE ONLY: text, border, icon.
     /// NO FILL, NO BUTTON. The constraint is the same pattern as `Success`, not a
     /// new one.
     ///
-    /// The ban was measured: white text on an amber fill is 1.67:1 — it collapses.
-    /// WHAT REPLACES IT: warning text `Warning` (12.58:1 / 11.94:1), border
-    /// `Warning50` (3.59:1 on `#08090A`, clears 1.4.11's 3:1 threshold — pink /50
-    /// at 2.17 and purple /50 at 1.82 did not carry this rung, amber does), icon
-    /// the same colour. If an action is needed the button is primary (blue) or
-    /// `Danger` (pink); the warning colour never enters a button.
+    /// The ban was measured: white text on an amber fill is 1.50:1 — it collapses.
+    /// WHAT REPLACES IT: warning text `Warning` (11.30:1), border
+    /// `Warning50` (3.60:1 on `#101115`, clears 1.4.11's 3:1 threshold — renk-2 /50
+    /// at 1.94 and renk-3 /50 at 1.92 did not carry this rung, amber does), icon
+    /// the same colour. If an action is needed the button is primary (renk-1) or
+    /// `Danger` (renk-2); the warning colour never enters a button.
     ///
     /// COLOUR ALONE CARRIES NO MEANING, amber included from the start: amber does
     /// not separate from `Success` under protanopia, ΔE2000 15.2
@@ -52,23 +52,23 @@ public static class Palette
     /// addition to colour.
     ///
     /// CAVEAT: this hex is subject to the `U9` ΔE measurement.
-    public static readonly Color Warning    = ColorTranslator.FromHtml("#FBBF24");
-    public static readonly Color Warning50  = Color.FromArgb(0x80, 0xFB, 0xBF, 0x24);
+    public static readonly Color Warning    = ColorTranslator.FromHtml("#FFD24D");
+    public static readonly Color Warning50  = Color.FromArgb(0x80, 0xFF, 0xD2, 0x4D);
 
-    public static readonly Color Surface    = ColorTranslator.FromHtml("#08090A");
+    public static readonly Color Surface    = ColorTranslator.FromHtml("#000000");
     public static readonly Color AppBg      = ColorTranslator.FromHtml("#000000");
     public static readonly Color AppBgFrom  = ColorTranslator.FromHtml("#000000");
-    public static readonly Color AppBgTo    = ColorTranslator.FromHtml("#08090A");
+    public static readonly Color AppBgTo    = ColorTranslator.FromHtml("#000000");
 
-    public static readonly Color BorderDefault    = Color.FromArgb(0x80, 0x00, 0xF3, 0xFF);
-    public static readonly Color BorderStrong     = Color.FromArgb(0x99, 0x00, 0xF3, 0xFF);
-    public static readonly Color BorderDecorative = Color.FromArgb(0x4D, 0x00, 0xF3, 0xFF);
+    public static readonly Color BorderDefault    = Color.FromArgb(0x8C, 0x4D, 0xA6, 0xFF);
+    public static readonly Color BorderStrong     = Color.FromArgb(0xB3, 0x4D, 0xA6, 0xFF);
+    public static readonly Color BorderDecorative = Color.FromArgb(0x33, 0x4D, 0xA6, 0xFF);
 
-    public static readonly Color FocusRing      = ColorTranslator.FromHtml("#00F3FF");
+    public static readonly Color FocusRing      = ColorTranslator.FromHtml("#4DA6FF");
     public static readonly Color FocusRingInner = ColorTranslator.FromHtml("#000000");
 
     public static readonly Color TextBody   = ColorTranslator.FromHtml("#FFFFFF");
-    public static readonly Color TextLabel  = ColorTranslator.FromHtml("#00F3FF");
+    public static readonly Color TextLabel  = ColorTranslator.FromHtml("#4DA6FF");
 
     /// A disabled control is exempt from 7:1 (SKILL §2) and there is a price: a
     /// colour-blind user cannot see the grey. This colour is never used alone —
@@ -80,16 +80,16 @@ public static class Palette
     /// the same value as `TextBody`, and a single value with two names eventually
     /// diverges. For secondary text the answer is not to give grey, it is to delete
     /// the text (SKILL §2, "no mid greys").
-    public static readonly Color Disabled   = ColorTranslator.FromHtml("#71717A");
+    public static readonly Color Disabled   = ColorTranslator.FromHtml("#8A8F9A");
 
     /// There is one radius: 6 DIP (SKILL §5, `layout.md` §5.1). Card, panel, button
     /// and cell take the same value. The one exception is the circle: `?` badge,
     /// slider thumb, status dot.
-    public const int Radius = 6;
+    public const int Radius = 4;
 
     /// Numeric tokens: the same values as the CSS `--tk-*` layer, in DIP.
     /// Tracking is em, line height a multiplier, ratios unitless, times in ms.
-    public const int    WindowRadius = 12;
+    public const int    WindowRadius = 4;
     public const int    BorderWidth  = 1;
     public const int    FocusWidth   = 2;
     public const int    FocusOffset  = 2;
@@ -98,18 +98,18 @@ public static class Palette
     public const int    FontSize2 = 16;
     public const int    FontSize3 = 20;
     public const int    FontSize4 = 24;
-    public const int    FontSize5 = 30;
-    public const double LineHeightBody    = 1.5;
-    public const double LineHeightHeading = 1.2;
-    public const double LineHeightMono    = 1.4;
+    public const int    FontSize5 = 32;
+    public const double LineHeightBody    = 1.6;
+    public const double LineHeightHeading = 1.25;
+    public const double LineHeightMono    = 1.5;
     public const int    MeasureCh    = 65;
-    public const double TrackingLabel = 0.15;
-    public const double TrackingH3    = 0.05;
-    public const double TrackingH2    = 0.02;
-    public const double TrackingHero  = -0.01;
+    public const double TrackingLabel = 0.08;
+    public const double TrackingH3    = 0.02;
+    public const double TrackingH2    = 0;
+    public const double TrackingHero  = -0.015;
     public const int    WeightBody = 400;
     public const int    WeightSemi = 600;
-    public const int    WeightHero = 900;
+    public const int    WeightHero = 800;
 
     public const int Space1 = 4;
     public const int Space2 = 8;
@@ -126,13 +126,15 @@ public static class Palette
     public const int ToastGap      = 12;
 
     public const int    TargetMin             = 24;
-    public const int    ScrollbarWidth        = 10;
-    public const int    TitleBarHeightMin     = 32;
-    public const int    TitleBarHeightMax     = 40;
+    public const int    ScrollbarWidth        = 3;
+    public const int    TitleBarHeightMin     = 28;
+    public const int    TitleBarHeightMax     = 28;
     public const int    SidebarWidth          = 240;
     public const int    SidebarCollapsedWidth = 48;
     public const int    InputHeight           = 40;
     public const int    ModalWidth            = 560;
+    public const int    InstallerWidth        = 720;
+    public const int    InstallerHeight       = 540;
     public const double ModalMaxRatio         = 0.85;
     public const int    ToastWidth            = 360;
     public const int    ToastMax              = 3;
@@ -141,6 +143,18 @@ public static class Palette
     public const int    IconSize2 = 16;
     public const int    IconSize3 = 22;
     public const int    IconSize4 = 56;
+    public const double ButtonHeight   = 28;
+    public const double ButtonPaddingX = 10;
+    public const double GlassBlur      = 0;
+    public const double BgAngle        = 160;
+    public const bool   BgRotate       = false;
+    public const string BackgroundType = "flat";
+    public const string ScrollbarStyle = "fade";
+    public const string ScrollBehavior = "auto";
+    public static readonly Color WindowEdge          = Color.Transparent;
+    public static readonly Color ScrollbarThumb      = Color.FromArgb(0xFF, 0xAC, 0x7F, 0xFF);
+    public static readonly Color ScrollbarThumbHover = Color.FromArgb(0xFF, 0xDE, 0x7E, 0xF1);
+    public static readonly Color ScrollbarTrack      = Color.FromArgb(0x4D, 0x00, 0x00, 0x00);
 
     public const double ScaleHover     = 1.02;
     public const double ScalePress     = 0.98;
@@ -201,21 +215,21 @@ public static class Palette
 /// ANSI console colours (for CLI projects such as Runly).
 public static class Ansi
 {
-    public const string Blue       = "[38;2;0;243;255m";
-    public const string Pink       = "[38;2;255;0;234m";
-    public const string Purple     = "[38;2;176;38;255m";
-    public const string PinkText   = "[38;2;255;84;235m";
-    public const string PurpleText = "[38;2;198;126;255m";
-    public const string Success    = "[38;2;52;211;153m";
+    public const string Renk1      = "[38;2;77;166;255m";
+    public const string Renk2      = "[38;2;222;126;241m";
+    public const string Renk3      = "[38;2;182;143;255m";
+    public const string Renk2Text  = "[38;2;250;140;255m";
+    public const string Renk3Text  = "[38;2;172;127;255m";
+    public const string Success    = "[38;2;102;240;154m";
     // Role colours enter ANSI too; without them the terminal output drifts from the
     // palette. Danger and DangerText take the value of the brand constant, the hex
     // is not copied.
-    public const string Danger     = Pink;
-    public const string DangerText = PinkText;
+    public const string Danger     = Renk2;
+    public const string DangerText = Renk2Text;
     // Warning: warning text only. A terminal has no fill anyway, so the constraint
     // holds by itself.
-    public const string Warning    = "[38;2;251;191;36m";
-    public const string Disabled   = "[38;2;113;113;122m";
+    public const string Warning    = "[38;2;255;210;77m";
+    public const string Disabled   = "[38;2;138;143;154m";
     public const string Bold       = "[1m";
     public const string Reset      = "[0m";
 }

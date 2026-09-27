@@ -10,6 +10,9 @@ public enum RegistryRoot
 
     /// <summary><c>HKEY_CLASSES_ROOT</c> — read only, used to turn a ProgID into a friendly name.</summary>
     ClassesRoot,
+
+    /// <summary><c>HKEY_LOCAL_MACHINE</c> — read only, used for machine state such as Defender's.</summary>
+    LocalMachine,
 }
 
 /// <summary>The registry value types Runly can read, write and serialise to a <c>.reg</c> file.</summary>

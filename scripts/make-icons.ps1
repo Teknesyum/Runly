@@ -6,6 +6,11 @@ if (-not (Test-Path $outputPath)) {
     New-Item -ItemType Directory $outputPath | Out-Null
 }
 
+$tokens = Get-Content (Join-Path (Split-Path $PSScriptRoot -Parent) "teknesyum-ui/theme.tokens.json") -Raw -Encoding UTF8 | ConvertFrom-Json
+$primary = $tokens.brand.'renk-1'.value
+$accent = $tokens.brand.'renk-2-text'.value
+$tile = $tokens.brand.'glass-base'.value
+
 $sizes = @(16, 32, 48, 256)
 $reviewPath = Join-Path (Split-Path $PSScriptRoot -Parent) "docs\reports\icon-review"
 $runlyMasterBase64 = "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"
@@ -17,20 +22,20 @@ $icons = @(
     @{ Name = "py";      Label = "PY"; Bg = "#3776AB"; Fg = "#FFFFFF" },
     @{ Name = "sh";      Label = "SH"; Bg = "#4EAA25"; Fg = "#FFFFFF" },
     @{ Name = "generic"; Label = "?";  Bg = "#666666"; Fg = "#FFFFFF" },
-    @{ Name = "category-scripts"; Label = ">"; Bg = "#071A24"; Fg = "#00F3FF" },
-    @{ Name = "category-code"; Label = "{}"; Bg = "#071A24"; Fg = "#FF00EA" },
-    @{ Name = "category-text"; Label = "T"; Bg = "#071A24"; Fg = "#00F3FF" },
-    @{ Name = "category-data"; Label = "D"; Bg = "#071A24"; Fg = "#FF00EA" },
-    @{ Name = "category-web"; Label = "W"; Bg = "#071A24"; Fg = "#00F3FF" },
-    @{ Name = "category-images"; Label = "I"; Bg = "#071A24"; Fg = "#FF00EA" },
-    @{ Name = "category-audio"; Label = "A"; Bg = "#071A24"; Fg = "#00F3FF" },
-    @{ Name = "category-video"; Label = "V"; Bg = "#071A24"; Fg = "#FF00EA" },
-    @{ Name = "category-archive"; Label = "Z"; Bg = "#071A24"; Fg = "#00F3FF" },
-    @{ Name = "category-office"; Label = "O"; Bg = "#071A24"; Fg = "#FF00EA" },
-    @{ Name = "category-design"; Label = "3D"; Bg = "#071A24"; Fg = "#00F3FF" },
-    @{ Name = "category-fonts"; Label = "F"; Bg = "#071A24"; Fg = "#FF00EA" },
-    @{ Name = "category-special"; Label = "*"; Bg = "#071A24"; Fg = "#00F3FF" },
-    @{ Name = "category-locked"; Label = "!"; Bg = "#071A24"; Fg = "#FF00EA" }
+    @{ Name = "category-scripts"; Label = ">"; Bg = $tile; Fg = $primary },
+    @{ Name = "category-code"; Label = "{}"; Bg = $tile; Fg = $accent },
+    @{ Name = "category-text"; Label = "T"; Bg = $tile; Fg = $primary },
+    @{ Name = "category-data"; Label = "D"; Bg = $tile; Fg = $accent },
+    @{ Name = "category-web"; Label = "W"; Bg = $tile; Fg = $primary },
+    @{ Name = "category-images"; Label = "I"; Bg = $tile; Fg = $accent },
+    @{ Name = "category-audio"; Label = "A"; Bg = $tile; Fg = $primary },
+    @{ Name = "category-video"; Label = "V"; Bg = $tile; Fg = $accent },
+    @{ Name = "category-archive"; Label = "Z"; Bg = $tile; Fg = $primary },
+    @{ Name = "category-office"; Label = "O"; Bg = $tile; Fg = $accent },
+    @{ Name = "category-design"; Label = "3D"; Bg = $tile; Fg = $primary },
+    @{ Name = "category-fonts"; Label = "F"; Bg = $tile; Fg = $accent },
+    @{ Name = "category-special"; Label = "*"; Bg = $tile; Fg = $primary },
+    @{ Name = "category-locked"; Label = "!"; Bg = $tile; Fg = $accent }
 )
 
 function Remove-OuterSurface {
@@ -88,6 +93,34 @@ function Remove-OuterSurface {
     $Bitmap.UnlockBits($data)
 }
 
+function Set-TokenColors {
+    param([System.Drawing.Bitmap]$Bitmap)
+
+    $blue = [System.Drawing.ColorTranslator]::FromHtml($primary)
+    $pink = [System.Drawing.ColorTranslator]::FromHtml($accent)
+    $w = $Bitmap.Width
+    $h = $Bitmap.Height
+    $rect = New-Object System.Drawing.Rectangle(0, 0, $w, $h)
+    $data = $Bitmap.LockBits($rect, [System.Drawing.Imaging.ImageLockMode]::ReadWrite, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+    $len = $data.Stride * $h
+    $buf = New-Object byte[] $len
+    [System.Runtime.InteropServices.Marshal]::Copy($data.Scan0, $buf, 0, $len)
+    for ($o = 0; $o -lt $len; $o += 4) {
+        if ($buf[$o + 3] -eq 0) { continue }
+        $b = $buf[$o]; $g = $buf[$o + 1]; $r = $buf[$o + 2]
+        $mx = [Math]::Max([Math]::Max($r, $g), $b)
+        $mn = [Math]::Min([Math]::Min($r, $g), $b)
+        $t = ($mx - $mn) / 255.0
+        if ($t -le 0) { continue }
+        $target = if ($g -gt $r) { $blue } else { $pink }
+        $buf[$o] = [byte][Math]::Round($mn + ($target.B - $mn) * $t)
+        $buf[$o + 1] = [byte][Math]::Round($mn + ($target.G - $mn) * $t)
+        $buf[$o + 2] = [byte][Math]::Round($mn + ($target.R - $mn) * $t)
+    }
+    [System.Runtime.InteropServices.Marshal]::Copy($buf, 0, $data.Scan0, $len)
+    $Bitmap.UnlockBits($data)
+}
+
 function New-RunlySmallFrame {
     param([int]$Size)
 
@@ -100,8 +133,8 @@ function New-RunlySmallFrame {
     $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
     $graphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::Half
 
-    $blue = New-Object System.Drawing.SolidBrush([System.Drawing.ColorTranslator]::FromHtml("#00F3FF"))
-    $pink = New-Object System.Drawing.SolidBrush([System.Drawing.ColorTranslator]::FromHtml("#FF00EA"))
+    $blue = New-Object System.Drawing.SolidBrush([System.Drawing.ColorTranslator]::FromHtml($primary))
+    $pink = New-Object System.Drawing.SolidBrush([System.Drawing.ColorTranslator]::FromHtml($accent))
 
     # Dis yuvarlak kare artik cizilmiyor: ikon saydam zemin uzerinde duruyor.
     # Belge govdesi: ust sag kose katlanmis.
@@ -153,6 +186,7 @@ function New-RunlyFrame {
     if ($null -eq $script:masterBitmap) {
         $script:masterBitmap = New-Object System.Drawing.Bitmap([System.Drawing.Image]::FromFile($masterPath))
         Remove-OuterSurface -Bitmap $script:masterBitmap
+        Set-TokenColors -Bitmap $script:masterBitmap
     }
     $master = $script:masterBitmap
     $scaled = New-Object System.Drawing.Bitmap($Size, $Size)

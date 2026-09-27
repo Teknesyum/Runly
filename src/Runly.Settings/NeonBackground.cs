@@ -5,10 +5,9 @@ namespace Runly.Settings;
 /// <summary>
 /// The one background gradient the window has.
 ///
-/// <para>The standard calls a flat <c>#000000</c> fill an incomplete delivery: the ground is a soft
-/// gradient running between <c>bg</c> and <c>surface</c>, and there is exactly one of it — panels sit on
-/// top rather than carrying gradients of their own. The two ends differ by 1.06:1, so this is a texture,
-/// not a hierarchy; it carries no information.</para>
+/// <para>Runs between the <c>bg</c> and <c>surface</c> tokens. The "benim" layout sets both to black
+/// (<c>derived.bg-gradient.type = flat</c>), so the ramp draws a flat ground; another layout brings the
+/// gradient back without a code change.</para>
 ///
 /// <para>Every surface that draws it resolves the brush against the <em>form's</em> client rectangle and
 /// then shifts the origin back to its own, which is what keeps the caption band, the layout panels and

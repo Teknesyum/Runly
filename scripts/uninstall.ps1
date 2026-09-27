@@ -1,6 +1,10 @@
 $ErrorActionPreference = "Stop"
 
-$programPath = Join-Path $env:LOCALAPPDATA "Programs\Runly"
+$programPath = if ($PSScriptRoot -and (Test-Path -LiteralPath (Join-Path $PSScriptRoot "RunlySettings.exe"))) {
+    $PSScriptRoot
+} else {
+    Join-Path $env:LOCALAPPDATA "Programs\Runly"
+}
 $dataPath = Join-Path $env:APPDATA "Runly"
 $desktopShortcut = Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::DesktopDirectory)) "Runly.lnk"
 

@@ -64,7 +64,7 @@ internal static class LauncherHost
         ScriptInfo script;
         try
         {
-            script = inspector.Inspect(request.ScriptPath);
+            script = InspectWithUnlock(inspector, request.ScriptPath, dialogs);
         }
         catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException or IOException
                                       or UnauthorizedAccessException or ArgumentException)
@@ -232,6 +232,43 @@ internal static class LauncherHost
         }
     }
 
+    /// <summary>
+    /// K33: a file that cannot be read is usually a file someone else is holding. Instead of the bare
+    /// "okunamadı" message, Runly names the processes and offers to end them, then tries once more.
+    /// </summary>
+    private static ScriptInfo InspectWithUnlock(ScriptInspector inspector, string path, TaskDialogInterop dialogs)
+    {
+        try
+        {
+            return inspector.Inspect(path);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            var holders = FileLockInspector.Find(path);
+            if (holders.Count == 0)
+            {
+                throw;
+            }
+
+            s_logger.Warn($"Dosya kilitli: {path} — {string.Join(", ", holders.Select(h => $"{h.Name}#{h.ProcessId}"))}");
+
+            if (!dialogs.AskUnlock(Path.GetFileName(path), holders))
+            {
+                throw;
+            }
+
+            foreach (var holder in holders)
+            {
+                if (!FileLockInspector.TryEnd(holder.ProcessId))
+                {
+                    s_logger.Warn($"Süreç sonlandırılamadı: {holder.Name}#{holder.ProcessId}");
+                }
+            }
+
+            return inspector.Inspect(path);
+        }
+    }
+
     private static int RunEditVerb(RunlyConfig config, ScriptInfo script, IPathSearcher pathSearcher, TaskDialogInterop dialogs)
     {
         if (EditorLauncher.Open(config.EditorCommand, script.Path, pathSearcher, s_logger))
@@ -286,7 +323,7 @@ internal static class LauncherHost
         if (s_surface == LauncherSurface.Gui)
         {
             var body = error is null ? CommandLineParser.UsageText : error + "\n\n" + CommandLineParser.UsageText;
-            Dialogs().ShowError("Runly nasıl kullanılır", body);
+            Dialogs().ShowError(Runly.Core.Shell.RunlyRegistryLayout.ApplicationName + " nasıl kullanılır", body);
             return ExitCode.UsageError;
         }
 
@@ -364,7 +401,7 @@ internal static class LauncherHost
         var body = $"{ex.Message}\n\nAyrıntılar günlüğe yazıldı:\n{RunlyPaths.LogPath}";
         if (s_dialogs is not null || s_surface == LauncherSurface.Gui)
         {
-            Dialogs().ShowError("Runly beklenmedik bir hatayla karşılaştı", body);
+            Dialogs().ShowError(Runly.Core.Shell.RunlyRegistryLayout.ApplicationName + " beklenmedik bir hatayla karşılaştı", body);
         }
         else
         {

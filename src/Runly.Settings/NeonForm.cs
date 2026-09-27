@@ -34,12 +34,14 @@ internal sealed class CaptionItem
 
     public Color Color { get; init; } = Palette.TextStrong;
 
-    public Color Accent { get; init; } = Palette.NeonBlue;
+    public Color Accent { get; init; } = Palette.Renk1;
 
     /// <summary>Status marker drawn ahead of the text, or null for no marker.</summary>
     public Color? Dot { get; set; }
 
     public Action? Click { get; init; }
+
+    public bool Visible { get; set; } = true;
 
     internal Rectangle Bounds { get; set; }
 
@@ -136,6 +138,10 @@ internal class NeonForm : Form
         RefreshCaptionItems();
     }
 
+    /// <summary>The leading part of the title drawn in the accent colour; the rest is drawn in pink text.
+    /// Null keeps a one-colour title.</summary>
+    protected string? TitleAccent { get; set; } = Runly.Core.Shell.RunlyRegistryLayout.ApplicationName;
+
     /// <summary>Re-measures the band. Item text is not fixed — the version, the status and the language
     /// switch all change width — so the layout has to be redone whenever one of them is rewritten.</summary>
     protected void RefreshCaptionItems()
@@ -191,10 +197,10 @@ internal class NeonForm : Form
     {
         base.OnPaint(e);
         var g = e.Graphics;
-        using var divider = new Pen(Color.FromArgb(NeonTheme.BorderAlpha, Palette.NeonBlue));
+        using var divider = new Pen(Color.FromArgb(NeonTheme.BorderAlpha, Palette.Renk1));
         g.DrawLine(divider, 0, CaptionHeight - 1, ClientSize.Width, CaptionHeight - 1);
 
-        var iconInset = Metrics.Px(12);
+        var iconInset = Metrics.Px(TeknesyumTokens.Space3);
         var iconSize = Metrics.CaptionIconSize;
         var icon = Icon;
         if (icon is not null)
@@ -202,23 +208,43 @@ internal class NeonForm : Form
             g.DrawIcon(icon, new Rectangle(iconInset, (CaptionHeight - iconSize) / 2, iconSize, iconSize));
         }
 
-        var titleLeft = iconInset + iconSize + Metrics.Px(8);
-        var titleColor = _active ? Palette.NeonBlue : Palette.TextLabel;
-        TextRenderer.DrawText(g, Text, Palette.Body,
-            new Rectangle(titleLeft, 0, Math.Max(0, _captionItemsLeft - Metrics.Px(16) - titleLeft), CaptionHeight),
-            titleColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+        var titleLeft = iconInset + iconSize + Metrics.Px(TeknesyumTokens.Space2);
+        var titleRight = Math.Max(titleLeft, _captionItemsLeft - Metrics.Px(TeknesyumTokens.Space4));
+        var titleFlags = TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding;
+        var accent = TitleAccent;
+        var split = !string.IsNullOrEmpty(accent) && Text.StartsWith(accent, StringComparison.Ordinal) && Text.Length > accent.Length;
+        if (split)
+        {
+            var first = TextRenderer.MeasureText(g, accent, Palette.Body, Size.Empty, TextFormatFlags.NoPadding).Width;
+            TextRenderer.DrawText(g, accent, Palette.Body,
+                new Rectangle(titleLeft, 0, Math.Min(first, titleRight - titleLeft), CaptionHeight),
+                _active ? Palette.Renk1 : Palette.TextLabel, titleFlags);
+            var restLeft = titleLeft + first;
+            TextRenderer.DrawText(g, Text[accent!.Length..], Palette.Body,
+                new Rectangle(restLeft, 0, Math.Max(0, titleRight - restLeft), CaptionHeight),
+                _active ? Palette.Renk2Text : Palette.TextLabel, titleFlags);
+        }
+        else
+        {
+            TextRenderer.DrawText(g, Text, Palette.Body,
+                new Rectangle(titleLeft, 0, titleRight - titleLeft, CaptionHeight),
+                _active ? Palette.Renk1 : Palette.TextLabel, titleFlags);
+        }
 
         g.SmoothingMode = SmoothingMode.AntiAlias;
         foreach (var item in _captionItems)
         {
-            DrawCaptionItem(g, item);
+            if (item.Visible)
+            {
+                DrawCaptionItem(g, item);
+            }
         }
 
         g.SmoothingMode = SmoothingMode.Default;
 
-        DrawCaptionButton(g, MinimizeBounds, _minimizeHover, "─", Palette.NeonBlue);
-        DrawCaptionButton(g, MaximizeBounds, _maximizeHover, WindowState == FormWindowState.Maximized ? "❐" : "□", Palette.NeonBlue);
-        DrawCaptionButton(g, CloseBounds, _closeHover, "×", Palette.NeonPink);
+        DrawCaptionButton(g, MinimizeBounds, _minimizeHover, "─", Palette.Renk1);
+        DrawCaptionButton(g, MaximizeBounds, _maximizeHover, WindowState == FormWindowState.Maximized ? "❐" : "□", Palette.Renk1);
+        DrawCaptionButton(g, CloseBounds, _closeHover, "×", Palette.Renk2);
 
         DrawWindowOutline(g);
     }
@@ -237,7 +263,7 @@ internal class NeonForm : Form
         var previous = g.SmoothingMode;
         g.SmoothingMode = SmoothingMode.AntiAlias;
         using (var path = NeonTheme.RoundedRect(new Rectangle(0, 0, ClientSize.Width - 1, ClientSize.Height - 1), CornerRadius))
-        using (var pen = new Pen(Color.FromArgb(NeonTheme.BorderAlpha, Palette.NeonBlue)))
+        using (var pen = new Pen(Color.FromArgb(NeonTheme.BorderAlpha, Palette.Renk1)))
         {
             g.DrawPath(pen, path);
         }
@@ -381,7 +407,7 @@ internal class NeonForm : Form
     {
         foreach (var item in _captionItems)
         {
-            if (item.Bounds.Contains(point))
+            if (item.Visible && item.Bounds.Contains(point))
             {
                 return item;
             }
@@ -394,12 +420,18 @@ internal class NeonForm : Form
     {
         var height = Metrics.CaptionItemHeight;
         var top = (CaptionHeight - height) / 2;
-        var gap = Metrics.Px(16);
-        var right = ClientSize.Width - (CaptionButtonWidth * 3) - Metrics.Px(8);
+        var gap = Metrics.Px(TeknesyumTokens.Space4);
+        var right = ClientSize.Width - (CaptionButtonWidth * 3) - Metrics.Px(TeknesyumTokens.Space2);
         _captionItemsLeft = right;
 
         foreach (var item in _captionItems)
         {
+            if (!item.Visible)
+            {
+                item.Bounds = Rectangle.Empty;
+                continue;
+            }
+
             var width = MeasureCaptionItem(item);
             right -= width;
             item.Bounds = new Rectangle(right, top, width, height);
@@ -413,21 +445,21 @@ internal class NeonForm : Form
         var width = TextRenderer.MeasureText(item.Text, item.Font, Size.Empty, TextFormatFlags.NoPadding).Width;
         if (item.Dot is not null)
         {
-            width += CaptionDotSize + Metrics.Px(6);
+            width += CaptionDotSize + Metrics.Px(TeknesyumTokens.Space2);
         }
 
         if (item.Icon != CaptionItemIcon.None)
         {
-            width += CaptionSponsorIconSize + Metrics.Px(6);
+            width += CaptionSponsorIconSize + Metrics.Px(TeknesyumTokens.Space2);
         }
 
-        var padding = item.Style == CaptionItemStyle.Outline ? Metrics.Px(12) : Metrics.Px(8);
-        return Math.Max(Metrics.Px(24), width + (padding * 2));
+        var padding = item.Style == CaptionItemStyle.Outline ? Metrics.Px(TeknesyumTokens.Space3) : Metrics.Px(TeknesyumTokens.Space2);
+        return Math.Max(Metrics.Px(TeknesyumTokens.Space5), width + (padding * 2));
     }
 
-    private static int CaptionDotSize => Metrics.Px(8);
+    private static int CaptionDotSize => Metrics.Px(TeknesyumTokens.Space2);
 
-    private static int CaptionSponsorIconSize => Metrics.Px(12);
+    private static int CaptionSponsorIconSize => Metrics.Px(TeknesyumTokens.Space3);
 
     private void DrawCaptionItem(Graphics g, CaptionItem item)
     {
@@ -440,29 +472,18 @@ internal class NeonForm : Form
             var frame = new Rectangle(bounds.X, bounds.Y, bounds.Width - 1, bounds.Height - 1);
             using var path = NeonTheme.RoundedRect(frame, NeonTheme.CornerRadius);
 
-            // Outline button, R5 §4: no fill, ever. Hover only takes the border to full opacity and
-            // opens the outer glow, which is drawn as widening low-alpha strokes because GDI+ has no
-            // shadow primitive.
-            if (hover)
-            {
-                for (var ring = 3; ring >= 1; ring--)
-                {
-                    using var glow = new Pen(Color.FromArgb(26, item.Accent), ((ring * 2) + 1) * Metrics.Scale);
-                    g.DrawPath(glow, path);
-                }
-            }
-
-            using var border = new Pen(hover ? item.Accent : Color.FromArgb(128, item.Accent), 1.5f * Metrics.Scale);
+            // Outline button: no fill, no glow. Hover takes the border to full opacity and focus width.
+            using var border = new Pen(hover ? item.Accent : Color.FromArgb(TeknesyumTokens.BorderAlpha, item.Accent), (hover ? TeknesyumTokens.ShapeFocusW : TeknesyumTokens.ShapeBorderW) * Metrics.Scale);
             g.DrawPath(border, path);
-            content = Rectangle.Inflate(bounds, -Metrics.Px(12), 0);
+            content = Rectangle.Inflate(bounds, -Metrics.Px(TeknesyumTokens.Space3), 0);
         }
         else
         {
-            content = Rectangle.Inflate(bounds, -Metrics.Px(8), 0);
+            content = Rectangle.Inflate(bounds, -Metrics.Px(TeknesyumTokens.Space2), 0);
             if (hover && item.Clickable)
             {
                 using var underline = new Pen(item.Accent, Metrics.Scale);
-                var baseline = content.Bottom - Metrics.Px(4);
+                var baseline = content.Bottom - Metrics.Px(TeknesyumTokens.Space1);
                 g.DrawLine(underline, content.Left, baseline, content.Right, baseline);
             }
         }
@@ -473,14 +494,14 @@ internal class NeonForm : Form
             var diameter = CaptionDotSize;
             using var marker = new SolidBrush(dot);
             g.FillEllipse(marker, left, content.Top + ((content.Height - diameter) / 2), diameter, diameter);
-            left += diameter + Metrics.Px(6);
+            left += diameter + Metrics.Px(TeknesyumTokens.Space2);
         }
 
         if (item.Icon == CaptionItemIcon.Coffee)
         {
             var size = CaptionSponsorIconSize;
             DrawCoffeeIcon(g, new Rectangle(left, content.Top + ((content.Height - size) / 2), size, size), item.Accent);
-            left += size + Metrics.Px(6);
+            left += size + Metrics.Px(TeknesyumTokens.Space2);
         }
 
         var color = item.Style switch
@@ -568,7 +589,7 @@ internal class NeonForm : Form
         if ((bounds == MaximizeBounds && !MaximizeBox) || (bounds == MinimizeBounds && !MinimizeBox)) return;
         if (hover)
         {
-            using var fill = new SolidBrush(Color.FromArgb(35, accent));
+            using var fill = new SolidBrush(Color.FromArgb(TeknesyumTokens.Tone20Alpha, accent));
             g.FillRectangle(fill, bounds);
         }
         TextRenderer.DrawText(g, glyph, Palette.CaptionGlyph, bounds, Palette.TextStrong,

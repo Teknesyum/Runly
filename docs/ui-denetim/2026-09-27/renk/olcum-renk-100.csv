@@ -1,0 +1,176 @@
+ekran;oge;durum;tur;on;zemin;oran;esik
+ana;başlık: Runly Ayarları;dinlenik;yazı;#FA8CFF;#000000;10.26;7
+ana;başlık düğmesi ×;dinlenik;simge;#FFFFFF;#000000;21.00;3
+ana;başlık düğmesi ×;hover;simge;#FFFFFF;#2C1930;16.29;3
+ana;başlık düğmesi □;dinlenik;simge;#FFFFFF;#000000;21.00;3
+ana;başlık düğmesi □;hover;simge;#FFFFFF;#0F2133;16.33;3
+ana;başlık düğmesi ─;dinlenik;simge;#FFFFFF;#000000;21.00;3
+ana;başlık düğmesi ─;hover;simge;#FFFFFF;#0F2133;16.33;3
+ana;tablo başlık: Etkin;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;tablo başlık: Uzantı;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;tablo başlık: Tür;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;tablo başlık: İşleyici;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;tablo başlık: Bulundu;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;tablo başlık: Argümanlar;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;tablo başlık: Durum;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;tablo · Etkin (NeonCheckCell, kapalı);dinlenik;simge;#3777B6;#000000;4.48;3
+ana;tablo · Uzantı (DataGridViewTextBoxCell, salt okunur);dinlenik;yazı;#FA8CFF;#000000;10.26;7
+ana;tablo · Tür (NeonChipCell, kapalı);dinlenik;çip yazısı;#FFFFFF;#000000;21.00;7
+ana;tablo · İşleyici (DataGridViewTextBoxCell);dinlenik;yazı;#FFFFFF;#000000;21.00;7
+ana;tablo · Bulundu (DataGridViewTextBoxCell, salt okunur);dinlenik;yazı;#B6FFDB;#000000;18.32;7
+ana;tablo · Argümanlar (DataGridViewTextBoxCell);dinlenik;yazı;#FFFFFF;#000000;21.00;7
+ana;tablo · Durum (DataGridViewTextBoxCell, salt okunur);dinlenik;yazı;#FFFFFF;#102518;16.16;7
+ana;tablo · Tür (NeonChipCell, açık);dinlenik;çip yazısı;#FFFFFF;#000000;21.00;7
+ana;tablo · Etkin (NeonCheckCell, açık);dinlenik;simge;#4DA6FF;#000000;8.21;3
+ana;tablo · Etkin (NeonCheckCell, kapalı);hover;simge;#3879BA;#000000;4.61;3
+ana;tablo · Tür (NeonChipCell, kapalı);hover;çip yazısı;#FFFFFF;#000000;21.00;7
+ana;tablo · Tür (NeonChipCell, açık);hover;çip yazısı;#FFFFFF;#000000;21.00;7
+ana;tablo · Etkin (NeonCheckCell, açık);hover;simge;#4DA6FF;#000000;8.21;3
+ana;tablo · Etkin (NeonCheckCell, kapalı);basılı;simge;#3A7CBD;#000000;4.80;3
+ana;tablo · Tür (NeonChipCell, kapalı);basılı;çip yazısı;#FFFFFF;#000000;21.00;7
+ana;tablo · Tür (NeonChipCell, açık);basılı;çip yazısı;#FFFFFF;#000000;21.00;7
+ana;tablo · Etkin (NeonCheckCell, açık);basılı;simge;#4DA6FF;#000000;8.21;3
+ana;tablo · Etkin (NeonCheckCell, kapalı);seçili;simge;#3E85CC;#17314C;3.44;3
+ana;tablo · Uzantı (DataGridViewTextBoxCell, salt okunur);seçili;yazı;#FFFFFF;#17314C;13.29;7
+ana;tablo · Tür (NeonChipCell, kapalı);seçili;çip yazısı;#FFFFFF;#17314C;13.29;7
+ana;tablo · İşleyici (DataGridViewTextBoxCell);seçili;yazı;#FFFFFF;#17314C;13.29;7
+ana;tablo · Bulundu (DataGridViewTextBoxCell, salt okunur);seçili;yazı;#B9FFE3;#17314C;11.69;7
+ana;tablo · Argümanlar (DataGridViewTextBoxCell);seçili;yazı;#FFFFFF;#17314C;13.29;7
+ana;tablo · Durum (DataGridViewTextBoxCell, salt okunur);seçili;yazı;#FFFFFF;#000000;21.00;7
+ana;tablo · Etkin (NeonCheckCell, kapalı);seçili+hover;simge;#3F86CE;#17314C;3.49;3
+ana;tablo · Tür (NeonChipCell, kapalı);seçili+hover;çip yazısı;#FFFFFF;#17314C;13.29;7
+ana;tablo · Etkin (NeonCheckCell, kapalı);seçili+basılı;simge;#4088D1;#17314C;3.58;3
+ana;tablo · Tür (NeonChipCell, kapalı);seçili+basılı;çip yazısı;#FFFFFF;#17314C;13.29;7
+ana;NeonGroupPanel: Ayrıntılar;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;Label: Bir satır seçtiğinizde ayrıntılar burada…;dinlenik;yazı;#FFFFFF;#000000;21.00;7
+ana;Label: Uzantı ara;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;NeonButton: Temizle;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Temizle;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Temizle;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Temizle;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Temizle;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;Label: Örnek: .md, markdown ya da notepad;dinlenik;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonButton: Kategoriyi bu uygulamayla aç;dinlenik;yazı;#000000;#4DA6FF;8.21;7
+ana;NeonButton: Kategoriyi bu uygulamayla aç;hover;yazı;#000000;#4DA6FF;8.21;7
+ana;NeonButton: Kategoriyi bu uygulamayla aç;basılı;yazı;#000000;#4DA6FF;8.21;7
+ana;NeonButton: Kategoriyi bu uygulamayla aç;odak;yazı;#000000;#4DA6FF;8.21;7
+ana;NeonButton: Kategoriyi bu uygulamayla aç;edilgen;yazı;#000000;#4DA6FF;8.21;7
+ana;NeonButton: Tümünü seç;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Tümünü seç;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Tümünü seç;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Tümünü seç;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Tümünü seç;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Uzantı ekle;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Uzantı ekle;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Uzantı ekle;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Uzantı ekle;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Uzantı ekle;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Seçili uzantıyı sil;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Seçili uzantıyı sil;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Seçili uzantıyı sil;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Seçili uzantıyı sil;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Seçili uzantıyı sil;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Profili dışa aktar;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Profili dışa aktar;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Profili dışa aktar;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Profili dışa aktar;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Profili dışa aktar;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Profili içe aktar;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Profili içe aktar;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Profili içe aktar;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Profili içe aktar;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Profili içe aktar;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Uygulama seç…;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Uygulama seç…;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Uygulama seç…;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Uygulama seç…;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Uygulama seç…;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonGroupPanel: Güvenlik;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;NeonRadioButton: Her seferinde sor;boş;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonRadioButton: Her seferinde sor;edilgen;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonRadioButton: İlk seferde sor, sonra güven;seçili;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonRadioButton: İlk seferde sor, sonra güven;edilgen;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonRadioButton: Hiç sorma;boş;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonRadioButton: Hiç sorma;edilgen;yazı;#FFFFFF;#000000;21.00;7
+ana;Label: Güvenilen klasörler;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;NeonButton: Ekle;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Ekle;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Ekle;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Ekle;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Ekle;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Çıkar;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Çıkar;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Çıkar;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Çıkar;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Çıkar;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;Label: Güvenilen dosyalar: 0 adet;dinlenik;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonButton: Tümünü temizle;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Tümünü temizle;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Tümünü temizle;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Tümünü temizle;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Tümünü temizle;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonGroupPanel: Davranış;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;Label: Pencereyi açık tut;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;NeonRadioButton: Her zaman;boş;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonRadioButton: Her zaman;edilgen;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonRadioButton: Sadece hata olursa;seçili;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonRadioButton: Sadece hata olursa;edilgen;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonRadioButton: Hiçbir zaman;boş;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonRadioButton: Hiçbir zaman;edilgen;yazı;#FFFFFF;#000000;21.00;7
+ana;Label: Düzenleyici komutu;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;NeonTextBox: code;dinlenik;yazı;#4DA6FF;#000000;8.21;7
+ana;NeonTextBox: code;edilgen;yazı;#6D6D6D;#000000;4.06;7
+ana;NeonButton: Seç…;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Seç…;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Seç…;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Seç…;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Seç…;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Test et;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Test et;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Test et;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Test et;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Test et;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonCheckBox: Günlük tut;seçili;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonCheckBox: Günlük tut;edilgen;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonCheckBox: Betikleri yönetici olarak çalıştır;boş;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonCheckBox: Betikleri yönetici olarak çalıştır;edilgen;yazı;#FFFFFF;#000000;21.00;7
+ana;NeonButton: Günlük klasörünü aç;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Günlük klasörünü aç;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Günlük klasörünü aç;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Günlük klasörünü aç;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Günlük klasörünü aç;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kapat;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kapat;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kapat;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kapat;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kapat;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Yenile;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Yenile;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Yenile;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Yenile;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Yenile;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kaydet;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kaydet;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kaydet;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kaydet;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kaydet;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Sağ menü…;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Sağ menü…;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Sağ menü…;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Sağ menü…;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Sağ menü…;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Yedekten geri yükle;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Yedekten geri yükle;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Yedekten geri yükle;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Yedekten geri yükle;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Yedekten geri yükle;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kaldır;dinlenik;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kaldır;hover;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kaldır;basılı;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kaldır;odak;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kaldır;edilgen;yazı;#AC7FFF;#000000;7.23;7
+ana;NeonButton: Kur / Güncelle;dinlenik;yazı;#000000;#4DA6FF;8.21;7
+ana;NeonButton: Kur / Güncelle;hover;yazı;#000000;#4DA6FF;8.21;7
+ana;NeonButton: Kur / Güncelle;basılı;yazı;#000000;#4DA6FF;8.21;7
+ana;NeonButton: Kur / Güncelle;odak;yazı;#000000;#4DA6FF;8.21;7
+ana;NeonButton: Kur / Güncelle;edilgen;yazı;#000000;#4DA6FF;8.21;7

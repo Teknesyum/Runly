@@ -1,0 +1,19 @@
+<Project>
+
+  <PropertyGroup>
+    <TeknesyumTokensSource>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\teknesyum-ui\theme.tokens.json'))</TeknesyumTokensSource>
+    <TeknesyumTokensScript>$(MSBuildThisFileDirectory)gen-tokens.ps1</TeknesyumTokensScript>
+  </PropertyGroup>
+
+  <Target Name="GenerateTeknesyumTokens" BeforeTargets="CoreCompile" Inputs="$(TeknesyumTokensSource);$(TeknesyumTokensScript)" Outputs="$(ProjectDir)$(IntermediateOutputPath)TeknesyumTokens.g.cs">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(TeknesyumTokensScript)&quot; -Source &quot;$(TeknesyumTokensSource)&quot; -Output &quot;$(ProjectDir)$(IntermediateOutputPath)TeknesyumTokens.g.cs&quot;" />
+  </Target>
+
+  <Target Name="IncludeTeknesyumTokens" BeforeTargets="CoreCompile" DependsOnTargets="GenerateTeknesyumTokens">
+    <ItemGroup>
+      <Compile Include="$(ProjectDir)$(IntermediateOutputPath)TeknesyumTokens.g.cs" />
+      <FileWrites Include="$(ProjectDir)$(IntermediateOutputPath)TeknesyumTokens.g.cs" />
+    </ItemGroup>
+  </Target>
+
+</Project>

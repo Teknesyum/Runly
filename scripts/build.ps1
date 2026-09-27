@@ -94,6 +94,17 @@ Write-Host ""
 Write-Host "> Çıktılar $Output/ altında toplanıyor..." -ForegroundColor Cyan
 
 if (Test-Path $Output) {
+    foreach ($file in Get-ChildItem $Output -File -Recurse) {
+        try {
+            $stream = [IO.File]::Open($file.FullName, 'Open', 'ReadWrite', 'None')
+            $stream.Close()
+        } catch {
+            $parked = Join-Path ([IO.Path]::GetTempPath()) ("runly-kilitli-" + [Guid]::NewGuid().ToString('N').Substring(0, 8))
+            New-Item -ItemType Directory $parked | Out-Null
+            Move-Item $file.FullName $parked
+            Write-Host "  ! $($file.Name) çalışıyor, $parked altına alındı" -ForegroundColor Yellow
+        }
+    }
     Remove-Item $Output -Recurse -Force
 }
 New-Item -ItemType Directory $Output | Out-Null

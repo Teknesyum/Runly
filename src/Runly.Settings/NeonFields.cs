@@ -124,7 +124,7 @@ internal static class NeonField
 
             var focused = control.Focused;
             var stroke = focused ? margin : IdleWidth;
-            using var pen = new Pen(focused ? Palette.NeonBlue : NeonTheme.IdleOutline, stroke);
+            using var pen = new Pen(focused ? Palette.Renk1 : NeonTheme.IdleOutline, stroke);
             var inset = stroke / 2f;
             g.DrawRectangle(pen, inset, inset, width - stroke, height - stroke);
         }
@@ -161,7 +161,7 @@ internal class NeonTextBox : TextBox
     {
         BorderStyle = BorderStyle.None;
         BackColor = Palette.FieldBg;
-        ForeColor = Palette.NeonBlue;
+        ForeColor = Palette.Renk1;
         Font = Palette.MonoBody;
         // The frame is carved out of the client area, and TextBox sizes itself to the text alone; without
         // a floor the reserved margin eats into the line and clips the descenders.
@@ -204,6 +204,46 @@ internal sealed class NeonListView : ListView
         BackColor = Palette.Surface;
         ForeColor = Palette.TextBody;
         Font = Palette.MonoBody;
+        OwnerDraw = true;
+    }
+
+    protected override void OnDrawColumnHeader(DrawListViewColumnHeaderEventArgs e)
+    {
+        using (var fill = new SolidBrush(Palette.Surface))
+        {
+            e.Graphics.FillRectangle(fill, e.Bounds);
+        }
+
+        using (var divider = new Pen(Color.FromArgb(NeonTheme.BorderAlpha, Palette.Renk1)))
+        {
+            e.Graphics.DrawLine(divider, e.Bounds.Left, e.Bounds.Bottom - 1, e.Bounds.Right, e.Bounds.Bottom - 1);
+            e.Graphics.DrawLine(divider, e.Bounds.Right - 1, e.Bounds.Top, e.Bounds.Right - 1, e.Bounds.Bottom - 1);
+        }
+
+        var text = Rectangle.Inflate(e.Bounds, -Metrics.Px(TeknesyumTokens.Space2), 0);
+        TextRenderer.DrawText(e.Graphics, e.Header?.Text, Palette.LabelFont, text, Palette.TextStrong,
+            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding);
+    }
+
+    protected override void OnDrawItem(DrawListViewItemEventArgs e)
+    {
+    }
+
+    protected override void OnDrawSubItem(DrawListViewSubItemEventArgs e)
+    {
+        if (e.Item is null || e.SubItem is null)
+        {
+            return;
+        }
+
+        using (var fill = new SolidBrush(e.Item.Selected ? Palette.SelectedFill : Palette.Surface))
+        {
+            e.Graphics.FillRectangle(fill, e.Bounds);
+        }
+
+        var text = Rectangle.Inflate(e.Bounds, -Metrics.Px(TeknesyumTokens.Space2), 0);
+        TextRenderer.DrawText(e.Graphics, e.SubItem.Text, Font, text, Palette.TextBody,
+            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding);
     }
 
     protected override void WndProc(ref Message m)

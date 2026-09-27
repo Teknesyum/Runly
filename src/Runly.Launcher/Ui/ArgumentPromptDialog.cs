@@ -49,13 +49,13 @@ internal static unsafe class ArgumentPromptDialog
         s_accepted = false;
         s_closing = false;
 
-        s_backgroundBrush = NativeMethods.CreateSolidBrush(NeonWindowChrome.ColorSurface);
+        s_backgroundBrush = NativeMethods.CreateSolidBrush(NeonWindowChrome.ColorBg);
         s_editBrush = NativeMethods.CreateSolidBrush(NeonWindowChrome.ColorEditBg);
 
         var window = NativeMethods.CreateWindowExW(
             NativeMethods.WsExDlgModalFrame | NativeMethods.WsExControlParent,
             ClassName,
-            "Runly — Argümanlarla çalıştır",
+            Runly.Core.Shell.RunlyRegistryLayout.ApplicationName + " — Argümanlarla çalıştır",
             NativeMethods.WsPopup | NativeMethods.WsThickFrame | NativeMethods.WsSysMenu |
             NativeMethods.WsMinimizeBox | NativeMethods.WsMaximizeBox,
             0, 0, 100, 100,
@@ -135,7 +135,7 @@ internal static unsafe class ArgumentPromptDialog
                 WndProc = (nint)(delegate* unmanaged<nint, uint, nint, nint, nint>)&WindowProc,
                 Instance = instance,
                 Cursor = NeonWindowChrome.LoadArrowCursor(),
-                Background = NativeMethods.CreateSolidBrush(NeonWindowChrome.ColorSurface),
+                Background = NativeMethods.CreateSolidBrush(NeonWindowChrome.ColorBg),
                 ClassName = classNamePointer,
             };
 
@@ -246,7 +246,7 @@ internal static unsafe class ArgumentPromptDialog
                 return NeonWindowChrome.HitTest(hwnd, lParam, CaptionButtons);
 
             case NativeMethods.WmPaint:
-                NeonWindowChrome.DrawCaption(hwnd, s_backgroundBrush, "Runly", CaptionButtons, s_sansFont);
+                NeonWindowChrome.DrawCaption(hwnd, s_backgroundBrush, Runly.Core.Shell.RunlyRegistryLayout.ApplicationName, CaptionButtons, s_sansFont);
                 return 0;
 
             case NativeMethods.WmActivate:
@@ -261,7 +261,7 @@ internal static unsafe class ArgumentPromptDialog
             case NativeMethods.WmCtlColorEdit:
                 NativeMethods.SetBkMode(wParam, NativeMethods.OpaqueBkMode);
                 NativeMethods.SetBkColor(wParam, NeonWindowChrome.ColorEditBg);
-                NativeMethods.SetTextColor(wParam, NeonWindowChrome.ColorNeonBlue);
+                NativeMethods.SetTextColor(wParam, NeonWindowChrome.ColorRenk1);
                 return s_editBrush;
 
             case NativeMethods.WmDrawItem:

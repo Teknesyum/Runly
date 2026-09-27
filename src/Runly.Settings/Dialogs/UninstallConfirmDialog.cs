@@ -16,7 +16,7 @@ internal sealed class UninstallConfirmDialog : NeonForm
         ShowInTaskbar = false;
         ClientSize = new Size(Metrics.Px(420), Metrics.Px(220));
         AutoScaleMode = AutoScaleMode.Dpi;
-        Padding = new Padding(Metrics.Px(16));
+        Padding = new Padding(Metrics.Px(TeknesyumTokens.Space4));
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
         Font = Palette.Body;
@@ -41,7 +41,7 @@ internal sealed class UninstallConfirmDialog : NeonForm
             AutoSize = true,
             ForeColor = Palette.TextBody,
             MaximumSize = new Size(contentWidth, 0),
-            Margin = new Padding(0, 0, 0, Metrics.Px(8)),
+            Margin = new Padding(0, 0, 0, Metrics.Px(TeknesyumTokens.Space2)),
         };
 
         _restoreBackupCheck = new NeonCheckBox
@@ -58,7 +58,7 @@ internal sealed class UninstallConfirmDialog : NeonForm
             ForeColor = Palette.TextDim,
             AutoSize = true,
             MaximumSize = new Size(contentWidth, 0),
-            Margin = new Padding(0, Metrics.Px(8), 0, 0),
+            Margin = new Padding(0, Metrics.Px(TeknesyumTokens.Space2), 0, 0),
         };
 
         layout.Controls.Add(question, 0, 0);
@@ -71,7 +71,7 @@ internal sealed class UninstallConfirmDialog : NeonForm
             AutoSize = true,
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
             Anchor = AnchorStyles.Top | AnchorStyles.Right,
-            Margin = new Padding(0, Metrics.Px(10), 0, 0),
+            Margin = new Padding(0, Metrics.Px(TeknesyumTokens.Space2), 0, 0),
             BackColor = Color.Transparent,
         };
 

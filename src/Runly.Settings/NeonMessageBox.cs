@@ -38,17 +38,17 @@ internal sealed class NeonMessageDialog : NeonForm
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
         Font = Palette.Body;
-        Padding = new Padding(Metrics.Px(20));
+        Padding = new Padding(Metrics.Px(TeknesyumTokens.Space4));
         ClientSize = MeasureDialog(message);
 
         // The badge sits in the card's left padding, so that padding is the badge slot rather than a number
         // of its own; the same applies to the title band above it.
         var card = new NeonGroupPanel(CaptionFor(icon)) { Dock = DockStyle.Fill };
         card.Padding = new Padding(
-            BadgeInset + BadgeSize + Metrics.Px(16),
-            Metrics.GroupTitleBand + Metrics.Px(8),
-            Metrics.Px(20),
-            Metrics.Px(18));
+            BadgeInset + BadgeSize + Metrics.Px(TeknesyumTokens.Space4),
+            Metrics.GroupTitleBand + Metrics.Px(TeknesyumTokens.Space2),
+            Metrics.Px(TeknesyumTokens.Space4),
+            Metrics.Px(TeknesyumTokens.Space4));
 
         var messageLabel = new Label
         {
@@ -62,7 +62,7 @@ internal sealed class NeonMessageDialog : NeonForm
 
         var iconBadge = new IconBadge(icon)
         {
-            Location = new Point(BadgeInset, Metrics.GroupTitleBand + Metrics.Px(12)),
+            Location = new Point(BadgeInset, Metrics.GroupTitleBand + Metrics.Px(TeknesyumTokens.Space3)),
             Size = new Size(BadgeSize, BadgeSize),
             Anchor = AnchorStyles.Top | AnchorStyles.Left,
         };
@@ -70,10 +70,10 @@ internal sealed class NeonMessageDialog : NeonForm
         var buttonBar = new FlowLayoutPanel
         {
             Dock = DockStyle.Bottom,
-            Height = Metrics.ButtonHeight + Metrics.Px(18),
+            Height = Metrics.ButtonHeight + Metrics.Px(TeknesyumTokens.Space4),
             FlowDirection = FlowDirection.RightToLeft,
             WrapContents = false,
-            Padding = new Padding(0, Metrics.Px(10), 0, 0),
+            Padding = new Padding(0, Metrics.Px(TeknesyumTokens.Space2), 0, 0),
             BackColor = Palette.Surface,
         };
 
@@ -90,7 +90,7 @@ internal sealed class NeonMessageDialog : NeonForm
                 Primary = i == DefaultIndex(defaultButton, definitions.Length),
                 BackColor = Palette.Surface,
                 AutoSize = true,
-                Margin = new Padding(Metrics.Px(8), 0, 0, 0),
+                Margin = new Padding(Metrics.Px(TeknesyumTokens.Space2), 0, 0, 0),
             };
             buttonBar.Controls.Add(button);
             if (button.Primary) defaultControl = button;
@@ -106,7 +106,7 @@ internal sealed class NeonMessageDialog : NeonForm
         Shown += (_, _) => defaultControl?.Focus();
     }
 
-    private static int BadgeInset => Metrics.Px(18);
+    private static int BadgeInset => Metrics.Px(TeknesyumTokens.Space4);
 
     private static int BadgeSize => Metrics.Px(36);
 
@@ -179,10 +179,10 @@ internal sealed class NeonMessageDialog : NeonForm
             // "look at this" accent must not arrive in the same colour.
             var color = _kind switch
             {
-                MessageBoxIcon.Error => Palette.PinkText,
+                MessageBoxIcon.Error => Palette.Renk2Text,
                 MessageBoxIcon.Warning => Palette.Warning,
-                MessageBoxIcon.Question => Palette.PurpleText,
-                _ => Palette.NeonBlue,
+                MessageBoxIcon.Question => Palette.Renk3Text,
+                _ => Palette.Renk1,
             };
             var inset = Metrics.Px(2);
             var diameter = Math.Max(1, Math.Min(Width, Height) - (inset * 2) - 1);

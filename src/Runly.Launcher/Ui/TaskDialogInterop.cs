@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using System.Text;
 using Runly.Core.Abstractions;
 using Runly.Core.Models;
+using Runly.Core.Services;
 
 namespace Runly.Launcher.Ui;
 
@@ -72,7 +73,7 @@ internal sealed unsafe class TaskDialogInterop : IDialogService
                 Parent = NativeMethods.GetConsoleWindow(),
                 Flags = NativeMethods.TdfAllowDialogCancellation | (isMotw ? NativeMethods.TdfCallbackTimer : 0),
                 CommonButtons = NativeMethods.TdcbfCancelButton,
-                WindowTitle = Alloc(allocations, "Runly — Script çalıştırılacak"),
+                WindowTitle = Alloc(allocations, Runly.Core.Shell.RunlyRegistryLayout.ApplicationName + " — Script çalıştırılacak"),
                 MainIcon = icon,
                 MainInstruction = Alloc(allocations, mainInstruction),
                 Content = Alloc(allocations, BuildContent(script, commandLine, verdict)),
@@ -172,6 +173,42 @@ internal sealed unsafe class TaskDialogInterop : IDialogService
         return false;
     }
 
+    /// <summary>
+    /// Shows which processes hold a file open and offers to end them (K33). Returns <see langword="true"/>
+    /// when the user asked for that; the caller decides what to retry afterwards.
+    /// </summary>
+    internal bool AskUnlock(string fileName, IReadOnlyList<FileLockHolder> holders)
+    {
+        ArgumentNullException.ThrowIfNull(holders);
+
+        var body = new StringBuilder();
+        body.Append('"').Append(fileName).Append("\" şu an başka bir program tarafından kullanılıyor:\n\n");
+
+        foreach (var holder in holders)
+        {
+            body.Append("• ").Append(holder.Name).Append(" (PID ").Append(holder.ProcessId).Append(')');
+            if (holder.ExecutablePath is { Length: > 0 } path)
+            {
+                body.Append('\n').Append("   ").Append(path);
+            }
+
+            body.Append('\n');
+        }
+
+        body.Append("\nBu programları kapatırsanız kaydedilmemiş çalışmaları kaybolabilir.");
+
+        const int endButtonId = 3001;
+        var pressed = ShowSimple(
+            "Dosya kullanımda",
+            body.ToString(),
+            NativeMethods.TdWarningIcon,
+            NativeMethods.TdcbfCancelButton,
+            [(endButtonId, "Sonlandır ve yeniden dene")],
+            out var button);
+
+        return pressed && button == endButtonId;
+    }
+
     private bool ShowSimple(
         string title,
         string body,
@@ -190,7 +227,7 @@ internal sealed unsafe class TaskDialogInterop : IDialogService
                 Parent = NativeMethods.GetConsoleWindow(),
                 Flags = NativeMethods.TdfAllowDialogCancellation,
                 CommonButtons = commonButtons,
-                WindowTitle = Alloc(allocations, "Runly"),
+                WindowTitle = Alloc(allocations, Runly.Core.Shell.RunlyRegistryLayout.ApplicationName),
                 MainIcon = icon,
                 MainInstruction = Alloc(allocations, title),
                 Content = Alloc(allocations, body),

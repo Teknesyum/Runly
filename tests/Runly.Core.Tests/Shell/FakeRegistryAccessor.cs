@@ -13,6 +13,7 @@ internal sealed class FakeRegistryAccessor : IRegistryAccessor
         {
             [RegistryRoot.CurrentUser] = new(StringComparer.OrdinalIgnoreCase),
             [RegistryRoot.ClassesRoot] = new(StringComparer.OrdinalIgnoreCase),
+            [RegistryRoot.LocalMachine] = new(StringComparer.OrdinalIgnoreCase),
         };
 
     /// <summary>Every write that was rejected because it targeted a hive other than HKCU.</summary>

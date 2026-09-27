@@ -18,7 +18,7 @@ internal sealed class RestoreBackupDialog : NeonForm
         ShowInTaskbar = false;
         ClientSize = new Size(Metrics.Px(520), Metrics.Px(320));
         AutoScaleMode = AutoScaleMode.Dpi;
-        Padding = new Padding(Metrics.Px(12));
+        Padding = new Padding(Metrics.Px(TeknesyumTokens.Space3));
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
         Font = Palette.Body;
@@ -55,7 +55,7 @@ internal sealed class RestoreBackupDialog : NeonForm
         {
             Dock = DockStyle.Bottom,
             FlowDirection = FlowDirection.RightToLeft,
-            Height = Metrics.ButtonHeight + Metrics.Px(8),
+            Height = Metrics.ButtonHeight + Metrics.Px(TeknesyumTokens.Space2),
             BackColor = Palette.AppBg,
         };
 
@@ -79,7 +79,7 @@ internal sealed class RestoreBackupDialog : NeonForm
     {
         if (_list.SelectedItems.Count == 0)
         {
-            NeonMessageBox.Show(this, "Lütfen bir yedek seçin.", "Runly Ayarları",
+            NeonMessageBox.Show(this, "Lütfen bir yedek seçin.", Strings.Get("app.title"),
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }

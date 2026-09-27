@@ -1,8 +1,8 @@
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const lum = h => { const [r, g, b] = hex(h).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
 const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
-const tint = (base, c, a) => '#' + hex(base).map((v, i) => Math.trunc(v + (hex(c)[i] - v) * a / 255)).map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase();
-const bgr = u => '#' + [u & 0xff, (u >> 8) & 0xff, (u >> 16) & 0xff].map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+const tint = (base, c, a) => '#' + hex(base).map((v, i) => Math.trunc(v + (hex(c)[i] - v) * a / 255)).map(v => v.toString(16).padStart(2, '0')).join('').toLocaleUpperCase('tr');
+const bgr = u => '#' + [u & 0xff, (u >> 8) & 0xff, (u >> 16) & 0xff].map(v => v.toString(16).padStart(2, '0')).join('').toLocaleUpperCase('tr');
 const S = '#08090A', BLUE = '#00F3FF', PINK = '#FF00EA', PURPLE = '#B026FF', PT = '#C67EFF', PKT = '#FF54EB', W = '#FFFFFF', WARN = '#FBBF24', OK = '#34D399';
 const rows = [
   ['Başlatıcı', 'NeonWindowChrome.cs:190', 'ikincil düğme yazısı (önce)', bgr(0xFF26B0), bgr(0x0A0908), 7],
@@ -30,6 +30,13 @@ const rows = [
   ['Açık', 'MainForm.cs:1148', 'Durum: Bağlı (yeşil yazı yeşil dolgu, aile ihlali)', OK, tint(S, OK, 40), 7],
   ['Açık', 'ChooseApplicationDialog.cs:434', 'seçili satır adı (mavi yazı mavi dolgu)', BLUE, tint(S, BLUE, 34), 7],
   ['Açık', 'ChooseApplicationDialog.cs:479', 'Önerilen çipi (pembe yazı pembe dolgu)', PKT, tint(S, PINK, 26), 7],
+  ['Kurulum', 'scripts/install.ps1', 'başlık ve adım yazısı (Text)', W, '#000000', 7],
+  ['Kurulum', 'scripts/install.ps1', 'eski günlük satırı (beyaz alfa 150)', tint('#000000', W, 150), '#000000', 7],
+  ['Kurulum', 'scripts/install.ps1', 'son günlük satırı ve yüzde (NeonBlue)', BLUE, '#000000', 7],
+  ['Kurulum', 'scripts/install.ps1', 'hata cümlesi ve × (PinkText)', PKT, '#000000', 7],
+  ['Kurulum', 'scripts/install.ps1', 'ikincil düğme yazısı (PurpleText)', PT, '#000000', 7],
+  ['Kurulum', 'scripts/install.ps1', 'bitti adımları ve yüzde (Success)', OK, '#000000', 7],
+  ['Kurulum', 'scripts/install.ps1', 'birincil düğme yazısı (siyah / mavi alfa 190)', '#000000', tint('#000000', BLUE, 190), 7],
 ];
 console.log('| Yüzey | Dosya:Satır | Öğe | Ön | Zemin | Oran | Eşik | Sonuç |');
 console.log('|---|---|---|---|---|---|---|---|');

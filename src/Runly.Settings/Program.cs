@@ -29,12 +29,31 @@ internal static class Program
         trustStore.Load();
 
         var pathSearcher = new PathSearcher(null, logger);
-        var shellRegistrar = new ShellRegistrar(pathSearcher);
-        var registryBackup = new RegistryBackup(new Win32RegistryAccessor());
+        var registry = new Win32RegistryAccessor();
+        var menuCleaner = new ContextMenuCleaner(registry, new ContextMenuScanner(registry));
+        var shellRegistrar = new ShellRegistrar(pathSearcher, menuCleaner);
+        var registryBackup = new RegistryBackup(registry);
+
+        var installDir = AppContext.BaseDirectory;
+        UpdateService.CleanupOld(installDir);
+        using var http = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
+        using var updates = new UpdateController(
+            new UpdateService(http),
+            typeof(Program).Assembly.GetName().Version ?? new Version(0, 0),
+            installDir,
+            logger);
 
         try
         {
-            Application.Run(new MainForm(configStore, config, trustStore, shellRegistrar, registryBackup, logger, selectedExtension));
+            var form = new MainForm(configStore, config, trustStore, shellRegistrar, registryBackup, menuCleaner, logger, selectedExtension);
+            form.AttachUpdates(updates);
+            updates.Restart = () =>
+            {
+                form.Close();
+                return !form.Visible;
+            };
+            form.Shown += async (_, _) => await updates.CheckAsync();
+            Application.Run(form);
         }
         catch (Exception ex)
         {
@@ -49,7 +68,7 @@ internal static class Program
         NeonMessageBox.Show(
             $"Beklenmeyen bir hata oluştu ve uygulama devam edemiyor:\n\n{exception.Message}\n\n" +
             "Ayrıntılar günlük dosyasına yazıldı.",
-            "Runly Ayarları — Hata",
+            Runly.Core.Shell.RunlyRegistryLayout.ApplicationName + " Ayarları — Hata",
             MessageBoxButtons.OK,
             MessageBoxIcon.Error);
     }

@@ -219,12 +219,24 @@ Hepsi **HKCU** altında — yönetici hakkı gerekmez.
 HKCU\Software\Classes\Runly.Script.js\
    (default)                  = "JavaScript Script (Runly)"
    DefaultIcon                = "<kurulum>\assets\js.ico,0"
+   shell\open\                = MUIVerb "Runly ile çalıştır"
    shell\open\command         = "<kurulum>\RunlyConsole.exe" "%1" %*
-   shell\runas\command        = "<kurulum>\RunlyConsole.exe" --verb runas "%1" %*
-   shell\edit\command         = "<kurulum>\RunlyConsole.exe" --verb edit "%1"
-   shell\runlyargs\           = MUIVerb "Runly ile argümanlarla çalıştır…"
-   shell\runlyargs\command    = "<kurulum>\RunlyConsole.exe" --verb prompt-args "%1"
+   shell\edit\                = MUIVerb "Runly: Düzenle (Notepad++)"
+   shell\edit\command         = "<kurulum>\Runly.exe" --verb edit "%1"
 ```
+
+Menüde ayrı bir yönetici fiili yoktur (K31). Yükseltme bir **ayardır**: genel `runAsAdmin`, uzantı
+başına `extensions[".py"].runAsAdmin` ile ezilir. Açıkken `open` fiili `--verb runas` ile yazılır ve
+etiketi "Runly ile yönetici olarak çalıştır" olur; UAC onayı her çalıştırmada yine sorulur.
+`edit` fiilinin etiketine editörün adı yazılır (`EditorName.EditVerbLabel`): dosya gerçekten varsa
+`FileVersionInfo.FileDescription`, yoksa dosya adının baş harfi büyütülmüş hali.
+
+`shell` ağacı her kurulumda silinip yeniden yazılır; eski sürümün bıraktığı fiil (ör. kaldırılan
+`runlyargs`) menüde kalmaz. `--verb prompt-args` komut satırından kullanılabilir, menüde yoktur.
+
+Ayarlarda kapatılmış bir uzantının ProgID'si kurulumda **silinir**, `OpenWithProgids` değeri ve
+Runly'yi gösteren `(default)` bağı da kaldırılır (K30). Kapalı uzantı bağlı kalırsa hem çift tık
+kapatılmış bir yorumlayıcıya gider hem de sağ menü sadeleştirmesi o türü kapsamaz.
 
 `Kind=Open` eşlemesinde tek fiil yazılır ve GUI ikilisine bağlanır (K29):
 ```
@@ -336,6 +348,10 @@ Paketler arası çelişkiler burada çözülür. Bir paket dosyası bu bölümle
 | K25 | Registry MCP gerçek registry'yi görüyor | `mcp__Windows-MCP__Registry` konteyner dışını okuyor/yazıyor (kanıt: R1'in en son yazdığı `.js` `UserChoice` `Hash = ACLO94VoMj0=` değerini görüyor). K22 hâlâ geçerli — ama artık doğrulama için Explorer script'ine ek olarak bu araç da kullanılabilir. Sınırı: `(default)` değerini **silemiyor**, yalnızca boş dizeye ayarlayabiliyor. | 2026-08-11 |
 | K26 | Kaldırmada `UserChoice` **geri yüklenmez, silinir** | R4 sordu: kaldırırken `.js`'in eski `ProgId`'si (`JSFile`) geri yazılabilir mi? **Hayır ve denenmeyecek.** Windows `UserChoice`'ı `Hash` ile doğrular; geçerli hash olmadan yazılan `ProgId` bozuk bir kayıt üretir ve Windows bunu kurcalama sayıp yok sayar — silmekten **daha kötü** bir sonuç. Hash üretmek §2 gereği yasak. Dolayısıyla mevcut davranış (kendi yazdığımız `UserChoice`'ı silmek) doğrudur ve kaldırma diyaloğunda zaten beyan ediliyor (".js eski WScript davranışına dönmez"). Bulgu kapatıldı, paket açılmadı. **Gelecek iyileştirme (engelleyici değil):** kurulum yedeği önceki handler'ı biliyor; kaldırma diyaloğu "eskiden X ile açılıyordu" diyebilir. | 2026-08-11 |
 | K27 | Varsayılan uygulama deep link'i | Dış araştırma (GPT) `ms-settings:defaultapps?registeredAppUser=Runly` deep link'ini önerdi. **Kabul edildi — ekleme olarak.** Windows 11'de destekleniyor, uygulamanın `RegisteredApplications` + `Capabilities` kaydını gerektiriyor (Runly bunu zaten yazıyor) ve genel ayar ekranına göre kullanıcıyı doğrudan Runly sayfasına götürüyor. **Reddedilen kısım:** aynı araştırma "Explorer'ın Birlikte aç akışını kaldırın, varsayılan belirleyemiyor" diyor — bu **yanlış**; `SHOpenWithDialog` **API'si** ile Explorer'ın **kendi** "Başka bir uygulama seç → Her zaman" akışı karıştırılmış. İkincisi R1 ve R3'te iki kez ölçüldü ve `UserChoice`'ı gerçekten yazdı (K23). O akış korunacak; deep link hızlı yol, Explorer akışı kanıtlanmış geri düşüş. **Şart:** deep link'in bu makinede kaç tık gerektirdiği **ölçülmeden** arayüzde "tek tıkla" benzeri bir cümle yazılamaz (B1'in tekrarı olur). | 2026-08-13 |
+| K33 | Kilitli dosya penceresi | **Kendiliğinden, hata anında.** Betik okunamadığında (`IOException`/`UnauthorizedAccessException`) `FileLockInspector` Restart Manager'a sorar, dosyayı tutan süreçleri listeler ve "Sonlandır ve yeniden dene" penceresini gösterir. Menüye yeni bir fiil eklenmez; File Locksmith girdisi buna karşılık gizlenebilir hale gelir. | 2026-09-12 |
+| K32 | Küresel girdiyi her dosyadan kaldırma | **Serbest.** Kullanıcı bir statik fiili yalnız Runly türlerinden değil her dosyadan kaldırabilir; bu durumda `AppliesTo` yerine HKCU kopyasına `ProgrammaticAccessOnly` yazılır ve `MenuCleanup\Verbs` defterine işlenir. Gerekçe: menü "işlev kaybı olmadan olabildiğince dar" olacak; defter sayesinde kaldırma her şeyi geri koyar. | 2026-09-12 |
+| K31 | Yönetici olarak çalıştır | **Fiil değil, ayar.** Sağ menüdeki "Runly ile yönetici olarak çalıştır" kaldırıldı; yerine genel `runAsAdmin` anahtarı ve uzantı başına ezme geldi. Açıkken çift tık doğrudan yükselterek çalıştırır. UAC'ı kapatmak **önerilmez** — kapalı UAC yönetici hakkını her programa sessizce açar; ayar yalnızca istemi öne getirir, kaldırmaz. | 2026-09-12 |
+| K30 | Ayarlarda kapatılan uzantı | **Bağ da kopar.** Kurulum, kapalı eşlemenin ProgID ağacını siler, `OpenWithProgids` değerini ve Runly'yi gösteren `(default)` bağını kaldırır, Runly'ye ait UserChoice'ı serbest bırakır. Gerekçe: hedef makinede `.sh`/`.pl` ayarlarda kapalıyken eski kurulumdan Runly'ye bağlı kalmıştı; `bash`/`perl` kurulu olmadığı için çift tık ölü bir bağa gidiyordu ve sağ menü sadeleştirmesi (yalnız çalıştırılan türleri kapsar) o türlere uygulanmıyordu. | 2026-09-12 |
 | K8 | Publish dosya kilidi | Gerçek (T1'de görüldü, Defender kaynaklı). T6 `build.ps1` publish adımına **3 denemeye kadar retry** koyacak (500 ms bekleme). | 2026-08-09 |
 
 ## 12. Kabul senaryoları (T7'de bunlar tek tek denenecek)

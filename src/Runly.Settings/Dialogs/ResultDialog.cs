@@ -30,7 +30,7 @@ internal sealed class ResultDialog : NeonForm
         ShowInTaskbar = false;
         ClientSize = new Size(Metrics.Px(540), Metrics.Px(360));
         AutoScaleMode = AutoScaleMode.Dpi;
-        Padding = new Padding(Metrics.Px(12));
+        Padding = new Padding(Metrics.Px(TeknesyumTokens.Space3));
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
         Font = Palette.Body;
@@ -47,7 +47,7 @@ internal sealed class ResultDialog : NeonForm
                 : "❌ İşlem başarısız oldu.",
             ForeColor = success
                 ? warned ? Palette.Warning : Palette.Success
-                : Palette.PinkText,
+                : Palette.Renk2Text,
         };
 
         var textBox = new NeonTextBox
@@ -74,7 +74,7 @@ internal sealed class ResultDialog : NeonForm
         {
             Dock = DockStyle.Bottom,
             FlowDirection = FlowDirection.RightToLeft,
-            Height = Metrics.ButtonHeight + Metrics.Px(8),
+            Height = Metrics.ButtonHeight + Metrics.Px(TeknesyumTokens.Space2),
             BackColor = Palette.AppBg,
         };
         buttonPanel.Controls.Add(closeButton);

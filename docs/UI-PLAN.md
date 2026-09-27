@@ -146,7 +146,7 @@ kontrolü. 0.2.0 yayınlandıktan sonra tek parça hâlinde yapılır.
 sonra ilerlemiş kısmını kapattı. Kanıt: `docs/reports/yigin1-turkce-ana-pencere.png` ve
 `docs/reports/yigin1-ingilizce-ana-pencere.png`.
 
-- **Tek doğruluk kaynağı:** hex değerleri `src/Runly.Core/Theme/TeknesyumTokens.cs`'e taşındı,
+- **Tek doğruluk kaynağı:** hex değerleri `src/Runly.Core/Theme/TeknesyumTokens.cs`'e taşındı (2026-09-27'den beri `teknesyum-ui/theme.tokens.json`'dan derlemede üretiliyor),
   `Palette` oradan okuyor. Yüzey `#0A0A0C` → `#08090A`; kaymış ikinci kopya artık yok.
 - **Tipografi:** ölçek beş basamağa çekildi — 14/16/20/24/30 px. H2 24, H3 20, Hero 30,
   MonoBody 14. Satır yükseklikleri `Metrics` üzerinden kendini topladı, sabit piksel eklenmedi.

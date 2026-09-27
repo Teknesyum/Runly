@@ -13,6 +13,7 @@ public sealed class Win32RegistryAccessor : IRegistryAccessor
 {
     private static readonly IntPtr HkeyCurrentUser = new(unchecked((int)0x80000001));
     private static readonly IntPtr HkeyClassesRoot = new(unchecked((int)0x80000000));
+    private static readonly IntPtr HkeyLocalMachine = new(unchecked((int)0x80000002));
 
     private const int ErrorSuccess = 0;
     private const int ErrorFileNotFound = 2;
@@ -252,8 +253,12 @@ public sealed class Win32RegistryAccessor : IRegistryAccessor
         }
     }
 
-    private static IntPtr RootHandle(RegistryRoot root) =>
-        root == RegistryRoot.CurrentUser ? HkeyCurrentUser : HkeyClassesRoot;
+    private static IntPtr RootHandle(RegistryRoot root) => root switch
+    {
+        RegistryRoot.CurrentUser => HkeyCurrentUser,
+        RegistryRoot.LocalMachine => HkeyLocalMachine,
+        _ => HkeyClassesRoot,
+    };
 
     private static IntPtr Open(RegistryRoot root, string subKey, int access)
     {
