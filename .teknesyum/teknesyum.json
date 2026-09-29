@@ -1,0 +1,84 @@
+{
+  "icon": ".teknesyum/icon.png",
+  "screenshot": ".teknesyum/shot.jpg",
+  "full": ".teknesyum/full.jpg",
+  "catalog": {
+    "category": "system",
+    "tags": {
+      "tr": [
+        "betik",
+        "dosya-ilişkilendirme",
+        "windows",
+        "geliştirici"
+      ],
+      "en": [
+        "scripts",
+        "file-association",
+        "windows",
+        "developer"
+      ]
+    },
+    "summary": {
+      "tr": "JavaScript, PowerShell, Python ve kabuk betiklerini çift tıklamayla sıradan bir Windows programı gibi çalıştıran dosya ilişkilendirme merkezi. Betik düzenleyicide açılmak yerine doğru yorumlayıcı bulunur, güvenlik denetiminden geçer ve çalıştırılır; internetten inen dosyalara daha sıkı davranır. Sağ tık menüsüne \"Runly ile çalıştır\" ekler, istenirse argüman sorar. Dosya ilişkilendirmelerini değiştirirken geri alınabilir kayıt defteri yedeği tutar ve bunu grafik ayar ekranından yapar. Windows 10 ve 11 için.",
+      "en": "A file-association hub that lets you double-click JavaScript, PowerShell, Python and shell scripts and run them like regular Windows programs. Instead of opening in an editor, a script gets the right interpreter, passes safety checks and runs; files downloaded from the internet are treated more strictly. It adds a \"Run with Runly\" context-menu entry with optional arguments. Association changes are made from a settings window and keep reversible registry backups. For Windows 10 and 11."
+    },
+    "points": {
+      "tr": [
+        "Betiğe doğru yorumlayıcıyı kendisi bulur",
+        "Önce shebang satırını, sonra uzantıyı okur",
+        "Eksik yorumlayıcıyı tahmin etmeden bildirir",
+        "Çalıştırmadan önce internet işaretini denetler",
+        "Güvenilir klasör ve dosya listesi",
+        "Ayarlanabilir güvenlik modu",
+        "Sağ tık menüsündeki tüm girdileri listeler",
+        "İstenmeyen sağ tık girdilerini gizler",
+        "Kayıt defteri değişikliklerini yedekler",
+        "Kaldırınca eski durumu geri yükler",
+        "Dosyayı kilitleyen süreci bulup kapatmayı önerir",
+        "Hata kodunda konsol penceresini açık tutar",
+        "Her uzantının bağlı olup olmadığını gösterir",
+        "Tek PowerShell komutuyla, SHA-256 doğrulamalı kurulum",
+        "Açılışta güncelleme denetimi",
+        "Windows 10/11, Türkçe arayüz"
+      ],
+      "en": [
+        "Finds the right interpreter for a script itself",
+        "Reads the shebang first, then the extension",
+        "Reports a missing interpreter instead of guessing",
+        "Checks the downloaded-file mark before running",
+        "Trusted folder and file list",
+        "Configurable security mode",
+        "Lists every entry in the right-click menu",
+        "Hides unwanted right-click entries",
+        "Backs up registry changes",
+        "Restores the previous state on uninstall",
+        "Finds the process locking a file and offers to end it",
+        "Keeps the console open on an error exit code",
+        "Shows whether each extension is really bound",
+        "One PowerShell command, SHA-256 verified install",
+        "Update check on startup",
+        "Windows 10/11, Turkish interface"
+      ]
+    },
+    "uses": {
+      "tr": [
+        "Betikleri çift tıklayıp çalıştır",
+        "Doğru yorumlayıcıyı kendiliğinden bul",
+        "İnternetten ineni önce denetle",
+        "Sağ tık menüsünü sadeleştir",
+        "Kaldırınca eski ayarlara dön"
+      ],
+      "en": [
+        "Run scripts with a double-click",
+        "Find the right interpreter automatically",
+        "Check downloaded files first",
+        "Clean up the right-click menu",
+        "Restore old settings on uninstall"
+      ]
+    },
+    "lead": {
+      "tr": "Betik Çalıştırıcı, Dosya İlişkilendirme ve Sağ Tık Menüsü Yöneticisi",
+      "en": "Script Runner, File Association and Context Menu Manager"
+    }
+  }
+}
