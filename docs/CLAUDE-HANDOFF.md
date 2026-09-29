@@ -19,7 +19,7 @@ Repository: `https://github.com/Teknesyum/Runly`
 
 ## Default-app decision — important
 
-Windows 11 protects per-user defaults in the `UserChoice` registry key. Runly must never delete, write, or forge that protected choice/hash.
+Windows 11 protects per-user defaults in the `UserChoice` registry key. Runly's own process never writes it; the bulk PS-SFTA command the user runs in their own shell may (SPEC K34).
 
 `SHOpenWithDialog` is not a permanent-binding solution on current Windows 11: when launched through that API it offers only **Just once**. Do not restore it to the Settings UI.
 
@@ -91,7 +91,7 @@ The new cyan/pink icon was visually verified in the live Release Settings title 
 
 - Do not silently claim Windows defaults.
 - Do not use `SHOpenWithDialog` as the permanent-binding CTA.
-- Do not mutate `UserChoice`.
+- Runly's process does not mutate `UserChoice`; bulk binding goes through the clipboard command (SPEC K34).
 - Keep successful installation silent; only an actual installation failure gets a result dialog.
 - Keep the localized `Tümünü seç` / `Select all` extension action.
 - Display only the human-readable semantic version; strip build metadata after `+`.

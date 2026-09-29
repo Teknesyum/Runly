@@ -5,9 +5,11 @@ Version 0.2.0 · Last updated: 2026-08-15
 ## 1. Windows kısıtları (çözümü yok)
 
 - **Hiçbir uzantı tek tıkla bağlanamaz (K19 + K23).** Kurulum ProgID'leri ve `.ext` varsayılanını
-  yazar, ama Windows 11 çift tıkta `FileExts\<ext>\UserChoice`'a bakar. Bağlamanın tek meşru yolu:
+  yazar, ama Windows 11 çift tıkta `FileExts\<ext>\UserChoice`'a bakar. Tek uzantı için:
   **sağ tık → Birlikte aç → Başka bir uygulama seç → Runly → "Her zaman"**. Hash programatik
-  olarak üretilemez; üretmeye çalışmak yasaktır (SPEC §2).
+  olarak üretilir ama Runly'nin kendi süreci yazmaz: çok uzantı için Runly'nin panoya kopyaladığı
+  PS-SFTA komutu vardır (SPEC K34). UCPD'nin koruduğu türler (.pdf, .html, Office) ve
+  `UserChoiceLatest`'e geçmiş makineler bu komutla da bağlanamaz (`docs/taramalar/toplu-atama-engelleri.md`).
 - **`SHOpenWithDialog` varsayılanı bağlayamıyor (K23).** R1 ekranda ölçtü: pencerede yalnız
   "Yalnızca bir kez" düğmesi çıkıyor; `OAIF_FORCE_REGISTRATION` eklenince Windows doğrudan
   reddediyor. GUI bu yüzden kullanıcıyı Ayarlar → Varsayılan uygulamalar'a ya da Explorer'ın

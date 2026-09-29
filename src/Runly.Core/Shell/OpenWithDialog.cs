@@ -7,7 +7,7 @@ namespace Runly.Core.Shell;
 /// Shows the Windows "Open with" dialog through <c>SHOpenWithDialog</c> so a file can be run with Runly once.
 /// It cannot bind an extension: since Windows 10 this dialog is documented as unable to change the default
 /// program, whatever flags it is given (see <see cref="OaifExec"/>). Binding is the user's to make, through
-/// Explorer's "Her zaman" or the Settings page — <c>UserChoice</c> is hash protected and SPEC 2 forbids forging it.
+/// Explorer's "Her zaman", the Settings page, or the bulk PS-SFTA command (SPEC K34) the user runs in their own shell.
 /// </summary>
 [SupportedOSPlatform("windows")]
 public static class OpenWithDialog

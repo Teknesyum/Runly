@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Globalization;
 using Microsoft.Win32;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Runly.Core.Abstractions;
 using Runly.Core.Defaults;
 using Runly.Core.Models;
@@ -1612,6 +1613,11 @@ internal sealed partial class MainForm : NeonForm
             }
         }
 
+        if (OfferBulkAssignment(extension is null ? PendingExtensions() : [extension, .. PendingExtensions()]))
+        {
+            return;
+        }
+
         // SHOpenWithDialog is intentionally not used here: Windows 11 exposes only "Just once"
         // through that API. The file-type deep link opens the list where a persistent choice can be
         // made; see OpenDefaultAppsForExtension for why the per-app page cannot serve this.
@@ -1622,6 +1628,53 @@ internal sealed partial class MainForm : NeonForm
         }
 
         OpenDefaultAppsForExtension(extension);
+    }
+
+    private IReadOnlyList<string> PendingExtensions() =>
+        _shellRegistrar.GetStatus(_config)
+            .Where(status => status.Bound == BindingState.NeedsUserChoice)
+            .Select(status => status.Extension)
+            .ToArray();
+
+    private bool OfferBulkAssignment(IReadOnlyList<string> pending)
+    {
+        var assignable = BulkAssociationCommand.Assignable(pending);
+        if (assignable.Count == 0)
+        {
+            return false;
+        }
+
+        var answer = NeonMessageBox.Show(this,
+            Strings.Get("bulk.offer").Replace("{count}", assignable.Count.ToString(CultureInfo.CurrentCulture), StringComparison.Ordinal),
+            Strings.Get("app.title"), MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+        if (answer == DialogResult.Cancel)
+        {
+            return true;
+        }
+
+        if (answer != DialogResult.Yes)
+        {
+            return false;
+        }
+
+        try
+        {
+            Clipboard.SetText(BulkAssociationCommand.Build(assignable));
+        }
+        catch (Exception ex) when (ex is ExternalException or ThreadStateException)
+        {
+            _logger.Error("Toplu atama komutu panoya kopyalanamadı", ex);
+            NeonMessageBox.Show(this,
+                Strings.Get("bulk.clipboardFailed").Replace("{error}", ex.Message, StringComparison.Ordinal),
+                Strings.Get("app.title"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return true;
+        }
+
+        _logger.Info($"Toplu atama komutu panoya kopyalandı: {string.Join(", ", assignable)}");
+        NeonMessageBox.Show(this, Strings.Get("bulk.copied"), Strings.Get("app.title"),
+            MessageBoxButtons.OK, MessageBoxIcon.Information);
+        return true;
     }
 
     private bool IsRegisteredWithWindows(string extension)
@@ -2228,9 +2281,11 @@ internal sealed partial class MainForm : NeonForm
             return;
         }
 
-        // Registration succeeded. Windows protects the final UserChoice value, so continue directly
-        // in the settings list where the choice is made. A single pending extension goes straight to
-        // its own row; several of them get the unfiltered list, since ftfilter takes one extension.
+        if (OfferBulkAssignment(pending))
+        {
+            return;
+        }
+
         if (pending.Count == 1)
         {
             OpenDefaultAppsForExtension(pending[0]);

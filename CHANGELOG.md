@@ -7,6 +7,18 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Bulk default assignment.** After install, and from "Make default", Runly offers to copy one
+  PowerShell command that binds every extension awaiting Windows approval at once. The command
+  downloads PS-SFTA from a pinned commit, stops if its SHA256 differs, assigns each extension to its
+  own `Runly.Script.<ext>` ProgID and checks the result. Runly never runs it; the user pastes it into
+  their own shell. Blocked system types are never included.
+
+### Changed
+
+- SPEC no longer forbids writing a hashed `UserChoice` (decision K34).
+
 ## [0.3.1] — 2026-09-27
 
 ### Added
