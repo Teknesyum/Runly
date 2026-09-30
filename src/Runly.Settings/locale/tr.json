@@ -22,6 +22,8 @@
   "bound": "Bağlı",
   "notBound": "Bağlı değil",
   "needsApproval": "Windows onayı gerekiyor",
+  "scale.caption": "Aa %{percent}",
+  "scale.restart": "Yazı boyutu %{percent} olarak kaydedildi.\n\nUygulamak için Runly yeniden başlasın mı?",
   "bulk.offer": "{count} uzantı Windows onayı bekliyor.\n\nHepsini tek seferde Runly'ye bağlayan bir PowerShell komutu panoya kopyalanabilir. Komut, PS-SFTA betiğini sabit bir sürümden indirir, SHA256 ile doğrular ve her uzantıyı tek tek atar.\n\nEvet: komutu panoya kopyala\nHayır: Windows ayarlarını aç",
   "bulk.copied": "Komut panoya kopyalandı.\n\nBaşlat menüsünden PowerShell'i açın (yönetici gerekmez), Ctrl+V ile yapıştırıp Enter'a basın. Bitince Runly'de durum yenilenir.",
   "bulk.clipboardFailed": "Pano şu an kullanılamıyor: {error}",

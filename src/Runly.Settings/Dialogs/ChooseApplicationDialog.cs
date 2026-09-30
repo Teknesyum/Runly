@@ -193,6 +193,7 @@ internal sealed class ChooseApplicationDialog : NeonForm
             WrapContents = false,
             BackColor = Color.Transparent,
             Padding = new Padding(0, Metrics.Px(TeknesyumTokens.Space2), 0, 0),
+            Margin = Padding.Empty,
         };
         var selectButton = new NeonButton { Text = Strings.Get("chooseApp.select"), Primary = true, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(Metrics.Px(TeknesyumTokens.Space2), 0, 0, 0) };
         var cancelButton = new NeonButton { Text = Strings.Get("cancel"), Primary = false, BackColor = Palette.AppBg, DialogResult = DialogResult.Cancel, AutoSize = true, Margin = new Padding(Metrics.Px(TeknesyumTokens.Space2), 0, 0, 0) };

@@ -7,7 +7,6 @@ internal enum CaptionItemStyle
 {
     Text,
     Link,
-    Outline,
 }
 
 internal enum CaptionItemIcon
@@ -453,7 +452,7 @@ internal class NeonForm : Form
             width += CaptionSponsorIconSize + Metrics.Px(TeknesyumTokens.Space2);
         }
 
-        var padding = item.Style == CaptionItemStyle.Outline ? Metrics.Px(TeknesyumTokens.Space3) : Metrics.Px(TeknesyumTokens.Space2);
+        var padding = Metrics.Px(TeknesyumTokens.Space2);
         return Math.Max(Metrics.Px(TeknesyumTokens.Space5), width + (padding * 2));
     }
 
@@ -465,29 +464,16 @@ internal class NeonForm : Form
     {
         var hover = ReferenceEquals(item, _hoverItem);
         var bounds = item.Bounds;
-        Rectangle content;
 
-        if (item.Style == CaptionItemStyle.Outline)
+        var content = Rectangle.Inflate(bounds, -Metrics.Px(TeknesyumTokens.Space2), 0);
+        if (hover && item.Clickable)
         {
-            var frame = new Rectangle(bounds.X, bounds.Y, bounds.Width - 1, bounds.Height - 1);
-            using var path = NeonTheme.RoundedRect(frame, NeonTheme.CornerRadius);
-
-            // Outline button: no fill, no glow. Hover takes the border to full opacity and focus width.
-            using var border = new Pen(hover ? item.Accent : Color.FromArgb(TeknesyumTokens.BorderAlpha, item.Accent), (hover ? TeknesyumTokens.ShapeFocusW : TeknesyumTokens.ShapeBorderW) * Metrics.Scale);
-            g.DrawPath(border, path);
-            content = Rectangle.Inflate(bounds, -Metrics.Px(TeknesyumTokens.Space3), 0);
-        }
-        else
-        {
-            content = Rectangle.Inflate(bounds, -Metrics.Px(TeknesyumTokens.Space2), 0);
-            if (hover && item.Clickable)
-            {
-                using var underline = new Pen(item.Accent, Metrics.Scale);
-                var baseline = content.Bottom - Metrics.Px(TeknesyumTokens.Space1);
-                g.DrawLine(underline, content.Left, baseline, content.Right, baseline);
-            }
+            using var underline = new Pen(item.Accent, Metrics.Scale);
+            var baseline = content.Bottom - Metrics.Px(TeknesyumTokens.Space1);
+            g.DrawLine(underline, content.Left, baseline, content.Right, baseline);
         }
 
+        var color = item.Style == CaptionItemStyle.Link && hover ? item.Accent : item.Color;
         var left = content.Left;
         if (item.Dot is Color dot)
         {
@@ -500,16 +486,9 @@ internal class NeonForm : Form
         if (item.Icon == CaptionItemIcon.Coffee)
         {
             var size = CaptionSponsorIconSize;
-            DrawCoffeeIcon(g, new Rectangle(left, content.Top + ((content.Height - size) / 2), size, size), item.Accent);
+            DrawCoffeeIcon(g, new Rectangle(left, content.Top + ((content.Height - size) / 2), size, size), color);
             left += size + Metrics.Px(TeknesyumTokens.Space2);
         }
-
-        var color = item.Style switch
-        {
-            CaptionItemStyle.Outline => item.Accent,
-            CaptionItemStyle.Link when hover => item.Accent,
-            _ => item.Color,
-        };
 
         TextRenderer.DrawText(g, item.Text, item.Font,
             new Rectangle(left, content.Top, Math.Max(0, content.Right - left), content.Height), color,

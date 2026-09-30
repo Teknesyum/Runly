@@ -12,13 +12,14 @@ internal static class Program
     {
         var selectedExtension = SettingsCommandLine.ParseSelectedExtension(args);
 
+        var configStore = new ConfigStore();
+        var config = configStore.Load();
+        UiScale.Set(config.UiScale);
+
         // Must run before any window exists, otherwise Win32 scrollbars stay light.
         NeonTheme.EnableDarkMode();
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-
-        var configStore = new ConfigStore();
-        var config = configStore.Load();
         var logger = new FileLogger(config.LogEnabled);
 
         Application.ThreadException += (_, e) => ReportUnhandled(logger, e.Exception);

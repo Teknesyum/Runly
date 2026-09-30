@@ -19,6 +19,7 @@ internal static class Program
 
     private static readonly List<Finding> s_findings = new();
     private static readonly List<string> s_log = new();
+    private static readonly List<string> s_clipped = new();
     private static readonly Dictionary<int, string> s_tokens = new();
     private static bool s_suppressGrid;
     private static string s_outDir = ".";
@@ -54,6 +55,8 @@ internal static class Program
             ("sonuc-uyari", () => Create("Runly.Settings.Dialogs.ResultDialog", "Kurulum", true, new List<string> { ".py bağlandı" }, null, "Gezgin yeniden başlatılmalı.")),
             ("sonuc-hata", () => Create("Runly.Settings.Dialogs.ResultDialog", "Kurulum", false, new List<string>(), "Kayıt defterine yazılamadı.", null)),
             ("mesaj", () => Create("Runly.Settings.NeonMessageDialog", "Seçili uzantı silinsin mi?", "Runly", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)),
+            ("toplu-teklif", () => Create("Runly.Settings.NeonMessageDialog", "12 uzantı Windows onayı bekliyor.\n\nHepsini tek seferde Runly'ye bağlayan bir PowerShell komutu panoya kopyalanabilir. Komut, PS-SFTA betiğini sabit bir sürümden indirir, SHA256 ile doğrular ve her uzantıyı tek tek atar.\n\nEvet: komutu panoya kopyala\nHayır: Windows ayarlarını aç", "Runly", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)),
+            ("toplu-kopyalandi", () => Create("Runly.Settings.NeonMessageDialog", "Komut panoya kopyalandı.\n\nBaşlat menüsünden PowerShell'i açın (yönetici gerekmez), Ctrl+V ile yapıştırıp Enter'a basın. Bitince Runly'de durum yenilenir.", "Runly", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)),
             ("uygulama-sec", () => BuildChooseApplication(true)),
             ("uygulama-sec-bos", () => BuildChooseApplication(false)),
             ("sag-menu", () => BuildContextMenu(true)),
@@ -113,13 +116,14 @@ internal static class Program
         }
 
         WriteReport();
-        var failures = s_findings.Count(f => f.Ratio < f.Threshold && f.State != "edilgen");
+        var failures = s_findings.Count(f => f.Ratio < f.Threshold && f.State != "edilgen") + s_clipped.Count;
+        File.WriteAllLines(Path.Combine(s_outDir, $"kesik-{s_tag}-{s_scale}.txt"), s_clipped.Count == 0 ? new[] { "kesik düğme yok" } : s_clipped, new UTF8Encoding(false));
         foreach (var line in s_log)
         {
             log.WriteLine(line);
         }
 
-        log.WriteLine($"ölçüm {s_findings.Count} · eşik altı {failures} · kararsız kare {s_log.Count}");
+        log.WriteLine($"ölçüm {s_findings.Count} · kesik {s_clipped.Count} · eşik altı {failures} · kararsız kare {s_log.Count}");
         Console.WriteLine($"ölçüm {s_findings.Count} · eşik altı {failures} · {s_outDir}");
         return failures == 0 ? 0 : 1;
     }
@@ -145,6 +149,7 @@ internal static class Program
         Pump();
         log.WriteLine($"{name}: {form.Width}x{form.Height} dpi={form.DeviceDpi} metrics={Metrics.Dpi}");
 
+        CheckClipping(name, form);
         MeasureCaption(name, form);
         foreach (var control in Walk(form))
         {
@@ -174,6 +179,28 @@ internal static class Program
         }
     }
 
+    private static void CheckClipping(string screen, Form form)
+    {
+        foreach (var button in Walk(form).OfType<NeonButton>().Where(IsShown))
+        {
+            var rect = button.RectangleToScreen(button.ClientRectangle);
+            for (var parent = button.Parent; parent is not null; parent = parent.Parent)
+            {
+                if (parent is ScrollableControl { AutoScroll: true })
+                {
+                    break;
+                }
+
+                var visible = parent.RectangleToScreen(parent is Form ? parent.ClientRectangle : parent.DisplayRectangle);
+                if (!visible.Contains(rect))
+                {
+                    s_clipped.Add($"{screen} · {Clip(TextOf(button) ?? button.Name)} · {parent.GetType().Name} dışına taşıyor: düğme {rect}, alan {visible}");
+                    break;
+                }
+            }
+        }
+    }
+
     private static void MeasureCaption(string screen, Form form)
     {
         var original = form.Text;
@@ -184,6 +211,36 @@ internal static class Program
             MeasureByDiff(screen, form, "başlık: " + Clip(original), "dinlenik", region,
                 () => { form.Text = string.Empty; form.Invalidate(); },
                 () => { form.Text = original; form.Invalidate(); });
+        }
+
+        var itemsField = FindField(form.GetType(), "_captionItems");
+        var hoverField = FindField(form.GetType(), "_hoverItem");
+        if (itemsField?.GetValue(form) is System.Collections.IList items && hoverField is not null)
+        {
+            foreach (var item in items.Cast<object>().ToList())
+            {
+                var type = item.GetType();
+                var textProp = type.GetProperty("Text")!;
+                var text = (string)textProp.GetValue(item)!;
+                var itemBounds = (Rectangle)type.GetProperty("Bounds", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(item)!;
+                var clickable = type.GetProperty("Clickable", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(item) is true;
+                if (string.IsNullOrWhiteSpace(text) || itemBounds.IsEmpty)
+                {
+                    continue;
+                }
+
+                foreach (var hover in clickable ? new[] { false, true } : new[] { false })
+                {
+                    hoverField.SetValue(form, hover ? item : null);
+                    MeasureByDiff(screen, form, "başlık öğesi: " + Clip(text), hover ? "hover" : "dinlenik", itemBounds,
+                        () => { textProp.SetValue(item, string.Empty); form.Invalidate(); },
+                        () => { textProp.SetValue(item, text); form.Invalidate(); });
+                }
+
+                hoverField.SetValue(form, null);
+                form.Invalidate();
+                Pump();
+            }
         }
 
         foreach (var (field, bounds, label) in new[]

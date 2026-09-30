@@ -18,6 +18,23 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - SPEC no longer forbids writing a hashed `UserChoice` (decision K34).
+- Text size setting: the "Aa" title-bar link cycles 100% / 125% / 150% (`uiScale`, default 125%).
+  Text and spacing grow together; the token type scale stays shared and untouched.
+- Settings opens maximized (teknesyum-ui 0.28 main-window rule).
+- The "Support" chip in the title bar has no outline; like every other caption link it shows an
+  underline and the accent colour on hover (teknesyum-ui 0.27).
+- The UI audit now measures title-bar links at rest and on hover, and covers the bulk-assignment
+  dialogs, and fails when a button is clipped by its container.
+
+### Fixed
+
+- **Grid rows ignored the row height.** Rows were added with `new DataGridViewRow()`, which does
+  not take `RowTemplate.Height`, so every row stayed 28 px at any DPI; they now use
+  `Metrics.GridRowHeight`.
+- **Clipped buttons.** The bottom button strip and the application picker's button row lost
+  their lower edge to the default 3 px layout margin.
+- **Cut category names.** The category rail was a fixed 210 px, so "Kod/Geliştirme" and
+  others ended in an ellipsis; it now widens to its longest label.
 
 ## [0.3.1] — 2026-09-27
 

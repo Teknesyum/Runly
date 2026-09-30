@@ -22,6 +22,8 @@
   "bound": "Bound",
   "notBound": "Not bound",
   "needsApproval": "Windows approval required",
+  "scale.caption": "Aa {percent}%",
+  "scale.restart": "Text size saved as {percent}%.\n\nRestart Runly to apply it?",
   "bulk.offer": "{count} extensions are awaiting Windows approval.\n\nA PowerShell command that binds all of them to Runly at once can be copied to the clipboard. It downloads the PS-SFTA script from a pinned revision, verifies it with SHA256 and assigns each extension in turn.\n\nYes: copy the command\nNo: open Windows settings",
   "bulk.copied": "The command is on the clipboard.\n\nOpen PowerShell from the Start menu (no admin needed), paste with Ctrl+V and press Enter. Runly refreshes the status when you come back.",
   "bulk.clipboardFailed": "The clipboard is unavailable right now: {error}",

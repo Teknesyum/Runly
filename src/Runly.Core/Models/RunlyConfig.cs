@@ -37,6 +37,19 @@ public sealed record RunlyConfig
     [JsonPropertyName("logEnabled")]
     public bool LogEnabled { get; init; } = true;
 
+    /// <summary>Settings text and spacing scale in percent; <see cref="UiScales"/> lists the accepted values.</summary>
+    [JsonPropertyName("uiScale")]
+    public int UiScale { get; init; } = DefaultUiScale;
+
+    /// <summary>Scale used when the file has none or an unsupported value.</summary>
+    public const int DefaultUiScale = 125;
+
+    /// <summary>Scales the Settings window offers; each is covered by the UI audit.</summary>
+    public static IReadOnlyList<int> UiScales { get; } = [100, 125, 150];
+
+    /// <summary>Returns <paramref name="percent"/> when it is one of <see cref="UiScales"/>, otherwise <see cref="DefaultUiScale"/>.</summary>
+    public static int NormalizeUiScale(int percent) => UiScales.Contains(percent) ? percent : DefaultUiScale;
+
     /// <summary>Other programs' context-menu entries to hide on Runly's types; <see langword="null"/> hides the recommended ones.</summary>
     [JsonPropertyName("hiddenMenuItems")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

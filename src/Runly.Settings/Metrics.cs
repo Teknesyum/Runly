@@ -302,6 +302,8 @@ internal static class Metrics
             s_measurementRatio = s_dpi / measurementDpi;
         }
 
+        s_dpi = (int)Math.Round(s_dpi * UiScale.Factor, MidpointRounding.AwayFromZero);
+
         LineHeights.Clear();
 
         s_buttonHeight = Row(Palette.Body, 13);

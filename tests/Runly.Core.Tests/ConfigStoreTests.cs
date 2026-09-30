@@ -160,4 +160,25 @@ public sealed class ConfigStoreTests : IDisposable
 
         Assert.EndsWith(Path.Combine("Runly", "config.json"), store.ConfigPath, StringComparison.OrdinalIgnoreCase);
     }
+    [Fact]
+    public void UiScale_DefaultsTo125AndRoundTrips()
+    {
+        var store = new ConfigStore(_configPath);
+        Assert.Equal(125, store.Load().UiScale);
+
+        store.Save(store.Load() with { UiScale = 150 });
+
+        Assert.Equal(150, new ConfigStore(_configPath).Load().UiScale);
+    }
+
+    [Theory]
+    [InlineData(100, 100)]
+    [InlineData(125, 125)]
+    [InlineData(150, 150)]
+    [InlineData(0, 125)]
+    [InlineData(175, 125)]
+    public void NormalizeUiScale_KeepsOfferedScalesOnly(int percent, int expected)
+    {
+        Assert.Equal(expected, RunlyConfig.NormalizeUiScale(percent));
+    }
 }

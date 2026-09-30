@@ -1,0 +1,8 @@
+mesaj: 430x270 dpi=96 metrics=96
+  16:40:44.266 NeonGroupPanel Dikkat
+  16:40:45.170 Label Seçili uzantı silinsin mi?
+  16:40:46.060 NeonButton Hayır
+  16:40:48.837 NeonButton Evet
+mesaj / NeonGroupPanel: Dikkat / dinlenik: kararsız kare, yeniden (1)
+mesaj / Label: Seçili uzantı silinsin mi? / dinlenik: kararsız kare, yeniden (1)
+ölçüm 13 · eşik altı 0 · kararsız kare 2

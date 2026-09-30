@@ -83,7 +83,7 @@ internal static class Palette
 
     // The token type scale is in design pixels; at 96 dpi a point is 4/3 of a pixel. WinForms has no 600
     // weight and no letter spacing, so headings stay Bold and the hierarchy is carried by size.
-    private static float Pt(int designPixels) => designPixels * 0.75f;
+    private static float Pt(int designPixels) => designPixels * 0.75f * UiScale.Factor;
 
     public static readonly Font H2 = new(SansFamily, Pt(TeknesyumTokens.Fs4), FontStyle.Bold);
     public static readonly Font H3 = new(SansFamily, Pt(TeknesyumTokens.Fs3), FontStyle.Bold);

@@ -124,6 +124,7 @@ internal sealed partial class MainForm : NeonForm
 
     private readonly DataGridView _grid;
     private readonly ListBox _categoryList;
+    private readonly ColumnStyle _categoryRailColumn;
     private readonly TextBox _searchBox;
     private readonly Label _searchResultLabel;
     private readonly Button _chooseAppButton;
@@ -175,6 +176,7 @@ internal sealed partial class MainForm : NeonForm
     private UpdateController? _updates;
     private UpdatePanel? _updatePanel;
     private readonly CaptionItem _captionLanguage;
+    private readonly CaptionItem _captionScale;
     private readonly CaptionItem _captionSponsor;
     private readonly CaptionItem _captionHelp;
 
@@ -221,6 +223,7 @@ internal sealed partial class MainForm : NeonForm
             Math.Min(Metrics.Px(1320), workArea.Width),
             Math.Min(Metrics.Px(860), workArea.Height));
         StartPosition = FormStartPosition.CenterScreen;
+        WindowState = FormWindowState.Maximized;
         BackColor = Palette.AppBg;
         ForeColor = Palette.TextBody;
         Font = Palette.Body;
@@ -244,7 +247,8 @@ internal sealed partial class MainForm : NeonForm
 
         // ---- 2. Extension table + detail panel -------------------------------------------
         var gridArea = new NeonLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 3, Padding = new Padding(Metrics.Px(TeknesyumTokens.Space5), Metrics.Px(TeknesyumTokens.Space4), Metrics.Px(TeknesyumTokens.Space5), 0) };
-        gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Metrics.Px(210)));
+        _categoryRailColumn = new ColumnStyle(SizeType.Absolute, Metrics.Px(210));
+        gridArea.ColumnStyles.Add(_categoryRailColumn);
         gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         gridArea.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Metrics.Px(300)));
         // The search strip sits above the table, not below it: buried at the bottom of a
@@ -416,7 +420,7 @@ internal sealed partial class MainForm : NeonForm
         root.Controls.Add(panelsRow, 0, 1);
 
         // ---- 5. Bottom bar --------------------------------------------------------------------
-        var bottomBar = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 1, Padding = new Padding(Metrics.Px(TeknesyumTokens.Space5), Metrics.Px(TeknesyumTokens.Space4), Metrics.Px(TeknesyumTokens.Space5), Metrics.Px(TeknesyumTokens.Space4)), BackColor = Palette.Surface };
+        var bottomBar = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 1, Padding = new Padding(Metrics.Px(TeknesyumTokens.Space5), Metrics.Px(TeknesyumTokens.Space4), Metrics.Px(TeknesyumTokens.Space5), Metrics.Px(TeknesyumTokens.Space4)), Margin = Padding.Empty, BackColor = Palette.Surface };
         bottomBar.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
         // Two columns instead of a Dock=Left label: a fixed 320px label starved the RightToLeft button
@@ -474,13 +478,23 @@ internal sealed partial class MainForm : NeonForm
             Click = () => ChangeLanguage(Strings.Language == "tr" ? "en" : "tr"),
         };
 
+        _captionScale = new CaptionItem
+        {
+            Style = CaptionItemStyle.Link,
+            Font = Palette.Mono,
+            Color = Palette.Renk1,
+            Accent = Palette.Renk2Text,
+            Click = ChangeUiScale,
+        };
+
         _captionSponsor = new CaptionItem
         {
             Text = Strings.Get("sig.support"),
-            Style = CaptionItemStyle.Outline,
+            Style = CaptionItemStyle.Link,
             Icon = CaptionItemIcon.Coffee,
             Font = Palette.Body,
-            Accent = Palette.Renk3Text,
+            Color = Palette.Renk3Text,
+            Accent = Palette.Renk2Text,
             Click = () => OpenUrl(Palette.SponsorUrl),
         };
         // The repository front page is always English -- GitHub has no language negotiation. The user
@@ -513,7 +527,7 @@ internal sealed partial class MainForm : NeonForm
             Visible = false,
             Click = OnUpdateBadgeClick,
         };
-        SetCaptionItems(captionSignature, _captionSponsor, _captionHelp, _captionLanguage, _captionVersion, _captionUpdate, _captionStatus);
+        SetCaptionItems(captionSignature, _captionSponsor, _captionHelp, _captionLanguage, _captionScale, _captionVersion, _captionUpdate, _captionStatus);
 
         FormClosing += OnFormClosing;
         Activated += (_, _) => RefreshStatusOnly(force: false);
@@ -563,9 +577,6 @@ internal sealed partial class MainForm : NeonForm
             // the "Durum" column — the one carrying the "Varsayılan yap" button — off screen behind a
             // horizontal scrollbar. Weights keep every column reachable at MinimumSize too.
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-            // Neither the row template nor the header below follows the DPI on its own, and both hold a
-            // line of text; a literal here is what clips the grid at 125% and 150%.
-            RowTemplate = { Height = Metrics.GridRowHeight },
             BackgroundColor = Palette.Surface,
             GridColor = Palette.GridLine, // opaque, dim blue-tinted line (GridColor rejects alpha)
             BorderStyle = BorderStyle.None,
@@ -584,6 +595,9 @@ internal sealed partial class MainForm : NeonForm
             Alignment = DataGridViewContentAlignment.MiddleCenter,
         };
         grid.ColumnHeadersHeight = Metrics.GridHeaderHeight;
+        // Neither the row template nor the header follows the DPI on its own, and both hold a line of
+        // text. The template height goes in after Font: assigning Font resets it to the font's height.
+        grid.RowTemplate.Height = Metrics.GridRowHeight;
         grid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
         grid.RowsDefaultCellStyle = new DataGridViewCellStyle
         {
@@ -809,6 +823,19 @@ internal sealed partial class MainForm : NeonForm
 
     private void RefreshCategoryRail() => _categoryList.Invalidate();
 
+    // The rail is as wide as its longest label in the current language and scale, so no category
+    // name is cut to an ellipsis; the fixed 210 stays as the floor.
+    private int CategoryRailWidth()
+    {
+        var widest = _categoryList.Items.Cast<string>()
+            .Select(category => TextRenderer.MeasureText(Strings.Get("category." + category), _categoryList.Font).Width)
+            .DefaultIfEmpty(0)
+            .Max();
+        var width = Metrics.Px(TeknesyumTokens.Space2) * 4 + Metrics.CategoryIconSize + widest + Metrics.Px(46)
+            + _categoryList.Margin.Horizontal + SystemInformation.VerticalScrollBarWidth;
+        return Math.Max(Metrics.Px(210), width);
+    }
+
     private ExtensionMapping EffectiveMapping(string extension)
     {
         if (_config.Extensions.TryGetValue(extension, out var configured)) return configured;
@@ -917,7 +944,7 @@ internal sealed partial class MainForm : NeonForm
             {
                 var mapping = EffectiveMapping(status.Extension);
 
-                var row = new DataGridViewRow();
+                var row = new DataGridViewRow { Height = Metrics.GridRowHeight };
                 row.CreateCells(_grid);
                 row.Cells[ColEnabled].Value = mapping.Enabled;
                 row.Cells[ColExtension].Value = status.Extension;
@@ -2631,11 +2658,25 @@ internal sealed partial class MainForm : NeonForm
         SaveAll();
     }
 
+    private void ChangeUiScale()
+    {
+        var next = UiScale.Next(_config.UiScale);
+        _config = _config with { UiScale = next };
+        ApplyLanguage();
+        SaveAll();
+        var question = Strings.Get("scale.restart").Replace("{percent}", next.ToString(CultureInfo.InvariantCulture));
+        if (NeonMessageBox.Show(this, question, Strings.Get("app.title"), MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes && !_dirty)
+        {
+            Application.Restart();
+        }
+    }
+
     private void ApplyLanguage()
     {
         _suppressGridEvents = true;
         _grid.Rows.Clear();
         Strings.Apply(this);
+        _categoryRailColumn.Width = CategoryRailWidth();
         Text = Strings.Get("app.title") + (_dirty ? " *" : string.Empty);
         _grid.Columns[ColEnabled].HeaderText = Strings.Get("enabled");
         _grid.Columns[ColExtension].HeaderText = Strings.Get("extension");
@@ -2646,6 +2687,7 @@ internal sealed partial class MainForm : NeonForm
         _grid.Columns[ColStatus].HeaderText = Strings.Get("status");
         UpdateSearchResultLabel();
         _captionLanguage.Text = Strings.Language == "tr" ? "TR | en" : "tr | EN";
+        _captionScale.Text = Strings.Get("scale.caption").Replace("{percent}", _config.UiScale.ToString(CultureInfo.InvariantCulture));
         _captionSponsor.Text = Strings.Get("sig.support");
         _captionHelp.Text = Strings.Get("caption.help");
         RenderUpdateBadge();

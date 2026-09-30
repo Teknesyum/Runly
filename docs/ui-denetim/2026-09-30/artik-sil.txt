@@ -1,0 +1,15 @@
+  327.7 MB  src/Runly.Settings/bin  (üretilen, silinebilir)
+  151.9 MB  dist  (üretilen, silinebilir)
+  112.4 MB  src/Runly.Launcher.Console/bin  (üretilen, silinebilir)
+  112.4 MB  src/Runly.Launcher.Gui/bin  (üretilen, silinebilir)
+   41.0 MB  src/Runly.Launcher/bin  (üretilen, silinebilir)
+   22.1 MB  tests/Runly.Core.Tests/bin  (üretilen, silinebilir)
+   17.5 MB  src/Runly.Launcher.Console/obj  (üretilen, silinebilir)
+   17.5 MB  src/Runly.Launcher.Gui/obj  (üretilen, silinebilir)
+   17.5 MB  src/Runly.Launcher/obj  (üretilen, silinebilir)
+    3.1 MB  src/Runly.Settings/obj  (üretilen, silinebilir)
+    1.6 MB  tests/Runly.UiAudit/bin  (üretilen, silinebilir)
+    1.3 MB  tests/Runly.Core.Tests/obj  (üretilen, silinebilir)
+    1.2 MB  src/Runly.Core/obj  (üretilen, silinebilir)
+Toplam 828.8 MB, silinebilir 828.7 MB
+Silindi 828.7 MB

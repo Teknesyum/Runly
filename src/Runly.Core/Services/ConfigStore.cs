@@ -129,6 +129,7 @@ public sealed class ConfigStore : IConfigStore
             SecurityMode = Enum.IsDefined(config.SecurityMode) ? config.SecurityMode : SecurityMode.TrustOnFirstUse,
             KeepWindowOpen = Enum.IsDefined(config.KeepWindowOpen) ? config.KeepWindowOpen : KeepWindowMode.OnError,
             EditorCommand = config.EditorCommand ?? string.Empty,
+            UiScale = RunlyConfig.NormalizeUiScale(config.UiScale),
             HiddenMenuItems = config.HiddenMenuItems?
                 .Where(id => !string.IsNullOrWhiteSpace(id))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
