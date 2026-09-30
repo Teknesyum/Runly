@@ -71,6 +71,15 @@ tık menüsü sunuyor. Runly bunun üzerine kuruluyor.
 
 ## Tek PowerShell Komutuyla Kurulum
 
+**Önerilen: Teknesyum Base (Windows).**
+
+1. [`Teknesyum-Base.exe`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe) dosyasını ([`.sha256`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe.sha256)) indirip çalıştırın. Yönetici hakkı gerekmez.
+2. Listeden **Runly** uygulamasını bulup kurun. Base sonradan güncellemeyi ve kaldırmayı da yapar.
+
+Base henüz imzalı değil; Windows SmartScreen ilk açılışta uyarabilir: *Diğer bilgiler*'i, sonra *Yine de çalıştır*'ı seçin. Ayrıntı: [Teknesyum Base](https://github.com/Teknesyum/Teknesyum-Base).
+
+**Ya da tek PowerShell komutuyla kurun.**
+
 PowerShell'i açın ve çalıştırın:
 
 ```powershell

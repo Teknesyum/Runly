@@ -70,6 +70,15 @@ type. That is the base it builds on.
 
 ## Install with One PowerShell Command
 
+**Recommended: Teknesyum Base (Windows).**
+
+1. Download [`Teknesyum-Base.exe`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe) ([`.sha256`](https://github.com/Teknesyum/Teknesyum-Base/releases/latest/download/Teknesyum-Base.exe.sha256)) and run it. No admin rights are needed.
+2. Find **Runly** in the list and install it. Base also updates and removes it later.
+
+Base is not code-signed yet, so Windows SmartScreen may warn on first launch: choose *More info*, then *Run anyway*. More: [Teknesyum Base](https://github.com/Teknesyum/Teknesyum-Base).
+
+**Or install with one PowerShell command.**
+
 Open PowerShell and run:
 
 ```powershell
