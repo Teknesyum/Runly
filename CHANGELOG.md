@@ -7,6 +7,17 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.3] — 2026-10-02
+
+### Changed
+
+- **Settings panels read as one form.** Security and Behaviour now share a label column sized to the
+  longest label in either language, so every field starts on the same vertical line. Labels use
+  the body size instead of the small caption, and each row carries its own buttons on the right.
+- **Select all moved into the table.** A checkbox beside the "Enabled" header ticks or clears every
+  visible extension; it shows ticked when all of them are on. The separate button under the table is
+  gone.
+
 ## [0.3.2] — 2026-10-02
 
 ### Added

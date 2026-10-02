@@ -13,8 +13,8 @@ Kaynak: [danışma 001](danisma/001-fable-tasarim-gozden-gecirme.md). Kullanıc�
 
 ## Sonraki Tura
 
-- Güvenlik / Davranış panellerinin ortak etiket sütunu (danışma md. 6, orta–büyük).
-- "Tümünü seç" yerine başlık onay kutusu, profil düğmelerinin tek açılır düğmede birleşmesi (temalı menü altyapısı yok).
+- Uygulandı (0.3.3): Güvenlik / Davranış ortak etiket sütunu (md. 6), "Tümünü seç" yerine başlık onay kutusu (md. 4).
+- Profil düğmelerinin tek açılır düğmede birleşmesi (temalı menü altyapısı yok).
 - Başlık çubuğunu seyreltme (md. 10, isteğe bağlı; teknesyum-ui başlık kuralıyla çelişir).
 
 ## Dosyalar

@@ -33,7 +33,6 @@ internal static class Metrics
     private static int s_buttonHeight;
     private static int s_buttonMinHeight;
     private static int s_captionHeight;
-    private static int s_sectionLabelHeight;
     private static int s_textBoxHeight;
     private static int s_groupTitleBand;
     private static int s_gridRowHeight;
@@ -142,16 +141,6 @@ internal static class Metrics
         {
             Ensure();
             return s_captionHeight;
-        }
-    }
-
-    /// <summary>Letter-spaced neon section label plus its margin.</summary>
-    public static int SectionLabelHeight
-    {
-        get
-        {
-            Ensure();
-            return s_sectionLabelHeight;
         }
     }
 
@@ -310,7 +299,6 @@ internal static class Metrics
         s_buttonMinHeight = Row(Palette.Body, 11);
         s_captionItemHeight = Math.Max(Px(TeknesyumTokens.TargetMin), Line(Palette.Body) + Px(TeknesyumTokens.Space1));
         s_captionHeight = Math.Max(Px(TeknesyumTokens.TitlebarHMax), Math.Max(Math.Max(Line(Palette.Body), Line(Palette.CaptionGlyph)), s_captionItemHeight) + Px(TeknesyumTokens.Space1));
-        s_sectionLabelHeight = Row(Palette.LabelFont, 8);
         s_textBoxHeight = Row(Palette.MonoBody, 13);
         s_groupTitleBand = Row(Palette.H3, 15);
         s_gridRowHeight = Row(Palette.MonoBody, 16);
