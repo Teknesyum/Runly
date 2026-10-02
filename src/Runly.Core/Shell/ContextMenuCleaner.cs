@@ -33,7 +33,7 @@ public sealed class ContextMenuCleaner
         _scanner = scanner;
     }
 
-    /// <summary>The script types whose menu is cleaned: enabled Run mappings, where "Runly: Düzenle" exists.</summary>
+    /// <summary>The script types whose menu is cleaned: enabled Run mappings, where "Runly ile düzenle" exists.</summary>
     public static IReadOnlyList<string> RunExtensions(RunlyConfig config)
     {
         ArgumentNullException.ThrowIfNull(config);

@@ -135,7 +135,10 @@ public sealed class ShellRegistrar : IShellRegistrar
 
             // 3-4. Application registration, so Runly shows up in the "Open with" list. This is the GUI binary
             // on purpose: it is Runly's user-visible identity, and the console binary must never appear there.
-            WriteApplicationRegistration(command, candidates.Select(c => c.Extension).ToList());
+            WriteApplicationRegistration(
+                command,
+                candidates.Select(c => c.Extension).ToList(),
+                candidates.Where(c => c.Mapping.Kind == HandlerKind.Open).Select(c => c.Extension).ToList());
 
             // The path goes into the action text, not just the registry: when associations later point at an
             // executable that no longer exists, the only question worth answering is which install wrote it,
@@ -591,11 +594,15 @@ public sealed class ShellRegistrar : IShellRegistrar
         var verbKey = $@"{progIdKey}\shell\{verb}";
 
         _registry.SetValue(RegistryRoot.CurrentUser, verbKey, RegistryValueEntry.FromString("MUIVerb", muiVerb));
+        _registry.SetValue(RegistryRoot.CurrentUser, verbKey, RegistryValueEntry.FromString("FriendlyAppName", RunlyRegistryLayout.ApplicationName));
         _registry.SetValue(RegistryRoot.CurrentUser, verbKey + @"\command",
             RegistryValueEntry.FromString(RegistryValueEntry.DefaultValueName, commandLine));
     }
 
-    private void WriteApplicationRegistration(string command, IReadOnlyList<string> extensions)
+    // A Run type already reaches "Open with" through its own ProgID; listing it under Runly.exe's
+    // SupportedTypes too put a second "Runly" beside it. SupportedTypes therefore holds Open types only,
+    // while Capabilities keeps every type for the Default apps page.
+    private void WriteApplicationRegistration(string command, IReadOnlyList<string> extensions, IReadOnlyList<string> supportedTypes)
     {
         _registry.SetValue(RegistryRoot.CurrentUser, RunlyRegistryLayout.ApplicationKey,
             RegistryValueEntry.FromString("FriendlyAppName", RunlyRegistryLayout.ApplicationName));
@@ -603,7 +610,18 @@ public sealed class ShellRegistrar : IShellRegistrar
         _registry.SetValue(RegistryRoot.CurrentUser, RunlyRegistryLayout.ApplicationKey + @"\shell\open\command",
             RegistryValueEntry.FromString(RegistryValueEntry.DefaultValueName, command + " \"%1\" %*"));
 
+        _registry.DeleteKeyTree(RegistryRoot.CurrentUser, RunlyRegistryLayout.SupportedTypesKey);
         _registry.CreateKey(RegistryRoot.CurrentUser, RunlyRegistryLayout.SupportedTypesKey);
+        foreach (var extension in supportedTypes)
+        {
+            _registry.SetValue(RegistryRoot.CurrentUser, RunlyRegistryLayout.SupportedTypesKey,
+                RegistryValueEntry.FromString(extension, string.Empty));
+        }
+
+        // The console binary is how a Run type executes, never an identity of its own: wherever Explorer
+        // names it, it is Runly. No shell verb is written here, so it cannot be picked as an app by itself.
+        _registry.SetValue(RegistryRoot.CurrentUser, RunlyRegistryLayout.ConsoleApplicationKey,
+            RegistryValueEntry.FromString("FriendlyAppName", RunlyRegistryLayout.ApplicationName));
         _registry.SetValue(RegistryRoot.CurrentUser, RunlyRegistryLayout.CapabilitiesKey,
             RegistryValueEntry.FromString("ApplicationName", RunlyRegistryLayout.ApplicationName));
         _registry.SetValue(RegistryRoot.CurrentUser, RunlyRegistryLayout.CapabilitiesKey,
@@ -611,9 +629,6 @@ public sealed class ShellRegistrar : IShellRegistrar
 
         foreach (var extension in extensions)
         {
-            _registry.SetValue(RegistryRoot.CurrentUser, RunlyRegistryLayout.SupportedTypesKey,
-                RegistryValueEntry.FromString(extension, string.Empty));
-
             _registry.SetValue(RegistryRoot.CurrentUser, RunlyRegistryLayout.FileAssociationsKey,
                 RegistryValueEntry.FromString(extension, RunlyRegistryLayout.ProgIdFor(extension)));
         }

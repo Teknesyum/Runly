@@ -7,6 +7,8 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.2] — 2026-10-02
+
 ### Added
 
 - **Bulk default assignment.** After install, and from "Make default", Runly offers to copy one
@@ -18,7 +20,23 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - SPEC no longer forbids writing a hashed `UserChoice` (decision K34).
-- Text size setting: the "Aa" title-bar link cycles 100% / 125% / 150% (`uiScale`, default 125%).
+- **Main window layout reworked** after a design review (`docs/danisma/001`). The search box sits
+  on the table's left edge under a "Categories" heading, with a placeholder that stays visible
+  while focused and a clear glyph inside the box; the separate label, "Clear" button and example
+  line are gone. Bulk "open category with" moved under the table, beside the other actions, as
+  label + list + "Apply". The duplicate "Choose application…" button under the table is gone (the
+  detail panel keeps it). The bottom row is three groups: setup (Install / Update, Restore,
+  Uninstall set apart without a frame), tools (Context menu…, Refresh), and the form's Save
+  (primary) / Close. Free-text grid columns are left-aligned; "Found" shows the file name and
+  the detail panel the full path; "✗" reads "Not found".
+- Title bar (teknesyum-ui 0.34): the version sits beside the name as a grey button that checks for
+  updates; the right-hand items run tools → update badge → TR/EN → Support → Teknesyum.
+- **One Runly in "Open with".** Run-type extensions such as `.js` showed both "Runly" and
+  "RunlyConsole"; the console launcher is now named "Runly" (`FriendlyAppName`, `AssemblyTitle`)
+  and `Runly.exe` lists only open-type extensions under `SupportedTypes`.
+- The edit verb reads "Edit with Runly" / "Runly ile düzenle" (was "Runly: Edit").
+- Text size setting: the "Aa" title-bar link cycles 100% / 125% / 150% (`uiScale`); new installs
+  start on the middle step.
   Text and spacing grow together; the token type scale stays shared and untouched.
 - Settings opens maximized (teknesyum-ui 0.28 main-window rule).
 - The "Support" chip in the title bar has no outline; like every other caption link it shows an
@@ -32,7 +50,7 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   not take `RowTemplate.Height`, so every row stayed 28 px at any DPI; they now use
   `Metrics.GridRowHeight`.
 - **Clipped buttons.** The bottom button strip and the application picker's button row lost
-  their lower edge to the default 3 px layout margin.
+  their lower edge to the stock WinForms layout margin.
 - **Cut category names.** The category rail was a fixed 210 px, so "Kod/Geliştirme" and
   others ended in an ellipsis; it now widens to its longest label.
 

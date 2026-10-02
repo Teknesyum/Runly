@@ -43,6 +43,16 @@ foreach ($a in @(@('Bg','black'), @('Label','renk-1'), @('Danger','renk-2'), @('
     Line "    public const uint $($a[0])Ref = $(ColorRef $colors[$a[1]]);"
 }
 
+foreach ($p in Props $root.role) {
+    if ($null -eq $p.Value.ref -or $null -eq $p.Value.alpha -or $null -eq $p.Value.over) { continue }
+    $hex = Over $colors[$p.Value.ref] (AlphaByte ([double]$p.Value.alpha)) $colors[$p.Value.over]
+    $name = Pascal $p.Name
+    Doc "role.$($p.Name): $($p.Value.ref) at $(([double]$p.Value.alpha).ToString($inv)) over $($p.Value.over), $hex"
+    Line "    public const string $name = `"$hex`";"
+    Doc "$name as a Win32 COLORREF."
+    Line "    public const uint ${name}Ref = $(ColorRef $hex);"
+}
+
 foreach ($p in Props $root.derived) {
     $alpha = $p.Value.alpha
     if ($null -eq $alpha -or -not ($alpha -is [double] -or $alpha -is [int] -or $alpha -is [decimal])) { continue }

@@ -53,25 +53,31 @@ internal sealed class UpdateController : IDisposable
 
     public bool IsInstalled => File.Exists(Path.Combine(_installDir, "Runly.exe"));
 
-    public async Task CheckAsync()
+    /// <summary>Asks the release channel once. True: a newer release is waiting; false: this is the
+    /// latest; null: not installed, already in an update stage, or the check failed.</summary>
+    public async Task<bool?> CheckAsync()
     {
         if (!IsInstalled || Stage != UpdateStage.None)
         {
-            return;
+            return null;
         }
 
         try
         {
             var release = await _service.CheckAsync(_current, _life.Token);
-            if (release is not null)
+            if (release is null)
             {
-                Release = release;
-                Set(UpdateStage.Available);
+                return false;
             }
+
+            Release = release;
+            Set(UpdateStage.Available);
+            return true;
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException or IOException)
         {
             _logger?.Info("Güncelleme denetimi yapılamadı: " + ex.Message);
+            return null;
         }
     }
 

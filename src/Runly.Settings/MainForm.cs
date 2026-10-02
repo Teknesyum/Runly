@@ -80,10 +80,9 @@ internal sealed partial class MainForm : NeonForm
 
     private static int EditorRowHeight => Metrics.ButtonHeight + Metrics.Px(TeknesyumTokens.Space3);
 
-    /// The strip's own slot plus the 12-pixel gap its bottom margin opens to the table. The margin is
-    /// part of the row: an Absolute row does not grow for it, and the difference lands as a clipped
-    /// button rather than as a shorter gap.
-    private static int SearchStripHeight => Metrics.ButtonHeight + Metrics.Px(TeknesyumTokens.Space4) + Metrics.Px(TeknesyumTokens.Space3);
+    /// The same band as the action row under the table, so the table sits between two equal strips; the
+    /// controls are centred in it rather than pushed down by hand-tuned top margins.
+    private static int SearchStripHeight => ExtensionButtonsHeight;
 
     private static int ExtensionButtonsHeight => Metrics.ButtonHeight + Metrics.Px(TeknesyumTokens.Space4);
 
@@ -127,7 +126,6 @@ internal sealed partial class MainForm : NeonForm
     private readonly ColumnStyle _categoryRailColumn;
     private readonly TextBox _searchBox;
     private readonly Label _searchResultLabel;
-    private readonly Button _chooseAppButton;
     private readonly System.Windows.Forms.Timer _searchDebounce;
     private CancellationTokenSource? _searchScan;
 
@@ -312,8 +310,12 @@ internal sealed partial class MainForm : NeonForm
         detailPanel.Controls.Add(_bindingProgress);
         gridArea.Controls.Add(detailPanel, 2, 1);
 
-        var extButtons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent, Margin = Padding.Empty };
-        var extButtonMargin = new Padding(0, Metrics.Px(TeknesyumTokens.Space1), Metrics.Px(TeknesyumTokens.Space3), Metrics.Px(TeknesyumTokens.Space1));
+        // One row of single-cell columns instead of a flow: every control is Anchor=Left in its own cell, so
+        // the table centres them on one line whatever their heights, and the bulk-assign group on the right
+        // end shares that line instead of sitting on its own baseline.
+        var extRow = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 1, BackColor = Color.Transparent, Margin = Padding.Empty };
+        extRow.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        var extButtonMargin = new Padding(0, 0, Metrics.Px(TeknesyumTokens.Space3), 0);
         var selectAllButton = new NeonButton { Text = "Tümünü seç", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
         var addExtButton = new NeonButton { Text = "Uzantı ekle", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
         var removeExtButton = new NeonButton { Text = "Seçili uzantıyı sil", Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
@@ -324,24 +326,43 @@ internal sealed partial class MainForm : NeonForm
         removeExtButton.Click += OnRemoveExtensionClicked;
         exportButton.Click += (_, _) => ExportProfile();
         importButton.Click += (_, _) => ImportProfile();
-        extButtons.Controls.Add(selectAllButton);
-        extButtons.Controls.Add(addExtButton);
-        extButtons.Controls.Add(removeExtButton);
-        extButtons.Controls.Add(exportButton);
-        extButtons.Controls.Add(importButton);
-        _chooseAppButton = new NeonButton { Text = Strings.Get("catalog.chooseApp"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = extButtonMargin };
-        _chooseAppButton.Click += (_, _) => ChooseApplicationForSelectedRow();
-        extButtons.Controls.Add(_chooseAppButton);
 
-        // Two columns, not one flow: the bulk-assign pair is AutoSize on the right and the search
-        // group absorbs the slack, so neither can be pushed off the edge at MinimumSize.
-        var searchStrip = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent, Margin = new Padding(0, 0, 0, Metrics.Px(TeknesyumTokens.Space3)) };
-        searchStrip.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        searchStrip.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        // Bulk assignment is an action on the category, not a filter, so it lives with the other actions
+        // under the table rather than beside the search box. Choosing one row's application is the detail
+        // panel's job; the copy that used to sit here as well is gone.
+        var bulkLabel = new Label { Text = Strings.Get("catalog.bulkLabel"), AutoSize = true, Font = Palette.Body, ForeColor = Palette.TextBody, Margin = new Padding(0, 0, Metrics.Px(TeknesyumTokens.Space2), 0) };
+        _bulkAppBox = new NeonComboBox { Width = Metrics.Px(220), Margin = new Padding(0, 0, Metrics.Px(TeknesyumTokens.Space2), 0) };
+        foreach (var app in _installedApplications) _bulkAppBox.Items.Add(app);
+        _bulkAppBox.DisplayMember = nameof(InstalledApplication.DisplayName);
+        var bulkButton = new NeonButton { Text = Strings.Get("catalog.bulkOpen"), Primary = true, AutoSize = true, Margin = Padding.Empty };
+        bulkButton.Click += (_, _) => AssignCategoryToSelectedApplication();
 
-        var searchGroup = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
-        var searchLabel = new Label { Text = Strings.Get("catalog.searchLabel"), AutoSize = true, Font = Palette.H3, ForeColor = Palette.Renk1, Margin = new Padding(0, Metrics.Px(11), Metrics.Px(TeknesyumTokens.Space2), Metrics.Px(TeknesyumTokens.Space1)) };
-        _searchBox = new NeonTextBox { Width = Metrics.Px(280), Margin = new Padding(0, Metrics.Px(TeknesyumTokens.Space2), Metrics.Px(TeknesyumTokens.Space2), Metrics.Px(TeknesyumTokens.Space1)) };
+        Control[] extCells = [selectAllButton, addExtButton, removeExtButton, exportButton, importButton, null!, bulkLabel, _bulkAppBox, bulkButton];
+        extRow.ColumnCount = extCells.Length;
+        for (var column = 0; column < extCells.Length; column++)
+        {
+            if (extCells[column] is null)
+            {
+                extRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+                continue;
+            }
+
+            extRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            extCells[column].Anchor = AnchorStyles.Left;
+            extRow.Controls.Add(extCells[column], column, 0);
+        }
+
+        // The search row is cut along the grid's own columns: the rail gets its heading, the box starts on
+        // the table's left edge, so the eye finds one left edge per column instead of three loose ones. The
+        // label, the "Temizle" button and the example line all said the same thing as the placeholder.
+        var categoriesLabel = new Label { Text = Strings.Get("categories"), AutoSize = true, Font = Palette.H3, ForeColor = Palette.Renk1, Anchor = AnchorStyles.Left, Margin = Padding.Empty };
+        var searchRow = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent, Margin = _grid.Margin };
+        searchRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+        searchRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+        searchRow.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        var searchBox = new NeonSearchBox { Cue = Strings.Get("catalog.searchLabel"), AccessibleName = Strings.Get("catalog.searchLabel"), AccessibleDescription = Strings.Get("catalog.searchClear"), Anchor = AnchorStyles.Left | AnchorStyles.Right, Margin = Padding.Empty };
+        searchBox.ClearRequested += (_, _) => ClearSearch();
+        _searchBox = searchBox;
 
         // The catalog carries 400+ rows and every refresh reprojects and refills the whole grid, so
         // rebuilding on each keystroke makes typing stutter. Only typing is delayed: ApplyLanguage and
@@ -374,31 +395,15 @@ internal sealed partial class MainForm : NeonForm
             _searchDebounce.Start();
         };
         _searchBox.KeyDown += OnSearchBoxKeyDown;
-        var clearSearchButton = new NeonButton { Text = Strings.Get("catalog.searchClear"), Primary = false, BackColor = Palette.AppBg, AutoSize = true, Margin = new Padding(0, Metrics.Px(5), Metrics.Px(TeknesyumTokens.Space3), Metrics.Px(TeknesyumTokens.Space1)) };
-        clearSearchButton.Click += (_, _) => ClearSearch();
-        _searchResultLabel = new Label { AutoSize = true, Font = Palette.MonoBody, ForeColor = Palette.Renk2Text, Margin = new Padding(0, Metrics.Px(11), 0, Metrics.Px(TeknesyumTokens.Space1)) };
-        searchGroup.Controls.Add(searchLabel);
-        searchGroup.Controls.Add(_searchBox);
-        searchGroup.Controls.Add(clearSearchButton);
-        searchGroup.Controls.Add(_searchResultLabel);
-
-        var bulkGroup = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent };
-        _bulkAppBox = new NeonComboBox { Width = Metrics.Px(220), Margin = new Padding(Metrics.Px(TeknesyumTokens.Space2), Metrics.Px(TeknesyumTokens.Space2), Metrics.Px(TeknesyumTokens.Space2), Metrics.Px(TeknesyumTokens.Space1)) };
-        foreach (var app in _installedApplications) _bulkAppBox.Items.Add(app);
-        _bulkAppBox.DisplayMember = nameof(InstalledApplication.DisplayName);
-        var bulkButton = new NeonButton { Text = Strings.Get("catalog.bulkOpen"), Primary = true, AutoSize = true, Margin = new Padding(0, Metrics.Px(5), 0, Metrics.Px(TeknesyumTokens.Space1)) };
-        bulkButton.Click += (_, _) => AssignCategoryToSelectedApplication();
-        bulkGroup.Controls.Add(_bulkAppBox);
-        bulkGroup.Controls.Add(bulkButton);
-
-        searchStrip.Controls.Add(searchGroup, 0, 0);
-        searchStrip.Controls.Add(bulkGroup, 1, 0);
+        _searchResultLabel = new Label { AutoSize = true, Font = Palette.MonoBody, ForeColor = Palette.Renk2Text, Anchor = AnchorStyles.Left, Margin = new Padding(Metrics.Px(TeknesyumTokens.Space3), 0, 0, 0) };
+        searchRow.Controls.Add(_searchBox, 0, 0);
+        searchRow.Controls.Add(_searchResultLabel, 1, 0);
 
         _categoryList.SelectedIndex = 0;
-        gridArea.Controls.Add(searchStrip, 0, 0);
-        gridArea.SetColumnSpan(searchStrip, 3);
-        gridArea.Controls.Add(extButtons, 0, 2);
-        gridArea.SetColumnSpan(extButtons, 3);
+        gridArea.Controls.Add(categoriesLabel, 0, 0);
+        gridArea.Controls.Add(searchRow, 1, 0);
+        gridArea.Controls.Add(extRow, 0, 2);
+        gridArea.SetColumnSpan(extRow, 3);
 
         Shown += (_, _) => _searchBox.Focus();
         Shown += (_, _) => ApplyRequestedExtension();
@@ -423,24 +428,27 @@ internal sealed partial class MainForm : NeonForm
         var bottomBar = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 1, Padding = new Padding(Metrics.Px(TeknesyumTokens.Space5), Metrics.Px(TeknesyumTokens.Space4), Metrics.Px(TeknesyumTokens.Space5), Metrics.Px(TeknesyumTokens.Space4)), Margin = Padding.Empty, BackColor = Palette.Surface };
         bottomBar.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
-        // Two columns instead of a Dock=Left label: a fixed 320px label starved the RightToLeft button
-        // flow at MinimumSize and clipped the leftmost button ("Kur / Güncelle" rendered as "Güncelle").
-        // The buttons now take the width they need and the progress label absorbs whatever is left.
-        var buttonsRow = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1, BackColor = Color.Transparent, Margin = Padding.Empty };
+        // Three groups instead of one run of seven equal buttons: setup on the left (with the destructive
+        // "Kaldır" last and set apart), the progress line and the window tools in the middle, and the form's
+        // own Kaydet / Kapat on the right. Each group is AutoSize; only the progress line takes the slack.
+        var buttonsRow = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 4, RowCount = 1, BackColor = Color.Transparent, Margin = Padding.Empty };
+        buttonsRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         buttonsRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         buttonsRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        _progressLabel = new Label { Dock = DockStyle.Fill, AutoEllipsis = true, TextAlign = ContentAlignment.MiddleLeft, Font = Palette.MonoBody, ForeColor = Palette.Renk1, Margin = Padding.Empty };
-        // Both layout panels default to a 3px margin. Nested three deep under a strip sized to exactly
-        // one button, that is what pushed the row past the window edge and sliced the buttons in half.
-        var buttonsFlow = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.RightToLeft, WrapContents = false, BackColor = Color.Transparent, Margin = Padding.Empty };
+        buttonsRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        var groupGap = Metrics.Px(TeknesyumTokens.Space5);
+        _progressLabel = new Label { Dock = DockStyle.Fill, AutoEllipsis = true, TextAlign = ContentAlignment.MiddleLeft, Font = Palette.MonoBody, ForeColor = Palette.Renk1, Margin = new Padding(groupGap, 0, groupGap, 0) };
+
+        FlowLayoutPanel ButtonGroup(Padding margin) => new() { Dock = DockStyle.Fill, AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, BackColor = Color.Transparent, Margin = margin };
+        var firstInGroup = Padding.Empty;
 
         var closeButton = new NeonButton { Text = "Kapat", Primary = false, AutoSize = true, Margin = buttonGap };
-        _saveButton = new NeonButton { Text = "Kaydet", Primary = false, AutoSize = true, Margin = buttonGap };
+        _saveButton = new NeonButton { Text = "Kaydet", Primary = true, AutoSize = true, Margin = firstInGroup };
         _restoreButton = new NeonButton { Text = "Yedekten geri yükle", Primary = false, AutoSize = true, Margin = buttonGap };
-        var menuButton = new NeonButton { Text = Strings.Get("menu.button"), Primary = false, AutoSize = true, Margin = buttonGap };
+        var menuButton = new NeonButton { Text = Strings.Get("menu.button"), Primary = false, AutoSize = true, Margin = firstInGroup };
         menuButton.Click += OnContextMenuClicked;
-        _uninstallButton = new NeonButton { Text = "Kaldır", Primary = false, AutoSize = true, Margin = buttonGap };
-        _installButton = new NeonButton { Text = "Kur / Güncelle", Primary = true, AutoSize = true, Margin = buttonGap };
+        _uninstallButton = new NeonButton { Text = "Kaldır", Primary = false, Danger = true, AutoSize = true, Margin = new Padding(groupGap, 0, 0, 0) };
+        _installButton = new NeonButton { Text = "Kur / Güncelle", Primary = true, AutoSize = true, Margin = firstInGroup };
 
         closeButton.Click += (_, _) => Close();
         _saveButton.Click += (_, _) => SaveAll();
@@ -448,16 +456,21 @@ internal sealed partial class MainForm : NeonForm
         _uninstallButton.Click += OnUninstallClicked;
         _installButton.Click += OnInstallClicked;
 
-        buttonsFlow.Controls.Add(closeButton);
-        buttonsFlow.Controls.Add(_refreshButton);
-        buttonsFlow.Controls.Add(_saveButton);
-        buttonsFlow.Controls.Add(menuButton);
-        buttonsFlow.Controls.Add(_restoreButton);
-        buttonsFlow.Controls.Add(_uninstallButton);
-        buttonsFlow.Controls.Add(_installButton);
+        var setupGroup = ButtonGroup(Padding.Empty);
+        setupGroup.Controls.Add(_installButton);
+        setupGroup.Controls.Add(_restoreButton);
+        setupGroup.Controls.Add(_uninstallButton);
+        var toolsGroup = ButtonGroup(Padding.Empty);
+        toolsGroup.Controls.Add(menuButton);
+        toolsGroup.Controls.Add(_refreshButton);
+        var formGroup = ButtonGroup(new Padding(groupGap, 0, 0, 0));
+        formGroup.Controls.Add(_saveButton);
+        formGroup.Controls.Add(closeButton);
 
-        buttonsRow.Controls.Add(_progressLabel, 0, 0);
-        buttonsRow.Controls.Add(buttonsFlow, 1, 0);
+        buttonsRow.Controls.Add(setupGroup, 0, 0);
+        buttonsRow.Controls.Add(_progressLabel, 1, 0);
+        buttonsRow.Controls.Add(toolsGroup, 2, 0);
+        buttonsRow.Controls.Add(formGroup, 3, 0);
         bottomBar.Controls.Add(buttonsRow, 0, 0);
 
         root.Controls.Add(bottomBar, 0, 2);
@@ -468,7 +481,17 @@ internal sealed partial class MainForm : NeonForm
         // R5 4 and 5.3: the support link and the signature belong immediately left of the window
         // buttons, and the strip they used to live in is gone. Items are handed over right to left.
         _captionStatus = new CaptionItem { Font = Palette.Body, Color = Palette.TextStrong, Dot = Palette.TextHint };
-        _captionVersion = new CaptionItem { Font = Palette.MonoBody, Color = Palette.Renk1 };
+        // teknesyum-ui 0.34: the version sits left, beside the name, as a quiet grey button that checks
+        // for updates; hover turns it renk-1 like every other caption link.
+        _captionVersion = new CaptionItem
+        {
+            Style = CaptionItemStyle.Link,
+            Leading = true,
+            Font = Palette.Mono,
+            Color = Palette.TextMuted,
+            Accent = Palette.Renk1,
+            Click = CheckForUpdatesNow,
+        };
         _captionLanguage = new CaptionItem
         {
             Style = CaptionItemStyle.Link,
@@ -527,7 +550,8 @@ internal sealed partial class MainForm : NeonForm
             Visible = false,
             Click = OnUpdateBadgeClick,
         };
-        SetCaptionItems(captionSignature, _captionSponsor, _captionHelp, _captionLanguage, _captionScale, _captionVersion, _captionUpdate, _captionStatus);
+        // Right part, right to left: Teknesyum, Destek Ol, TR/EN, update badge, then Runly's own tools.
+        SetCaptionItems(captionSignature, _captionSponsor, _captionLanguage, _captionUpdate, _captionStatus, _captionScale, _captionHelp, _captionVersion);
 
         FormClosing += OnFormClosing;
         Activated += (_, _) => RefreshStatusOnly(force: false);
@@ -605,8 +629,10 @@ internal sealed partial class MainForm : NeonForm
             ForeColor = Palette.TextBody,
             SelectionBackColor = Palette.SelectedFill,
             SelectionForeColor = Palette.TextBody,
-            Alignment = DataGridViewContentAlignment.MiddleCenter,
         };
+        // Centring lives on the grid, the weakest style layer: on RowsDefaultCellStyle it outranked every
+        // column's own alignment and the free-text columns could not be left-aligned.
+        grid.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
         grid.AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
         {
             BackColor = Palette.FieldBg,
@@ -623,6 +649,13 @@ internal sealed partial class MainForm : NeonForm
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Found", HeaderText = "Bulundu", FillWeight = 18, MinimumWidth = Metrics.Px(130), ReadOnly = true });
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Args", HeaderText = "Argümanlar", FillWeight = 12, MinimumWidth = Metrics.Px(90) });
         grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "Durum", FillWeight = 19, MinimumWidth = Metrics.Px(110), ReadOnly = true });
+
+        // Free text reads from one left edge; only the checkbox, the chip and the status badge stay centred.
+        foreach (var name in new[] { "Interpreter", "Found", "Args" })
+        {
+            grid.Columns[name].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            grid.Columns[name].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleLeft;
+        }
 
         WidenHeadersToLongestTranslation(grid);
 
@@ -725,12 +758,14 @@ internal sealed partial class MainForm : NeonForm
         editorRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         editorRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         editorRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        var editorLabel = SectionLabel(Strings.Get("editorCommand"), new Padding(0, Metrics.Px(TeknesyumTokens.Space2), Metrics.Px(TeknesyumTokens.Space2), 0));
+        // Label, box and buttons are all anchored rather than docked, so the row centres them on one line;
+        // a top margin on the label and a docked box put three different baselines side by side.
+        var editorLabel = SectionLabel(Strings.Get("editorCommand"), new Padding(0, 0, Metrics.Px(TeknesyumTokens.Space2), 0));
         editorLabel.Anchor = AnchorStyles.Left;
-        var editorBox = new NeonTextBox { Dock = DockStyle.Fill };
-        var testButton = new NeonButton { Text = "Test et", Primary = false, AutoSize = true, Margin = new Padding(Metrics.Px(TeknesyumTokens.Space2), 0, 0, 0) };
+        var editorBox = new NeonTextBox { Anchor = AnchorStyles.Left | AnchorStyles.Right, Margin = Padding.Empty };
+        var testButton = new NeonButton { Text = "Test et", Primary = false, AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(Metrics.Px(TeknesyumTokens.Space2), 0, 0, 0) };
         testButton.Click += OnTestEditorClicked;
-        var chooseEditorButton = new NeonButton { Text = Strings.Get("chooseApp.browseEditor"), Primary = false, AutoSize = true, Margin = new Padding(Metrics.Px(TeknesyumTokens.Space2), 0, 0, 0) };
+        var chooseEditorButton = new NeonButton { Text = Strings.Get("chooseApp.browseEditor"), Primary = false, AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(Metrics.Px(TeknesyumTokens.Space2), 0, 0, 0) };
         chooseEditorButton.Click += OnChooseEditorClicked;
         editorRow.Controls.Add(editorLabel, 0, 0);
         editorRow.Controls.Add(editorBox, 1, 0);
@@ -1151,7 +1186,7 @@ internal sealed partial class MainForm : NeonForm
         var mapping = EffectiveMapping(status.Extension);
         row.Cells[ColFound].Value = mapping.Kind == HandlerKind.Open && string.IsNullOrWhiteSpace(mapping.OpenWith)
             ? Strings.Get("handler.notSelected")
-            : status.InterpreterFound ? $"✓ {status.InterpreterPath}" : "✗";
+            : status.InterpreterFound ? $"✓ {Path.GetFileName(status.InterpreterPath)}" : Strings.Get("found.missing");
 
         var (text, back, fore) = DescribeStatus(status.Bound);
 
@@ -1576,9 +1611,7 @@ internal sealed partial class MainForm : NeonForm
     {
         if (_searchBox.Text.Trim().Length == 0)
         {
-            _searchResultLabel.Font = Palette.Help;
-            _searchResultLabel.ForeColor = Palette.TextDim;
-            _searchResultLabel.Text = Strings.Get("catalog.searchHelp");
+            _searchResultLabel.Text = string.Empty;
             return;
         }
 
@@ -1774,6 +1807,11 @@ internal sealed partial class MainForm : NeonForm
                 ? $"`{status.Extension}` is not bound to Runly yet. Use the ‘Install / Update’ button to bind it."
                 : $"`{status.Extension}` henüz Runly'ye bağlı değil. Bağlamak için \"Kur / Güncelle\" düğmesini kullanın.";
             _detailAskButton.Visible = false;
+        }
+
+        if (status.InterpreterFound && !string.IsNullOrWhiteSpace(status.InterpreterPath))
+        {
+            body += "\n\n" + Strings.Get("found.path").Replace("{path}", status.InterpreterPath, StringComparison.Ordinal);
         }
 
         var risk = RiskNoteFor(status.Extension);
@@ -2734,6 +2772,29 @@ internal sealed partial class MainForm : NeonForm
         RefreshCaptionItems();
     }
 
+    private async void CheckForUpdatesNow()
+    {
+        if (_updates is null)
+        {
+            return;
+        }
+
+        if (_updates.Stage != UpdateStage.None)
+        {
+            OnUpdateBadgeClick();
+            return;
+        }
+
+        var found = await _updates.CheckAsync();
+        if (found == true)
+        {
+            OnUpdateBadgeClick();
+            return;
+        }
+
+        _progressLabel.Text = Strings.Get(found == false ? "update.current" : "update.error");
+    }
+
     private void OnUpdateBadgeClick()
     {
         if (_updates is null)
@@ -2846,7 +2907,7 @@ internal sealed partial class MainForm : NeonForm
         _exePathLabel.Text = ShortenPathMiddle(exeFullText, 42);
         _statusTip.SetToolTip(_exePathLabel, exeFullText);
 
-        _captionVersion.Text = Strings.Get("version") + ": v" + GetVersionText(exePath).TrimStart('v');
+        _captionVersion.Text = "v" + GetVersionText(exePath).TrimStart('v');
 
         var configFullText = "config: " + _configStore.ConfigPath;
         _configPathLink.Text = ShortenPathMiddle(configFullText, 42);

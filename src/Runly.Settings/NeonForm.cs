@@ -42,6 +42,10 @@ internal sealed class CaptionItem
 
     public bool Visible { get; set; } = true;
 
+    /// <summary>Placed on the left, right after the window title (the version button). Every other item
+    /// runs right to left from the window buttons.</summary>
+    public bool Leading { get; init; }
+
     internal Rectangle Bounds { get; set; }
 
     internal bool Clickable => Click is not null;
@@ -207,7 +211,7 @@ internal class NeonForm : Form
             g.DrawIcon(icon, new Rectangle(iconInset, (CaptionHeight - iconSize) / 2, iconSize, iconSize));
         }
 
-        var titleLeft = iconInset + iconSize + Metrics.Px(TeknesyumTokens.Space2);
+        var titleLeft = TitleLeft;
         var titleRight = Math.Max(titleLeft, _captionItemsLeft - Metrics.Px(TeknesyumTokens.Space4));
         var titleFlags = TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding;
         var accent = TitleAccent;
@@ -415,6 +419,14 @@ internal class NeonForm : Form
         return null;
     }
 
+    private static int TitleLeft => Metrics.Px(TeknesyumTokens.Space3) + Metrics.CaptionIconSize + Metrics.Px(TeknesyumTokens.Space2);
+
+    protected override void OnTextChanged(EventArgs e)
+    {
+        base.OnTextChanged(e);
+        RefreshCaptionItems();
+    }
+
     private void LayoutCaptionItems()
     {
         var height = Metrics.CaptionItemHeight;
@@ -425,7 +437,7 @@ internal class NeonForm : Form
 
         foreach (var item in _captionItems)
         {
-            if (!item.Visible)
+            if (!item.Visible || item.Leading)
             {
                 item.Bounds = Rectangle.Empty;
                 continue;
@@ -436,6 +448,19 @@ internal class NeonForm : Form
             item.Bounds = new Rectangle(right, top, width, height);
             _captionItemsLeft = right;
             right -= gap;
+        }
+
+        var left = TitleLeft + TextRenderer.MeasureText(Text, Palette.Body, Size.Empty, TextFormatFlags.NoPadding).Width + Metrics.Px(TeknesyumTokens.Space3);
+        foreach (var item in _captionItems)
+        {
+            if (!item.Visible || !item.Leading)
+            {
+                continue;
+            }
+
+            var width = MeasureCaptionItem(item);
+            item.Bounds = left + width <= _captionItemsLeft - gap ? new Rectangle(left, top, width, height) : Rectangle.Empty;
+            left += width + gap;
         }
     }
 

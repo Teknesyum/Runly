@@ -177,6 +177,128 @@ internal class NeonTextBox : TextBox
     }
 }
 
+/// <summary>Search field: a placeholder that stays visible while the box has focus (the window focuses it on
+/// open, and <see cref="TextBox.PlaceholderText"/> hides itself on focus), and a clear glyph inside the right
+/// edge that replaces the separate "Temizle" button.</summary>
+internal sealed class NeonSearchBox : NeonTextBox
+{
+    private const int WmPaint = 0x000F;
+    private const int EmSetMargins = 0x00D3;
+    private const int EcRightMargin = 0x0002;
+
+    [DllImport("user32.dll")]
+    private static extern nint SendMessage(nint hWnd, int msg, nint wParam, nint lParam);
+
+    private bool _glyphHover;
+
+    public string Cue { get; set; } = string.Empty;
+
+    public event EventHandler? ClearRequested;
+
+    private int GlyphWidth => ClientSize.Height;
+
+    private Rectangle GlyphBounds => new(ClientSize.Width - GlyphWidth, 0, GlyphWidth, ClientSize.Height);
+
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        ReserveGlyph();
+    }
+
+    protected override void OnFontChanged(EventArgs e)
+    {
+        base.OnFontChanged(e);
+        ReserveGlyph();
+    }
+
+    protected override void OnResize(EventArgs e)
+    {
+        base.OnResize(e);
+        ReserveGlyph();
+    }
+
+    protected override void OnTextChanged(EventArgs e)
+    {
+        base.OnTextChanged(e);
+        Invalidate();
+    }
+
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+        base.OnMouseMove(e);
+        var hover = TextLength > 0 && GlyphBounds.Contains(e.Location);
+        Cursor = hover ? Cursors.Hand : Cursors.IBeam;
+        if (hover != _glyphHover)
+        {
+            _glyphHover = hover;
+            Invalidate();
+        }
+    }
+
+    protected override void OnMouseLeave(EventArgs e)
+    {
+        base.OnMouseLeave(e);
+        if (_glyphHover)
+        {
+            _glyphHover = false;
+            Invalidate();
+        }
+    }
+
+    protected override void OnMouseDown(MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Left && TextLength > 0 && GlyphBounds.Contains(e.Location))
+        {
+            ClearRequested?.Invoke(this, EventArgs.Empty);
+            return;
+        }
+
+        base.OnMouseDown(e);
+    }
+
+    protected override void WndProc(ref Message m)
+    {
+        base.WndProc(ref m);
+        if (m.Msg == WmPaint)
+        {
+            PaintOverlay();
+        }
+    }
+
+    private void ReserveGlyph()
+    {
+        if (IsHandleCreated)
+        {
+            SendMessage(Handle, EmSetMargins, EcRightMargin, (nint)(GlyphWidth << 16));
+        }
+    }
+
+    private void PaintOverlay()
+    {
+        if (!IsHandleCreated || ClientSize.Width <= GlyphWidth)
+        {
+            return;
+        }
+
+        using var g = CreateGraphics();
+        if (TextLength == 0)
+        {
+            var cueBounds = new Rectangle(Metrics.Px(2), 0, ClientSize.Width - GlyphWidth - Metrics.Px(2), ClientSize.Height);
+            TextRenderer.DrawText(g, Cue, Font, cueBounds, Palette.TextHint,
+                TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding);
+            return;
+        }
+
+        using (var fill = new SolidBrush(BackColor))
+        {
+            g.FillRectangle(fill, GlyphBounds);
+        }
+
+        TextRenderer.DrawText(g, "✕", Palette.Body, GlyphBounds, _glyphHover ? Palette.Renk1 : Palette.TextHint,
+            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+    }
+}
+
 /// <summary>List field with an owner-drawn neon frame.</summary>
 internal sealed class NeonListBox : ListBox
 {

@@ -34,7 +34,7 @@ public sealed record ContextMenuItem
     /// <summary>Handler CLSIDs a <see cref="MenuHideMethod.Blocked"/> entry is made of.</summary>
     public IReadOnlyList<string> Clsids { get; init; } = [];
 
-    /// <summary>Whether the entry opens the file in an editor, duplicating "Runly: Düzenle".</summary>
+    /// <summary>Whether the entry opens the file in an editor, duplicating "Runly ile düzenle".</summary>
     public bool IsEditor { get; init; }
 
     /// <summary>Whether Runly hides it when the user has not chosen: an editor duplicate that stays off other files.</summary>

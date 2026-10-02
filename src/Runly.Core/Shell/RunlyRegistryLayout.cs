@@ -30,7 +30,7 @@ public static class RunlyRegistryLayout
     /// <summary><c>Software\Classes\Applications\Runly.exe</c> — the identity the user sees in "Open with".</summary>
     public const string ApplicationKey = @"Software\Classes\Applications\" + LauncherFileName;
 
-    /// <summary><c>Software\Classes\Applications\RunlyConsole.exe</c>, so uninstall can clear it even though install never writes it (K29).</summary>
+    /// <summary><c>Software\Classes\Applications\RunlyConsole.exe</c>, which install writes only to name the console launcher "Runly" (K29); uninstall clears it.</summary>
     public const string ConsoleApplicationKey = @"Software\Classes\Applications\" + ConsoleLauncherFileName;
 
     /// <summary><c>Software\Runly</c> — the root of Runly's capability registration.</summary>

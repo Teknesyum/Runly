@@ -222,7 +222,7 @@ HKCU\Software\Classes\Runly.Script.js\
    DefaultIcon                = "<kurulum>\assets\js.ico,0"
    shell\open\                = MUIVerb "Runly ile çalıştır"
    shell\open\command         = "<kurulum>\RunlyConsole.exe" "%1" %*
-   shell\edit\                = MUIVerb "Runly: Düzenle (Notepad++)"
+   shell\edit\                = MUIVerb "Runly ile düzenle (Notepad++)"
    shell\edit\command         = "<kurulum>\Runly.exe" --verb edit "%1"
 ```
 

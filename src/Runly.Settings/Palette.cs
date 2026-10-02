@@ -58,6 +58,9 @@ internal static class Palette
     /// <summary>Labels and section headings: bold, tracked, neon — never a dimmed grey.</summary>
     public static readonly Color TextLabel = Renk1;
 
+    /// <summary>The quiet grey of the version button only: body text at 65 % over the surface, above 7:1.</summary>
+    public static readonly Color TextMuted = ColorTranslator.FromHtml(TeknesyumTokens.TextMuted);
+
     /// <summary>The one grey in the theme. Placeholder and genuinely inactive content only.</summary>
     public static readonly Color Disabled = ColorTranslator.FromHtml(TeknesyumTokens.Disabled);
 

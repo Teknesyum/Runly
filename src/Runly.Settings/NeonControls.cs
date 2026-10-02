@@ -325,6 +325,10 @@ internal sealed class NeonButton : Button
 {
     public bool Primary { get; set; } = true;
 
+    /// <summary>Destructive action: no frame and the renk-2 text role, so it reads apart from the outlined
+    /// buttons beside it without inventing a red. Hover draws the frame, as on every other button.</summary>
+    public bool Danger { get; set; }
+
     private bool _hover;
 
     public NeonButton()
@@ -362,18 +366,19 @@ internal sealed class NeonButton : Button
         var g = pevent.Graphics;
         NeonBackground.Clear(g, this, BackColor);
         g.SmoothingMode = SmoothingMode.AntiAlias;
-        var accent = Primary ? Palette.Renk1 : Palette.Renk3;
+        var accent = Danger ? Palette.Renk2 : Primary ? Palette.Renk1 : Palette.Renk3;
         var bounds = new Rectangle(1, 1, Math.Max(1, Width - 2), Math.Max(1, Height - 2));
 
         using var path = NeonTheme.RoundedRect(bounds, NeonTheme.CornerRadius);
 
-        if (Primary)
+        if (Primary && !Danger)
         {
             using var fill = new SolidBrush(accent);
             g.FillPath(fill, path);
         }
-        using (var border = new Pen(Color.FromArgb(_hover ? 255 : TeknesyumTokens.BorderStrongAlpha, accent), (_hover ? TeknesyumTokens.ShapeFocusW : TeknesyumTokens.ShapeBorderW) * Metrics.Scale))
+        if (!Danger || _hover)
         {
+            using var border = new Pen(Color.FromArgb(_hover ? 255 : TeknesyumTokens.BorderStrongAlpha, accent), (_hover ? TeknesyumTokens.ShapeFocusW : TeknesyumTokens.ShapeBorderW) * Metrics.Scale);
             g.DrawPath(border, path);
         }
 
@@ -381,7 +386,7 @@ internal sealed class NeonButton : Button
 
         // Filled buttons take black text: white on renk-1 is 2.12:1. Outlined ones take the text role
         // of their accent — the purple fill hex is 4.57:1 and cannot carry a caption.
-        var textColor = Primary ? Palette.AppBg : Palette.Renk3Text;
+        var textColor = Danger ? Palette.Renk2Text : Primary ? Palette.AppBg : Palette.Renk3Text;
         TextRenderer.DrawText(g, Text, Font, bounds, textColor,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
     }

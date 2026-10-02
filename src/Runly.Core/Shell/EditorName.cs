@@ -4,7 +4,7 @@ namespace Runly.Core.Shell;
 
 /// <summary>
 /// Turns the configured editor command into the name the user sees in the context menu, so
-/// "Runly: Düzenle" says which program it will open (K31 round).
+/// "Runly ile düzenle" says which program it will open (K31 round).
 /// </summary>
 public static class EditorName
 {
@@ -12,7 +12,7 @@ public static class EditorName
     public static string EditVerbLabel(string? editorCommand)
     {
         var name = Describe(editorCommand);
-        return name is null ? "Runly: Düzenle" : $"Runly: Düzenle ({name})";
+        return name is null ? "Runly ile düzenle" : $"Runly ile düzenle ({name})";
     }
 
     /// <summary>The friendly name of the editor an <c>editorCommand</c> points at, or <see langword="null"/>.</summary>

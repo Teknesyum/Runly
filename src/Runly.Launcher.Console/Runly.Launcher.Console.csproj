@@ -7,6 +7,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Runly.Launcher</RootNamespace>
     <AssemblyName>RunlyConsole</AssemblyName>
+    <!-- Explorer names a ProgID after its command's FileDescription; the console launcher is still Runly. -->
+    <AssemblyTitle>Runly</AssemblyTitle>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <PublishAot>true</PublishAot>
     <InvariantGlobalization>true</InvariantGlobalization>

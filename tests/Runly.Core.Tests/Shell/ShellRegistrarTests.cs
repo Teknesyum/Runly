@@ -89,7 +89,7 @@ public sealed class ShellRegistrarTests : IDisposable
         // mapping; the console binary would flash a black window for a verb that never writes to it.
         Assert.Equal("\"C:\\Program Files\\Runly\\Runly.exe\" --verb edit \"%1\"",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\edit\command", "")!.AsString());
-        Assert.Equal("Runly: Düzenle (Code)",
+        Assert.Equal("Runly ile düzenle (Code)",
             _registry.GetValue(RegistryRoot.CurrentUser, progId + @"\shell\edit", "MUIVerb")!.AsString());
         Assert.False(_registry.KeyExists(RegistryRoot.CurrentUser, progId + @"\shell\runlyargs"));
     }
@@ -120,7 +120,7 @@ public sealed class ShellRegistrarTests : IDisposable
 
         NewRegistrar().Install(config, ExePath, ConsoleExePath);
 
-        Assert.Equal("Runly: Düzenle (Notepad++)", _registry
+        Assert.Equal("Runly ile düzenle (Notepad++)", _registry
             .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Runly.Script.js\shell\edit", "MUIVerb")!.AsString());
     }
 
@@ -226,12 +226,26 @@ public sealed class ShellRegistrarTests : IDisposable
 
         Assert.Equal("Runly", _registry
             .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Applications\Runly.exe", "FriendlyAppName")!.AsString());
-        Assert.NotNull(_registry
-            .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Applications\Runly.exe\SupportedTypes", ".ps1"));
         Assert.Equal(@"Software\Runly\Capabilities", _registry
             .GetValue(RegistryRoot.CurrentUser, @"Software\RegisteredApplications", "Runly")!.AsString());
         Assert.Equal("Runly.Script.py", _registry
             .GetValue(RegistryRoot.CurrentUser, @"Software\Runly\Capabilities\FileAssociations", ".py")!.AsString());
+    }
+
+    [Fact]
+    public void Install_shows_a_Run_type_once_in_Open_with_and_names_it_Runly()
+    {
+        SeedTargetMachineInterpreters();
+        NewRegistrar().Install(TargetMachineConfig(), ExePath, ConsoleExePath);
+
+        Assert.Null(_registry
+            .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Applications\Runly.exe\SupportedTypes", ".ps1"));
+        Assert.Equal("Runly", _registry
+            .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Runly.Script.ps1\shell\open", "FriendlyAppName")!.AsString());
+        Assert.Equal("Runly", _registry
+            .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Applications\RunlyConsole.exe", "FriendlyAppName")!.AsString());
+        Assert.NotNull(_registry
+            .GetValue(RegistryRoot.CurrentUser, @"Software\Classes\Runly.Script.ps1\shell\edit", "MUIVerb"));
     }
 
     [Fact]
